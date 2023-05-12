@@ -1,0 +1,40 @@
+
+syntax = "proto3";
+option go_package = "github.com/tamararankovic/microservices_demo/common/accommodations";
+
+package accommodations;
+
+
+import "google/api/annotations.proto";
+
+service AccommodationService{
+  rpc Get(GetRequest) returns(GetResponse) {
+    option (google.api.http) = {
+      get: "/accommodations/accommodation/{id}"
+    };
+  }
+  rpc GetAll(GetAllRequest) returns(GetAllResponse) {
+    option (google.api.http) = {
+      get: "/accommodations/accommodation"
+    };
+  }
+}
+
+message GetRequest {
+  string id = 1;
+}
+
+message GetResponse {
+  Accommodation accommodation = 1;
+}
+
+message GetAllRequest {
+}
+
+message GetAllResponse {
+  repeated Accommodation accommodations = 1;
+}
+
+message Accommodation {
+  string id = 1;
+}

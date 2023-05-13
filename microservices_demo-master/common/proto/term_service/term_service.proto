@@ -7,15 +7,15 @@ package terms;
 
 import "google/api/annotations.proto";
 
-service UserService{
+service TermService{
   rpc Get(GetRequest) returns(GetResponse) {
     option (google.api.http) = {
-      get: "/users/user/{id}"
+      get: "/terms/term/{id}"
     };
   }
   rpc GetAll(GetAllRequest) returns(GetAllResponse) {
     option (google.api.http) = {
-      get: "/users/user"
+      get: "/terms/term"
     };
   }
 }
@@ -25,16 +25,16 @@ message GetRequest {
 }
 
 message GetResponse {
-  User user = 1;
+  Term term = 1;
 }
 
 message GetAllRequest {
 }
 
 message GetAllResponse {
-  repeated User users = 1;
+  repeated Term terms = 1;
 }
 
-message User {
+message Term {
   string id = 1;
 }

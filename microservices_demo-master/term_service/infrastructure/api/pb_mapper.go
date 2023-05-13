@@ -1,7 +1,7 @@
 package api
 
 import (
-	pb "microservices_demo/common/proto/term_service"
+	pb "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	"term_service/domain"
 )
 

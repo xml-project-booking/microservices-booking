@@ -1,8 +1,8 @@
 package api
 
 import (
-	pb "/common/proto/term_service"
 	"context"
+	pb "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	"term_service/application"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"

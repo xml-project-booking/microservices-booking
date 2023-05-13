@@ -52,6 +52,23 @@ services:
     networks:
       - network
 
+  term_service:
+    image: term_service
+    container_name: term_service
+    build:
+      context: .
+      dockerfile: ./term_service/Dockerfile
+    restart: on-failure
+    environment:
+      ACCOMMODATION_DB_HOST: ${ACCOMMODATION_DB_HOST}
+      ACCOMMODATION_DB_PORT: ${ACCOMMODATION_DB_PORT}
+      ACCOMMODATION_SERVICE_PORT: ${ACCOMMODATION_SERVICE_PORT}
+    depends_on:
+      - term_db
+    networks:
+      - network
+
+
 
 
 
@@ -98,6 +115,15 @@ services:
 
 
 
+  term_db:
+    image: mongo
+    container_name: term_db
+    restart: on-failure
+    ports:
+      - "27033:27017"
+    networks:
+      - network
+
   user_db:
     image: mongo
     container_name: user_db
@@ -106,7 +132,7 @@ services:
       - "27020:27017"
     networks:
       - network
-      
+
   mongo-express-2:
     image: mongo-express
     ports:

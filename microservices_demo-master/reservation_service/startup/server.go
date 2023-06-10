@@ -53,12 +53,7 @@ func (server *Server) initMongoClient() *mongo.Client {
 func (server *Server) initReservationStore(client *mongo.Client) domain.ReservationStore {
 	store := persistence.NewReservationMongoDBStore(client)
 	store.DeleteAll()
-	for _, Reservation := range reservations {
-		err := store.Insert(Reservation)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+
 	return store
 }
 
@@ -95,6 +90,7 @@ func (server *Server) startGrpcServer(reservationHandler *api.ReservationHandler
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	grpcServer := grpc.NewServer()
 	reservation.RegisterReservationServiceServer(grpcServer, reservationHandler)
 	if err := grpcServer.Serve(listener); err != nil {

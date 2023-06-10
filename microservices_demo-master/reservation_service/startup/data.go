@@ -1,13 +1,8 @@
 package startup
 
-import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"resevation/domain"
-)
-
-var reservations = []*domain.Reservation{
+/*var reservations = []*domain.Reservation{
 	{
-		Id: getObjectId("623b0cc336a1d6fd8c1cf0f6"),
+		Id: getObjectId("623b0cc336a1d6fd8c1cf0f9"),
 	},
 }
 
@@ -16,4 +11,4 @@ func getObjectId(id string) primitive.ObjectID {
 		return objectId
 	}
 	return primitive.NewObjectID()
-}
+}*/

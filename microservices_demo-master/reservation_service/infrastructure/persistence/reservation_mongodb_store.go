@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,13 +35,26 @@ func (store *ReservationMongoDBStore) Get(id primitive.ObjectID) (*domain.Reserv
 	return store.filterOne(filter)
 }
 
+func (store *ReservationMongoDBStore) GetAllReservationRequests() ([]*domain.Reservation, error) {
+	filter := bson.M{"confirmation": false}
+	return store.filter(filter)
+}
+func (store *ReservationMongoDBStore) GetAllReservation() ([]*domain.Reservation, error) {
+	filter := bson.M{"confirmation": true}
+	return store.filter(filter)
+}
+
 func (store *ReservationMongoDBStore) GetAll() ([]*domain.Reservation, error) {
 	filter := bson.D{{}}
 	return store.filter(filter)
 }
 
 func (store *ReservationMongoDBStore) Insert(Reservation *domain.Reservation) error {
-	result, err := store.reservations.InsertOne(context.TODO(), Reservation)
+	fmt.Println("dosao si dovdee majnmuneeeeee")
+	fmt.Println(Reservation)
+	Reservation.Id = primitive.NewObjectID()
+	result, err := store.reservations.InsertOne(context.TODO(), &Reservation)
+	fmt.Println(result)
 	if err != nil {
 		return err
 	}

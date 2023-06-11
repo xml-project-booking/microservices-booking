@@ -35,6 +35,10 @@ func (service *ReservationService) Create(user *domain.Reservation) error {
 	return service.store.Insert(user)
 }
 
+func (service *ReservationService) GetAllGuestReservations(guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	return service.store.GetAllGuestReservation(guestId)
+}
+
 func (service *ReservationService) Cancel(user *domain.Reservation) error {
 	return service.store.UpdateStatus(user)
 }
@@ -67,6 +71,17 @@ func (service *ReservationService) CheckForReservationInDateRange(accommodationI
 
 }
 
+func (service *ReservationService) CancelReservation(reservationId primitive.ObjectID) bool {
+
+	if service.CheckIfLessThan24Hours(reservationId) {
+		return false
+	}
+
+	var isDeleted = service.store.DeleteReservationById(reservationId)
+	return isDeleted
+
+}
+
 func (service *ReservationService) CheckIfOverLaps(start1 time.Time, end1 time.Time, start2 time.Time, end2 time.Time) bool {
 	if (start1.Before(end2) || start1.Equal(end2)) && (end1.After(start2) || end1.Equal(start2)) {
 		return true
@@ -81,4 +96,16 @@ func (service *ReservationService) CheckIfOverLaps(start1 time.Time, end1 time.T
 	}
 
 	return false
+}
+
+func (service *ReservationService) CheckIfLessThan24Hours(reservationId primitive.ObjectID) bool {
+	reservation, _ := service.store.Get(reservationId)
+	startTime := time.Now()
+	startReservationTime := reservation.StartDate
+	difference := (startReservationTime).Sub(startTime).Hours()
+	if difference < 24 {
+		return true
+	}
+	return false
+
 }

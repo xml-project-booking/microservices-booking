@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"log"
 	"resevation/domain"
 )
 
@@ -16,6 +17,25 @@ const (
 
 type ReservationMongoDBStore struct {
 	reservations *mongo.Collection
+}
+
+func (store *ReservationMongoDBStore) DeleteReservationById(reservationId primitive.ObjectID) bool {
+	filter := bson.M{"_id": reservationId}
+	result, err := store.reservations.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if result.DeletedCount > 0 {
+		return true
+	}
+	return false
+}
+
+func (store *ReservationMongoDBStore) GetAllGuestReservation(guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"guest_id": guestId,
+		"confirmation": true}
+	return store.filter(filter)
+
 }
 
 func (store *ReservationMongoDBStore) UpdateStatus(user *domain.Reservation) error {

@@ -25,6 +25,24 @@ type ReservationHandler struct {
 	LogError *logrus.Logger
 }
 
+func (handler *ReservationHandler) CancelReservation(ctx context.Context, request *pb.CancelReservationRequest) (*pb.CancelReservationResponse, error) {
+	id := request.Id
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	isDeletedRes := handler.service.CancelReservation(objectId)
+	if err != nil {
+		return nil, err
+	}
+	//isDeletedPb := mapReservationCancelation(isDeletedRes)
+	response := &pb.CancelReservationResponse{
+		IsDeleted: isDeletedRes,
+	}
+	return response, nil
+
+}
+
 func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context, request *pb.ReservationRequest) (*pb.ReservationRequestResponse, error) {
 
 	var reservationDTO domain.ReservationDTO
@@ -78,6 +96,7 @@ func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context
 		EndDate:         endDate,
 		Confirmation:    b,
 		GuestNumber:     int64(num),
+		GuestId:         reservationDTO.GuestId,
 	}
 	fmt.Println(reservationDTO.AccommodationID)
 	fmt.Println("ahhahahahahahahaahahahah")

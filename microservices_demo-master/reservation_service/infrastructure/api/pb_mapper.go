@@ -11,3 +11,9 @@ func mapReservation(order *domain.Reservation) *pb.Reservation {
 	}
 	return orderPb
 }
+
+/*func mapReservationCancelation(isDeleted bool) *pb.CancelReservationResponse {
+	isDeletedPb := &pb.CancelReservationResponse{
+		isDeleted: isDeleted,
+	}
+}*/

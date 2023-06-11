@@ -1,6 +1,6 @@
 
 syntax = "proto3";
-option go_package = "github.com/tamararankovic/microservices_demo/common/accommodations";
+option go_package = "github.com/tamararankovic/microservices_demo/common/reservations";
 
 package accommodations;
 
@@ -18,10 +18,42 @@ service ReservationService{
       get: "/reservations/reservation"
     };
   }
+  rpc MakeRequestForReservation(ReservationRequest) returns (ReservationRequestResponse){
+    option (google.api.http) = {
+      post: "/reservations/reservation-request"
+      body:"*"
+    };
+  }
+  rpc CancelReservation(CancelReservationRequest) returns (CancelReservationResponse){
+    option (google.api.http) = {
+      get: "/reservations/cancel-request/{id}"
+    };
+  }
 }
+
 
 message GetRequest {
   string id = 1;
+}
+
+message ReservationRequest {
+  string id  = 1;
+  string AccommodationID = 2;
+  string  StartDate = 3;
+  string EndDate = 4;
+  string GuestNumber = 5;
+  string  Confirmation = 6;
+  string GuestId = 7;
+
+}
+
+message CancelReservationRequest {
+  string id = 1;
+}
+
+message CancelReservationResponse {
+  string id = 1;
+  bool isDeleted = 2;
 }
 
 message GetResponse {
@@ -35,6 +67,20 @@ message GetAllResponse {
   repeated Reservation reservations = 1;
 }
 
+message ReservationRequestResponse{
+  string id = 1;
+
+}
 message Reservation {
   string id = 1;
+}
+
+message ReservationDTO {
+  string id  = 1;
+  string accommodationID = 2;
+  string  startDate = 3;
+  string endDate = 4;
+  int64 guestNumber = 5;
+  bool  isConfirmed = 6;
+
 }

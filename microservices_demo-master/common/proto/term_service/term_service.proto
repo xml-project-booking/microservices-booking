@@ -1,21 +1,41 @@
 syntax = "proto3";
 
-option go_package = "github.com/tamararankovic/microservices_demo/common/terms";
-
 package terms;
-
 
 import "google/api/annotations.proto";
 
-service TermService{
-  rpc Get(GetRequest) returns(GetResponse) {
+option go_package = "github.com/tamararankovic/microservices_demo/common/terms";
+
+service TermService {
+  rpc Get(GetRequest) returns (GetResponse) {
     option (google.api.http) = {
       get: "/terms/term/{id}"
     };
   }
-  rpc GetAll(GetAllRequest) returns(GetAllResponse) {
+
+  rpc GetAll(GetAllRequest) returns (GetAllResponse) {
     option (google.api.http) = {
       get: "/terms/term"
+    };
+  }
+
+  rpc Create(CreateRequest) returns (CreateResponse) {
+    option (google.api.http) = {
+      post: "/terms/term"
+      body: "*"
+    };
+  }
+
+  rpc Update(UpdateRequest) returns (UpdateResponse) {
+    option (google.api.http) = {
+      put: "/terms/term/{id}"
+      body: "*"
+    };
+  }
+
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/terms/term/{id}"
     };
   }
 }
@@ -28,13 +48,46 @@ message GetResponse {
   Term term = 1;
 }
 
-message GetAllRequest {
-}
+message GetAllRequest {}
 
 message GetAllResponse {
   repeated Term terms = 1;
 }
 
+message CreateRequest {
+  Term term = 1;
+}
+
+message CreateResponse {
+  string id = 1;
+}
+
+message UpdateRequest {
+  string id = 1;
+  Term term = 2;
+}
+
+message UpdateResponse {}
+
+message DeleteRequest {
+  string id = 1;
+}
+
+message DeleteResponse {}
+
 message Term {
   string id = 1;
+  string AccommodationId = 2;
+  repeated Availability availability = 3;
+  repeated Price price = 4;
+}
+
+message Availability {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message Price {
+  string price_type = 1;
+  double value = 2;
 }

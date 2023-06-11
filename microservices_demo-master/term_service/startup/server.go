@@ -5,7 +5,6 @@ import (
 	term "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"term_service/application"
@@ -102,8 +101,7 @@ func (server *Server) startGrpcServer(userHandler *api.TermHandler) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	reflection.Register(grpcServer)
-	term.RegisterUserServiceServer(grpcServer, userHandler)
+	term.RegisterTermServiceServer(grpcServer, userHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}

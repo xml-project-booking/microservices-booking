@@ -23,10 +23,10 @@ func (service *TermService) GetAll() ([]*domain.Term, error) {
 	return service.store.GetAll()
 }
 
-func (service *TermService) Create(user *domain.Term) error {
-	return service.store.Insert(user)
+func (service *TermService) Create(term *domain.Term) error {
+	return service.store.Insert(term)
 }
 
-func (service *TermService) Cancel(user *domain.Term) error {
-	return service.store.UpdateStatus(user)
+func (service *TermService) Cancel(term *domain.Term) error {
+	return service.store.UpdateStatus(term)
 }

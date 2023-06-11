@@ -14,6 +14,7 @@ type ReservationDTO struct {
 	EndDate         string             `bson:"end_date"`
 	GuestNumber     string             `bson:"guest_number"`
 	Confirmation    string             `bson:"confirmation"`
+	GuestId         primitive.ObjectID `bson:"guest_id"`
 }
 
 type Reservation struct {
@@ -23,6 +24,7 @@ type Reservation struct {
 	EndDate         time.Time          `bson:"end_date"`
 	GuestNumber     int64              `bson:"guest_number"`
 	Confirmation    bool               `bson:"confirmation"`
+	GuestId         primitive.ObjectID `bson:"guest_id"`
 }
 
 type AccommodationRequest struct {

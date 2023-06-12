@@ -6,9 +6,11 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/api"
 	cfg "github.com/tamararankovic/microservices_demo/api_gateway/startup/config"
+	reservationGw "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	userGw "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
 	"log"
 	"net/http"
 )
@@ -33,9 +35,17 @@ func (server *Server) initHandlers() {
 
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
+
 	if err != nil {
 		panic(err)
 	}
+	reservationEndpoint := fmt.Sprintf("%s:%s", server.config.ReservationHost, server.config.ReservationPort)
+	err1 := reservationGw.RegisterReservationServiceHandlerFromEndpoint(context.TODO(), server.mux, reservationEndpoint, opts)
+	if err1 != nil {
+		fmt.Printf("dhhdhdhdhdhddhdhdhdhdhdhdhdhdhdhdhdhdh")
+		panic(err)
+	}
+
 }
 
 func (server *Server) initCustomHandlers() {

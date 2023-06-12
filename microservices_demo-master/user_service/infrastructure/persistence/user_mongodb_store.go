@@ -69,6 +69,34 @@ func (store *UserMongoDBStore) filterOne(filter interface{}) (User *domain.User,
 	return
 }
 
+func (store *UserMongoDBStore) GetUserByUsername(username string) (User *domain.User, err error) {
+	filter := bson.D{{"username", username}}
+	result := store.users.FindOne(context.TODO(), filter)
+	err = result.Decode(&User)
+	return
+}
+
+func (store *UserMongoDBStore) CheckIfUsernameExists(username string) (bool, error) {
+	filter := bson.D{{"username", username}}
+	var _, err = store.filterOne(filter)
+	if err == mongo.ErrNoDocuments {
+		return false, nil
+	}
+
+	return true, err
+	//filter := bson.D{{"_id", id}, {"deleted", false}}
+	//result, err := store.filterOne(filter)
+	//
+	//if err != nil {
+	//	if err == mongo.ErrNoDocuments {
+	//		return nil, persistance.ErrorUserNotFound
+	//	}
+	//	return nil, err
+	//}
+	//
+	//return result, nil
+}
+
 func decode(cursor *mongo.Cursor) (users []*domain.User, err error) {
 	for cursor.Next(context.TODO()) {
 		var User domain.User

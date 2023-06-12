@@ -1,12 +1,14 @@
 package services
 
 import (
+	"log"
+
 	catalogue "github.com/tamararankovic/microservices_demo/common/proto/catalogue_service"
 	ordering "github.com/tamararankovic/microservices_demo/common/proto/ordering_service"
 	shipping "github.com/tamararankovic/microservices_demo/common/proto/shipping_service"
+	user "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"log"
 )
 
 func NewCatalogueClient(address string) catalogue.CatalogueServiceClient {
@@ -31,6 +33,13 @@ func NewShippingClient(address string) shipping.ShippingServiceClient {
 		log.Fatalf("Failed to start gRPC connection to Shipping service: %v", err)
 	}
 	return shipping.NewShippingServiceClient(conn)
+}
+func NewUserClient(address string) user.UserServiceClient {
+	conn, err := getConnection(address)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC connection to Shipping service: %v", err)
+	}
+	return user.NewUserServiceClient(conn)
 }
 
 func getConnection(address string) (*grpc.ClientConn, error) {

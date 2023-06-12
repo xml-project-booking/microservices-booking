@@ -10,4 +10,6 @@ type UserStore interface {
 	Insert(user *User) error
 	DeleteAll()
 	UpdateStatus(user *User) error
+	CheckIfUsernameExists(username string) (bool, error)
+	GetUserByUsername(username string) (*User, error)
 }

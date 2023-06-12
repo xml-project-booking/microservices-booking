@@ -5,6 +5,7 @@ import (
 	user "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
 	"user_service/application"
@@ -12,7 +13,6 @@ import (
 	"user_service/infrastructure/api"
 	"user_service/infrastructure/persistence"
 	"user_service/startup/config"
-	"google.golang.org/grpc/reflection"
 )
 
 type Server struct {
@@ -34,8 +34,8 @@ func (server *Server) Start() {
 	userStore := server.initUserStore(mongoClient)
 
 	userService := server.initUserService(userStore)
-
-	userHandler := server.initUserHandler(userService)
+	authService := server.initAuthService(userStore)
+	userHandler := server.initUserHandler(userService, authService)
 
 	server.startGrpcServer(userHandler)
 }
@@ -51,13 +51,6 @@ func (server *Server) initMongoClient() *mongo.Client {
 
 func (server *Server) initUserStore(client *mongo.Client) domain.UserStore {
 	store := persistence.NewUserMongoDBStore(client)
-	store.DeleteAll()
-	for _, User := range users {
-		err := store.Insert(User)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 	return store
 }
 
@@ -84,6 +77,9 @@ func (server *Server) initUserStore(client *mongo.Client) domain.UserStore {
 func (server *Server) initUserService(store domain.UserStore) *application.UserService {
 	return application.NewUserService(store)
 }
+func (server *Server) initAuthService(store domain.UserStore) *application.AuthentificationService {
+	return application.NewAuthentificationService(store)
+}
 
 //func (server *Server) initCreateOrderHandler(service *application.UserService, publisher saga.Publisher, subscriber saga.Subscriber) {
 //	_, err := api.NewCreateUserCommandHandler(service, publisher, subscriber)
@@ -92,8 +88,8 @@ func (server *Server) initUserService(store domain.UserStore) *application.UserS
 //	}
 //}
 
-func (server *Server) initUserHandler(service *application.UserService) *api.UserHandler {
-	return api.NewUserHandler(service)
+func (server *Server) initUserHandler(service *application.UserService, auth *application.AuthentificationService) *api.UserHandler {
+	return api.NewUserHandler(service, auth)
 }
 
 func (server *Server) startGrpcServer(userHandler *api.UserHandler) {

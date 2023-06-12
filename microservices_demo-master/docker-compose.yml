@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-      
+
   accommodation_service:
     image: accommodation_service
     container_name: accommodation_service
@@ -17,7 +17,7 @@ services:
       - accommodation_db
     networks:
       - network
-      
+
   reservation_service:
     image: reservation_service
     container_name: reservation_service
@@ -33,7 +33,7 @@ services:
       - reservation_db
     networks:
       - network
-      
+
   user_service:
     image: user_service
     container_name: user_service
@@ -93,6 +93,8 @@ services:
       INVENTORY_SERVICE_PORT: ${INVENTORY_SERVICE_PORT}
       TERM_SERVICE_HOST: ${TERM_SERVICE_HOST}
       TERM_SERVICE_PORT: ${TERM_SERVICE_PORT}
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
     networks:
       - network
 
@@ -104,7 +106,7 @@ services:
       - "27022:27017"
     networks:
       - network
-  
+
   reservation_db:
     image: mongo
     container_name: reservation_db
@@ -131,7 +133,7 @@ services:
     container_name: user_db
     restart: on-failure
     ports:
-      - "27020:27017"
+      - "27017:27017"
     networks:
       - network
 
@@ -148,7 +150,7 @@ services:
       - user_db
     networks:
       - network
-      
+
 
 
   nats:

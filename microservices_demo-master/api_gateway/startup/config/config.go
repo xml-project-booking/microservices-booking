@@ -39,5 +39,7 @@ func NewConfig() *Config {
 		ReservationPort:   os.Getenv("RESERVATION_SERVICE_PORT"),
 		TermHost:          os.Getenv("TERM_SERVICE_HOST"),
 		TermPort:          os.Getenv("TERM_SERVICE_PORT"),
+		UserHost:          os.Getenv("USER_SERVICE_HOST"),
+		UserPort:          os.Getenv("USER_SERVICE_PORT"),
 	}
 }

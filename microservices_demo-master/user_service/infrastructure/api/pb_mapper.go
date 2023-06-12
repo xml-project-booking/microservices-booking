@@ -6,8 +6,19 @@ import (
 )
 
 func mapUser(order *domain.User) *pb.User {
+	boolRole := true
+	if order.Role == 1 {
+		boolRole = false
+	}
+
 	orderPb := &pb.User{
-		Id: order.Id.Hex(),
+		Id:       order.Id.Hex(),
+		Name:     order.Name,
+		Surname:  order.Surname,
+		Email:    order.Email,
+		Address:  order.Address,
+		Username: order.Username,
+		IsHost:   boolRole,
 	}
 	return orderPb
 }

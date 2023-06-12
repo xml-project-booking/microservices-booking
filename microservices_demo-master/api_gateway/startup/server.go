@@ -3,17 +3,19 @@ package startup
 import (
 	"context"
 	"fmt"
+	"log"
+	"net/http"
+	"strings"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/api"
+	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/services"
 	cfg "github.com/tamararankovic/microservices_demo/api_gateway/startup/config"
 	reservationGw "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	termGw "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	userGw "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	"log"
-	"net/http"
 )
 
 type Server struct {
@@ -65,5 +67,59 @@ func (server *Server) initCustomHandlers() {
 }
 
 func (server *Server) Start() {
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), server.mux))
+	handler := MiddlewareContentTypeSetWithCORS(server.mux)
+	newHandler := AuthMiddleware(handler)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", server.config.Port), newHandler))
+}
+func MiddlewareContentTypeSetWithCORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(rw http.ResponseWriter, h *http.Request) {
+		log.Println("Method [", h.Method, "] - Hit path :", h.URL.Path)
+
+		// Add CORS headers
+		rw.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+		rw.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		rw.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, Accept-Encoding, X-CSRF-Token, accept, origin, Cache-Control, X-Requested-With")
+
+		// Add Content-Type header
+		rw.Header().Add("Content-Type", "application/json")
+
+		next.ServeHTTP(rw, h)
+	})
+}
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//if r.URL.Path == "/users/register" || r.URL.Path == "/users/login" {
+		//	// Call the next handler without performing authentication
+		//	next.ServeHTTP(w, r)
+		//	return
+		//}
+		//otkom ovo i zakom ovo iznad ako testiratenesto bez aut
+		if true {
+			next.ServeHTTP(w, r)
+			return
+		}
+		log.Println("PRE HEDERA???")
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		log.Println("POSLE HEDERA???")
+		authParts := strings.Split(authHeader, " ")
+		if len(authParts) != 2 || strings.ToLower(authParts[0]) != "bearer" {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+		token := authParts[1]
+		authenticationEmdpoint := "localhost:8000"
+		authenticationClient := services.NewUserClient(authenticationEmdpoint)
+		message, _ := authenticationClient.Authenticate(r.Context(), &userGw.AuthenticateRequest{
+			Token: token,
+		})
+		if message.Message == "ok" {
+			next.ServeHTTP(w, r)
+		} else {
+			http.Error(w, "Unauthorized: "+message.Message, http.StatusUnauthorized)
+		}
+	})
 }

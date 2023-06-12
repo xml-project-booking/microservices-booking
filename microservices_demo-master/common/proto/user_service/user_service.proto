@@ -18,6 +18,32 @@ service UserService{
       get: "/users/user"
     };
   }
+  rpc Authenticate(AuthenticateRequest) returns(AuthenticateResponse) {
+    option (google.api.http) = {
+      get: "/users/authenticate"
+    };
+  }
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/users/login"
+      body: "*"
+    };
+  }
+
+  rpc Register(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/users/register"
+      body: "*"
+    };
+  }
+
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/users/update"
+      body: "*"
+    };
+  }
+
 }
 
 message GetRequest {
@@ -37,4 +63,60 @@ message GetAllResponse {
 
 message User {
   string id = 1;
+  string name = 2;
+  string surname = 3;
+  string username = 4;
+  string email = 5;
+  string address = 6;
+  bool isHost = 7;
+
+}
+
+message AuthenticateRequest {
+    string token = 1;
+}
+
+message AuthenticateResponse {
+    string message = 1;
+}
+
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message LoginResponse {
+    RequestResult requestResult = 1;
+    string token = 2;
+}
+message RegisterRequest {
+    string username = 1;
+    string password = 2;
+    bool isHost = 3;
+    string name = 4;
+    string surname = 5;
+    string email = 6;
+    string address = 7;
+}
+
+message RegisterResponse {
+    RequestResult requestResult = 1;
+    string token = 2;
+}
+message UpdateUserRequest {
+  string id = 1;
+  string username = 2;
+  string password = 3;
+  string name = 4;
+  string surname = 5;
+  string email = 6;
+  string address = 7;
+}
+
+message UpdateUserResponse {
+  RequestResult requestResult = 1;
+}
+message RequestResult {
+    int32 code = 1;
+    string message = 2;
 }

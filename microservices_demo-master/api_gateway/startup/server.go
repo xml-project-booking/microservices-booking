@@ -78,7 +78,7 @@ func MiddlewareContentTypeSetWithCORS(next http.Handler) http.Handler {
 		// Add CORS headers
 		rw.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 		rw.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		rw.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		rw.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, Accept-Encoding, X-CSRF-Token, accept, origin, Cache-Control, X-Requested-With")
 
 		// Add Content-Type header
 		rw.Header().Add("Content-Type", "application/json")
@@ -88,15 +88,23 @@ func MiddlewareContentTypeSetWithCORS(next http.Handler) http.Handler {
 }
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//if r.URL.Path == "/users/register" || r.URL.Path == "/users/login" {
+		//	// Call the next handler without performing authentication
+		//	next.ServeHTTP(w, r)
+		//	return
+		//}
+		//otkom ovo i zakom ovo iznad ako testiratenesto bez aut
 		if true {
 			next.ServeHTTP(w, r)
 			return
 		}
+		log.Println("PRE HEDERA???")
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
+		log.Println("POSLE HEDERA???")
 		authParts := strings.Split(authHeader, " ")
 		if len(authParts) != 2 || strings.ToLower(authParts[0]) != "bearer" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)

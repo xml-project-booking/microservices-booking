@@ -1,12 +1,17 @@
 package application
 
 import (
+	"errors"
 	"github.com/dgrijalva/jwt-go"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 	"user_service/domain"
 )
+
+var ErrorUsernameTaken = errors.New("Username is already taken")
+var ErrorUserNotFound = errors.New("User not found")
+var ErrorInvalidPassword = errors.New("Password is invalid")
 
 type AuthentificationService struct {
 	store domain.UserStore
@@ -33,7 +38,7 @@ func (service *AuthentificationService) RegisterUser(user *domain.User) (jwtToke
 	}
 
 	if exists {
-		return
+		return jwtToken, ErrorUsernameTaken
 	}
 
 	user.Password, err = HashPassword(user.Password)
@@ -58,11 +63,14 @@ func (service *AuthentificationService) Login(username string, password string) 
 	user, err := service.store.GetUserByUsername(username)
 
 	if err != nil {
-		return jwtToken, err
+		return jwtToken, ErrorUserNotFound
+	}
+	if user == nil {
+		return jwtToken, ErrorUserNotFound
 	}
 
-	if !CheckPasswordHash(user.Password, password) {
-		return jwtToken, err
+	if !CheckPasswordHash(password, user.Password) {
+		return jwtToken, ErrorInvalidPassword
 	}
 	stringRole := "HOST"
 	if user.Role == 1 {

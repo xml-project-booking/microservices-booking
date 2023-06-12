@@ -8,15 +8,14 @@ import (
 )
 
 type User struct {
-	Id          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Name        string             `bson:"name" json:"name"`
-	Surname     string             `bson:"surname,omitempty" json:"surname"`
-	PhoneNumber string             `bson:"phoneNumber,omitempty" json:"phoneNumber"`
-	Email       string             `bson:"email" json:"email"`
-	Username    string             `bson:"username,omitempty" json:"username"`
-	Password    string             `bson:"password" json:"password"`
-	Address     string             `bson:"address,omitempty" json:"address"`
-	Role        Role               `bson:"role" json:"role"`
+	Id       primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Name     string             `bson:"name" json:"name"`
+	Surname  string             `bson:"surname,omitempty" json:"surname"`
+	Email    string             `bson:"email" json:"email"`
+	Username string             `bson:"username,omitempty" json:"username"`
+	Password string             `bson:"password" json:"password"`
+	Address  string             `bson:"address,omitempty" json:"address"`
+	Role     Role               `bson:"role" json:"role"`
 }
 
 type Role int

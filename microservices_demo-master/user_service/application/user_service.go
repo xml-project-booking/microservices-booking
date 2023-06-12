@@ -30,3 +30,6 @@ func (service *UserService) Create(user *domain.User) error {
 func (service *UserService) Cancel(user *domain.User) error {
 	return service.store.UpdateStatus(user)
 }
+func (service *UserService) UpdateUser(user *domain.User) error {
+	return service.store.UpdateUser(user)
+}

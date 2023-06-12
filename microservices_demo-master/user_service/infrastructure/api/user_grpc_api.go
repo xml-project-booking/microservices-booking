@@ -61,6 +61,10 @@ func (handler *UserHandler) Register(ctx context.Context, request *pb.RegisterRe
 	user := &domain.User{
 		Username: request.Username,
 		Password: request.Password,
+		Name:     request.Name,
+		Surname:  request.Surname,
+		Email:    request.Email,
+		Address:  request.Address,
 	}
 
 	if request.IsHost {
@@ -153,4 +157,36 @@ func userClaimFromToken(claims jwt.MapClaims) string {
 	}
 
 	return sub
+}
+func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUserRequest) (response *pb.UpdateUserResponse, err error) {
+	user := &domain.User{
+		Name:     request.Name,
+		Surname:  request.Surname,
+		Email:    request.Email,
+		Address:  request.Address,
+		Username: request.Username,
+		Password: request.Password,
+	}
+	id := request.Id
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	user.Id = objectId
+	err = handler.service.UpdateUser(user)
+
+	if err != nil {
+		return &pb.UpdateUserResponse{
+			RequestResult: &pb.RequestResult{
+				Code:    400,
+				Message: err.Error(),
+			},
+		}, nil
+	}
+
+	return &pb.UpdateUserResponse{
+		RequestResult: &pb.RequestResult{
+			Code: 200,
+		},
+	}, nil
 }

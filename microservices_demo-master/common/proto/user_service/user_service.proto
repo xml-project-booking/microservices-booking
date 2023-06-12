@@ -37,6 +37,13 @@ service UserService{
     };
   }
 
+  rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/users/update"
+      body: "*"
+    };
+  }
+
 }
 
 message GetRequest {
@@ -56,6 +63,13 @@ message GetAllResponse {
 
 message User {
   string id = 1;
+  string name = 2;
+  string surname = 3;
+  string username = 4;
+  string email = 5;
+  string address = 6;
+  bool isHost = 7;
+
 }
 
 message AuthenticateRequest {
@@ -79,11 +93,28 @@ message RegisterRequest {
     string username = 1;
     string password = 2;
     bool isHost = 3;
+    string name = 4;
+    string surname = 5;
+    string email = 6;
+    string address = 7;
 }
 
 message RegisterResponse {
     RequestResult requestResult = 1;
     string token = 2;
+}
+message UpdateUserRequest {
+  string id = 1;
+  string username = 2;
+  string password = 3;
+  string name = 4;
+  string surname = 5;
+  string email = 6;
+  string address = 7;
+}
+
+message UpdateUserResponse {
+  RequestResult requestResult = 1;
 }
 message RequestResult {
     int32 code = 1;

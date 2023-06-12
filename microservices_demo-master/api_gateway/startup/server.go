@@ -7,6 +7,7 @@ import (
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/api"
 	cfg "github.com/tamararankovic/microservices_demo/api_gateway/startup/config"
 	reservationGw "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
+	termGw "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	userGw "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -43,6 +44,13 @@ func (server *Server) initHandlers() {
 	err1 := reservationGw.RegisterReservationServiceHandlerFromEndpoint(context.TODO(), server.mux, reservationEndpoint, opts)
 	if err1 != nil {
 		fmt.Printf("dhhdhdhdhdhddhdhdhdhdhdhdhdhdhdhdhdhdh")
+		panic(err)
+	}
+
+	termEndpoint := fmt.Sprintf("%s:%s", server.config.TermHost, server.config.TermPort)
+	err2 := termGw.RegisterTermServiceHandlerFromEndpoint(context.TODO(), server.mux, termEndpoint, opts)
+	if err2 != nil {
+		fmt.Printf("Problem neki sa term_service u fajlu server.go")
 		panic(err)
 	}
 

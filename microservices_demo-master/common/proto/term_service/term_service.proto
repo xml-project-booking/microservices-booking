@@ -45,17 +45,28 @@ message GetRequest {
 }
 
 message GetResponse {
-  Term term = 1;
+  string id = 1;
+  string accommodationId = 2;
+  string userId = 3;
+  string StartDate = 4;
+  string EndDate = 5;
+  string PriceType = 6;
+  double Value = 7;
 }
 
 message GetAllRequest {}
 
 message GetAllResponse {
-  repeated Term terms = 1;
+  repeated GetResponse getResponses = 1;
 }
 
 message CreateRequest {
-  Term term = 1;
+  string accommodationId = 2;
+  string userId = 3;
+  string StartDate = 4;
+  string EndDate = 5;
+  string PriceType = 6;
+  double Value = 7;
 }
 
 message CreateResponse {
@@ -64,7 +75,12 @@ message CreateResponse {
 
 message UpdateRequest {
   string id = 1;
-  Term term = 2;
+  string accommodationId = 2;
+  string userId = 3;
+  string StartDate = 4;
+  string EndDate = 5;
+  string PriceType = 6;
+  double Value = 7;
 }
 
 message UpdateResponse {}
@@ -74,20 +90,3 @@ message DeleteRequest {
 }
 
 message DeleteResponse {}
-
-message Term {
-  string id = 1;
-  string AccommodationId = 2;
-  repeated Availability availability = 3;
-  repeated Price price = 4;
-}
-
-message Availability {
-  string start_date = 1;
-  string end_date = 2;
-}
-
-message Price {
-  string price_type = 1;
-  double value = 2;
-}

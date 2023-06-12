@@ -24,6 +24,7 @@ func (service *TermService) GetAll() ([]*domain.Term, error) {
 }
 
 func (service *TermService) Create(term *domain.Term) error {
+	term.Id = primitive.NewObjectID()
 	return service.store.Insert(term)
 }
 

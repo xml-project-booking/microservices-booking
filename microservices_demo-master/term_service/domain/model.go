@@ -6,30 +6,17 @@ import (
 )
 
 type Term struct {
-	Id              primitive.ObjectID `bson:"id"`              // ID termina
+	Id              primitive.ObjectID `bson:"_id"`
 	AccommodationID primitive.ObjectID `bson:"accommodationId"` // ID smeštaja za koji je termin vezan
 	UserID          primitive.ObjectID `bson:"userId"`          // ID korisnika koji je rezervisao smeštaj
-	Date            time.Time          `bson:"date"`            // Datum termina
-	Available       bool               `bson:"available"`       // Dostupnost smeštaja za dati termin
-	Price           float64            `bson:"price"`           // Cena smeštaja za dati termin
-	//PriceType       string             // Tip cene - "per_guest" ili "per_unit" dodati na nivou nekretnine
+	PriceType       string             `bson:"price_type"`
+	Value           int32              `bson:"value"`
+	StartDate       time.Time          `bson:"start_date"`
+	EndDate         time.Time          `bson:"end_date"`
 }
 
-// Metoda za kreiranje novog termina
-func NewTerm(accommodationID, id primitive.ObjectID, date time.Time, available bool, price float64, userID primitive.ObjectID) *Term {
-	return &Term{
-		AccommodationID: accommodationID,
-		Id:              id,
-		Date:            date,
-		Available:       available,
-		Price:           price,
-		UserID:          userID,
-	}
-}
-
-// Metoda za izmenu cene termina
-func (t *Term) UpdatePrice(newPrice float64) {
-	t.Price = newPrice
+func NewTerm(accommodationID primitive.ObjectID, userID primitive.ObjectID, priceType string, value int32, startDate time.Time, endDate time.Time) *Term {
+	return &Term{AccommodationID: accommodationID, UserID: userID, PriceType: priceType, Value: value, StartDate: startDate, EndDate: endDate}
 }
 
 // Metoda za proveru da li je termin zauzet

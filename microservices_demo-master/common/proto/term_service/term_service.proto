@@ -19,7 +19,7 @@ service TermService {
     };
   }
 
-  rpc Create(CreateRequest) returns (CreateResponse) {
+  rpc Create(CreateRequest) returns (GetAllResponse) {
     option (google.api.http) = {
       post: "/terms/term"
       body: "*"
@@ -48,10 +48,9 @@ message GetResponse {
   string id = 1;
   string accommodationId = 2;
   string userId = 3;
-  string StartDate = 4;
-  string EndDate = 5;
-  string PriceType = 6;
-  double Value = 7;
+  string Date = 4;
+  string PriceType = 5;
+  double Value = 6;
 }
 
 message GetAllRequest {}

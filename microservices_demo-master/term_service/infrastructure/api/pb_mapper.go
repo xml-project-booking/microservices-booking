@@ -8,8 +8,7 @@ import (
 func mapTerm(term *domain.Term) *pb.GetResponse {
 	termPb := &pb.GetResponse{
 		Id:              term.Id.Hex(),
-		StartDate:       term.StartDate.String(),
-		EndDate:         term.EndDate.String(),
+		Date:            term.Date.String(),
 		PriceType:       term.PriceType,
 		Value:           float64(term.Value),
 		AccommodationId: term.AccommodationID.Hex(),

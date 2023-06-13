@@ -50,13 +50,6 @@ func (server *Server) initMongoClient() *mongo.Client {
 
 func (server *Server) initTermStore(client *mongo.Client) domain.TermStore {
 	store := persistence.NewTermMongoDBStore(client)
-	store.DeleteAll()
-	for _, Term := range terms {
-		err := store.Insert(Term)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
 	return store
 }
 
@@ -95,13 +88,13 @@ func (server *Server) initTermHandler(service *application.TermService) *api.Ter
 	return api.NewUserHandler(service)
 }
 
-func (server *Server) startGrpcServer(userHandler *api.TermHandler) {
+func (server *Server) startGrpcServer(termHandler *api.TermHandler) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	term.RegisterTermServiceServer(grpcServer, userHandler)
+	term.RegisterTermServiceServer(grpcServer, termHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}

@@ -55,9 +55,9 @@ func (handler *TermHandler) GetAll(ctx context.Context, request *pb.GetAllReques
 	return response, nil
 }
 
-func (handler *TermHandler) Create(ctx context.Context, request *pb.CreateRequest) (*pb.CreateResponse, error) {
+func (handler *TermHandler) Create(ctx context.Context, request *pb.CreateRequest) (*pb.GetAllResponse, error) {
 
-	fmt.Println(request.String())
+	//OVO NZM STA JE VRV JSON U BINARNO
 	jsonBytes, err := protojson.Marshal(request)
 	if err != nil {
 		{
@@ -76,6 +76,7 @@ func (handler *TermHandler) Create(ctx context.Context, request *pb.CreateReques
 		return nil, err
 	}
 
+	//KONVERZIJA IZ STRINGA U ODGOVARAJUCE TIPOVE
 	layout := "2006-01-02T15:04:05.000Z"
 	accId, _ := primitive.ObjectIDFromHex(request.AccommodationId)
 	usrId, _ := primitive.ObjectIDFromHex(request.UserId)
@@ -83,17 +84,38 @@ func (handler *TermHandler) Create(ctx context.Context, request *pb.CreateReques
 	strtDate, _ := time.Parse(layout, request.StartDate)
 	eDate, _ := time.Parse(layout, request.EndDate)
 
-	newTerm := domain.NewTerm(accId, usrId, request.PriceType, int32(request.Value), strtDate, eDate)
+	//PROVJERE
 
-	err = handler.service.Create(newTerm)
-	TermPb := mapTerm(newTerm)
-	fmt.Println(TermPb.Id)
+	var isTaken = handler.service.CheckForReservationInDateRange(accId, strtDate, eDate)
 
+	if isTaken {
+		return nil, fmt.Errorf("reservation is already taken for the specified date range")
+	}
+
+	var Terms []*domain.Term // Ovo su termini koje smo napravili
+
+	// Iteriranje kroz datume i pravljenje slobodnih
+	for date := strtDate; date.Before(eDate); date = date.AddDate(0, 0, 1) {
+		newTerm := domain.NewTerm(accId, usrId, request.PriceType, int32(request.Value), date)
+		err = handler.service.Create(newTerm)
+		Terms = append(Terms, newTerm)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Konverzija i priprema za odgovor
 	if err != nil {
 		return nil, err
 	}
-	response := &pb.CreateResponse{
-		Id: TermPb.Id,
+	response := &pb.GetAllResponse{
+		GetResponses: []*pb.GetResponse{},
+	}
+
+	for _, Term := range Terms {
+		current := mapTerm(Term)
+		response.GetResponses = append(response.GetResponses, current)
 	}
 
 	return response, nil

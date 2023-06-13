@@ -11,12 +11,11 @@ type Term struct {
 	UserID          primitive.ObjectID `bson:"userId"`          // ID korisnika koji je rezervisao smeštaj
 	PriceType       string             `bson:"price_type"`
 	Value           int32              `bson:"value"`
-	StartDate       time.Time          `bson:"start_date"`
-	EndDate         time.Time          `bson:"end_date"`
+	Date            time.Time          `bson:"date"`
 }
 
-func NewTerm(accommodationID primitive.ObjectID, userID primitive.ObjectID, priceType string, value int32, startDate time.Time, endDate time.Time) *Term {
-	return &Term{AccommodationID: accommodationID, UserID: userID, PriceType: priceType, Value: value, StartDate: startDate, EndDate: endDate}
+func NewTerm(accommodationID primitive.ObjectID, userID primitive.ObjectID, priceType string, value int32, date time.Time) *Term {
+	return &Term{AccommodationID: accommodationID, UserID: userID, PriceType: priceType, Value: value, Date: date}
 }
 
 // Metoda za proveru da li je termin zauzet

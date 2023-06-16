@@ -2,20 +2,20 @@ package startup
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
-	"strings"
-
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/api"
-	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/services"
 	cfg "github.com/tamararankovic/microservices_demo/api_gateway/startup/config"
 	reservationGw "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	termGw "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	userGw "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strings"
 )
 
 type Server struct {
@@ -34,8 +34,11 @@ func NewServer(config *cfg.Config) *Server {
 }
 
 func (server *Server) initHandlers() {
-	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-
+	//opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		//grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(100*1024*1024), grpc.MaxCallSendMsgSize(100*1024*1024)), // Set maximum frame size to 10MB
+	}
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
 
@@ -82,44 +85,82 @@ func MiddlewareContentTypeSetWithCORS(next http.Handler) http.Handler {
 
 		// Add Content-Type header
 		rw.Header().Add("Content-Type", "application/json")
-
+		if h.Method == "OPTIONS" {
+			// Handle preflight request
+			rw.WriteHeader(http.StatusOK)
+			return
+		}
 		next.ServeHTTP(rw, h)
 	})
 }
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		//if r.URL.Path == "/users/register" || r.URL.Path == "/users/login" {
-		//	// Call the next handler without performing authentication
-		//	next.ServeHTTP(w, r)
-		//	return
-		//}
-		//otkom ovo i zakom ovo iznad ako testiratenesto bez aut
-		if true {
+		if r.URL.Path == "/users/register" || r.URL.Path == "/users/login" || strings.Contains(r.URL.Path, "/users/user/existsUsername") || strings.Contains(r.URL.Path, "/users/user/existsEmail") || strings.Contains(r.URL.Path, "/users/authenticate") {
+			// Call the next handler without performing authentication
 			next.ServeHTTP(w, r)
 			return
 		}
-		log.Println("PRE HEDERA???")
+		if r.Method == http.MethodOptions {
+			// Set the necessary CORS headers
+			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, Accept-Encoding, X-CSRF-Token, accept, origin, Cache-Control, X-Requested-With")
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		//otkom ovo i zakom ovo iznad ako testiratenesto bez aut
+		//if true {
+		//	next.ServeHTTP(w, r)
+		//	return
+		//}
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
-		log.Println("POSLE HEDERA???")
 		authParts := strings.Split(authHeader, " ")
 		if len(authParts) != 2 || strings.ToLower(authParts[0]) != "bearer" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		token := authParts[1]
-		authenticationEmdpoint := "localhost:8000"
-		authenticationClient := services.NewUserClient(authenticationEmdpoint)
-		message, _ := authenticationClient.Authenticate(r.Context(), &userGw.AuthenticateRequest{
-			Token: token,
-		})
-		if message.Message == "ok" {
+		log.Println(token)
+		//authenticationEndpoint := "localhost:8000"
+		//authenticationClient := services.NewUserClient(authenticationEndpoint)
+		//message, err := authenticationClient.Authenticate(r.Context(), &userGw.AuthenticateRequest{
+		//	Token: token,
+		//})
+		authServiceEndpoint := "localhost:8000"
+		resp, err := http.Get("http://" + authServiceEndpoint + "/users/authenticate/" + token)
+		if err != nil {
+			log.Println("Error during authentication:", err)
+			return
+		}
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			http.Error(w, "Failed to read response body", http.StatusInternalServerError)
+			return
+		}
+
+		responseContent := string(body)
+		var response map[string]interface{}
+		err2 := json.Unmarshal([]byte(responseContent), &response)
+		if err2 != nil {
+			log.Println("Failed to decode response:", err2)
+			return
+		}
+
+		messageValue, ok := response["message"].(string)
+		if !ok {
+			log.Println("Failed to get message value")
+			return
+		}
+		if messageValue == "ok" {
 			next.ServeHTTP(w, r)
 		} else {
-			http.Error(w, "Unauthorized: "+message.Message, http.StatusUnauthorized)
+			http.Error(w, "Unauthorized: "+messageValue, http.StatusUnauthorized)
 		}
 	})
 }

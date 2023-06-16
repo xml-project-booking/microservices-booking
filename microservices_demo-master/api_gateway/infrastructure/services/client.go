@@ -43,5 +43,7 @@ func NewUserClient(address string) user.UserServiceClient {
 }
 
 func getConnection(address string) (*grpc.ClientConn, error) {
-	return grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	return grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(100*1024*1024)),
+		grpc.WithDefaultCallOptions(grpc.MaxCallSendMsgSize(100*1024*1024)))
 }

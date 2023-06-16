@@ -100,6 +100,15 @@ func (store *UserMongoDBStore) CheckIfUsernameExists(username string) (bool, err
 	//
 	//return result, nil
 }
+func (store *UserMongoDBStore) CheckIfEmailExists(email string) (bool, error) {
+	filter := bson.D{{"email", email}}
+	var _, err = store.filterOne(filter)
+	if err == mongo.ErrNoDocuments {
+		return false, nil
+	}
+
+	return true, err
+}
 func (store *UserMongoDBStore) UpdateUser(user *domain.User) error {
 	filter := bson.M{"_id": user.Id}
 	result, err2 := store.filterOne(filter)
@@ -107,7 +116,11 @@ func (store *UserMongoDBStore) UpdateUser(user *domain.User) error {
 		return err2
 	}
 	user.Role = result.Role
-	user.Password, _ = HashPassword(user.Password)
+	if user.Password == "" {
+		user.Password = result.Password
+	} else {
+		user.Password, _ = HashPassword(user.Password)
+	}
 	if user.Username != result.Username {
 		exists, err := store.CheckIfUsernameExists(user.Username)
 		if err != nil {

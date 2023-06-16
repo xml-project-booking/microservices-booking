@@ -13,6 +13,16 @@ service UserService{
       get: "/users/user/{id}"
     };
   }
+  rpc ExistsUsername(ExistsUsernameRequest) returns(ExistsUsernameResponse) {
+    option (google.api.http) = {
+      get: "/users/user/existsUsername/{username}"
+    };
+  }
+  rpc ExistsEmail(ExistsEmailRequest) returns(ExistsEmailResponse) {
+    option (google.api.http) = {
+      get: "/users/user/existsEmail/{email}"
+    };
+  }
   rpc GetAll(GetAllRequest) returns(GetAllResponse) {
     option (google.api.http) = {
       get: "/users/user"
@@ -20,7 +30,7 @@ service UserService{
   }
   rpc Authenticate(AuthenticateRequest) returns(AuthenticateResponse) {
     option (google.api.http) = {
-      get: "/users/authenticate"
+      get: "/users/authenticate/{token}"
     };
   }
   rpc Login(LoginRequest) returns (LoginResponse) {
@@ -43,6 +53,11 @@ service UserService{
       body: "*"
     };
   }
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {
+    option (google.api.http) = {
+      delete: "/users/delete/{id}"
+    };
+  }
 
 }
 
@@ -53,7 +68,20 @@ message GetRequest {
 message GetResponse {
   User user = 1;
 }
+message ExistsUsernameRequest {
+  string username = 1;
+}
 
+message ExistsUsernameResponse {
+  bool exists = 1;
+}
+message ExistsEmailRequest {
+  string email = 1;
+}
+
+message ExistsEmailResponse {
+  bool exists = 1;
+}
 message GetAllRequest {
 }
 
@@ -81,13 +109,15 @@ message AuthenticateResponse {
 }
 
 message LoginRequest {
-    string username = 1;
-    string password = 2;
+  string username = 1;
+  string password = 2;
 }
 
 message LoginResponse {
     RequestResult requestResult = 1;
     string token = 2;
+    string role = 3;
+    string id = 4;
 }
 message RegisterRequest {
     string username = 1;
@@ -114,6 +144,14 @@ message UpdateUserRequest {
 }
 
 message UpdateUserResponse {
+  RequestResult requestResult = 1;
+}
+
+message DeleteRequest {
+  string id = 1;
+}
+
+message DeleteResponse {
   RequestResult requestResult = 1;
 }
 message RequestResult {

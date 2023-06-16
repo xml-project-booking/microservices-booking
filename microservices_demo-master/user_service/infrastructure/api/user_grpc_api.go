@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"log"
+	"strings"
 	"user_service/application"
 	"user_service/domain"
 
@@ -39,6 +41,28 @@ func (handler *UserHandler) Get(ctx context.Context, request *pb.GetRequest) (*p
 	UserPb := mapUser(User)
 	response := &pb.GetResponse{
 		User: UserPb,
+	}
+	return response, nil
+}
+func (handler *UserHandler) ExistsUsername(ctx context.Context, request *pb.ExistsUsernameRequest) (*pb.ExistsUsernameResponse, error) {
+	username := request.Username
+	exists, err := handler.serviceAuth.ExistsUsername(username)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.ExistsUsernameResponse{
+		Exists: exists,
+	}
+	return response, nil
+}
+func (handler *UserHandler) ExistsEmail(ctx context.Context, request *pb.ExistsEmailRequest) (*pb.ExistsEmailResponse, error) {
+	email := request.Email
+	exists, err := handler.serviceAuth.ExistsEmail(email)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.ExistsEmailResponse{
+		Exists: exists,
 	}
 	return response, nil
 }
@@ -92,7 +116,8 @@ func (handler *UserHandler) Register(ctx context.Context, request *pb.RegisterRe
 	}, nil
 }
 func (handler *UserHandler) Login(ctx context.Context, request *pb.LoginRequest) (*pb.LoginResponse, error) {
-	jwtToken, err := handler.serviceAuth.Login(request.Username, request.Password)
+	log.Println("BLAA " + request.Username + request.Password)
+	jwtToken, role, id, err := handler.serviceAuth.Login(request.Username, request.Password)
 
 	if err != nil {
 		return &pb.LoginResponse{
@@ -108,9 +133,12 @@ func (handler *UserHandler) Login(ctx context.Context, request *pb.LoginRequest)
 		RequestResult: &pb.RequestResult{
 			Code: 200,
 		},
+		Role: role,
+		Id:   id,
 	}, nil
 }
 func (handler *UserHandler) Authenticate(ctx context.Context, request *pb.AuthenticateRequest) (*pb.AuthenticateResponse, error) {
+	log.Println("pozvalo se???")
 	message := "ok"
 
 	tokenInfo, err := parseToken(request.Token)
@@ -118,12 +146,12 @@ func (handler *UserHandler) Authenticate(ctx context.Context, request *pb.Authen
 		message = "invalid auth token"
 	}
 	user_id := userClaimFromToken(tokenInfo)
-	objectId, err := primitive.ObjectIDFromHex(user_id)
+	substrings := strings.Split(user_id, "\"")
+	objectId, err := primitive.ObjectIDFromHex(substrings[1])
 	if err != nil {
 		return nil, err
 	}
 	user, err := handler.service.Get(objectId)
-
 	if err != nil || user == nil {
 		message = "user not found"
 	}
@@ -151,9 +179,9 @@ func parseToken(token string) (jwt.MapClaims, error) {
 
 func userClaimFromToken(claims jwt.MapClaims) string {
 
-	sub, ok := claims["user_id"].(string)
-	if !ok {
-		return ""
+	sub, err := claims["user_id"].(string)
+	if !err {
+		return "error user claim"
 	}
 
 	return sub

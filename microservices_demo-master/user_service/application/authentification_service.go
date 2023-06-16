@@ -26,6 +26,12 @@ func NewAuthentificationService(store domain.UserStore) *AuthentificationService
 func (service *AuthentificationService) Get(id primitive.ObjectID) (*domain.User, error) {
 	return service.store.Get(id)
 }
+func (service *AuthentificationService) ExistsUsername(username string) (bool, error) {
+	return service.store.CheckIfUsernameExists(username)
+}
+func (service *AuthentificationService) ExistsEmail(email string) (bool, error) {
+	return service.store.CheckIfEmailExists(email)
+}
 
 func (service *AuthentificationService) GetAll() ([]*domain.User, error) {
 	return service.store.GetAll()
@@ -59,18 +65,18 @@ func (service *AuthentificationService) RegisterUser(user *domain.User) (jwtToke
 
 	return GenerateJWT(user.Username, user.Id.String(), stringRole)
 }
-func (service *AuthentificationService) Login(username string, password string) (jwtToken string, err error) {
+func (service *AuthentificationService) Login(username string, password string) (jwtToken string, role string, id string, err error) {
 	user, err := service.store.GetUserByUsername(username)
 
 	if err != nil {
-		return jwtToken, ErrorUserNotFound
+		return jwtToken, role, id, ErrorUserNotFound
 	}
 	if user == nil {
-		return jwtToken, ErrorUserNotFound
+		return jwtToken, role, id, ErrorUserNotFound
 	}
 
 	if !CheckPasswordHash(password, user.Password) {
-		return jwtToken, ErrorInvalidPassword
+		return jwtToken, role, id, ErrorInvalidPassword
 	}
 	stringRole := "HOST"
 	if user.Role == 1 {
@@ -80,10 +86,10 @@ func (service *AuthentificationService) Login(username string, password string) 
 	jwtToken, err = GenerateJWT(user.Username, user.Id.String(), stringRole)
 
 	if err != nil {
-		return jwtToken, err
+		return jwtToken, role, id, err
 	}
 
-	return jwtToken, nil
+	return jwtToken, stringRole, user.Id.String(), nil
 }
 
 func HashPassword(password string) (string, error) {

@@ -26,6 +26,84 @@ func NewUserHandler(service *application.TermService) *TermHandler {
 	}
 }
 
+func (handler *TermHandler) Update(ctx context.Context, request *pb.UpdateRequest) (*pb.UpdateResponse, error) {
+
+	//OVO NZM STA JE VRV JSON U BINARNO
+	jsonBytes, err := protojson.Marshal(request)
+	if err != nil {
+		{
+			handler.LogError.WithFields(logrus.Fields{
+				"status":    "failure",
+				"location":  "Term Handler",
+				"action":    "CRADA731",
+				"timestamp": time.Now().String(),
+			}).Error("Wrong cast json to Term!")
+		}
+	}
+
+	err = json.Unmarshal(jsonBytes, &request)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	//KONVERZIJA IZ STRINGA U ODGOVARAJUCE TIPOVE
+	layout := "2006-01-02T15:04:05.000Z"
+	id, _ := primitive.ObjectIDFromHex(request.Id)
+	accId, _ := primitive.ObjectIDFromHex(request.AccommodationId)
+	usrId, _ := primitive.ObjectIDFromHex(request.UserId)
+
+	date, _ := time.Parse(layout, request.Date)
+
+	//PROVJER
+
+	newTerm := domain.NewTermWithId(id, accId, usrId, request.PriceType, int32(request.Value), date)
+	err = handler.service.Update(newTerm)
+	if err != nil {
+		return nil, err
+	}
+	res := pb.UpdateResponse{}
+
+	return &res, nil
+}
+
+func (handler *TermHandler) Delete(ctx context.Context, request *pb.DeleteRequest) (*pb.DeleteResponse, error) {
+	//OVO NZM STA JE VRV JSON U BINARNO
+	jsonBytes, err := protojson.Marshal(request)
+	if err != nil {
+		{
+			handler.LogError.WithFields(logrus.Fields{
+				"status":    "failure",
+				"location":  "Term Handler",
+				"action":    "CRADA731",
+				"timestamp": time.Now().String(),
+			}).Error("Wrong cast json to Term!")
+		}
+	}
+
+	err = json.Unmarshal(jsonBytes, &request)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	//KONVERZIJA IZ STRINGA U ODGOVARAJUCE TIPOVE
+
+	id, _ := primitive.ObjectIDFromHex(request.Id)
+
+	//PROVJER
+
+	Term, err := handler.service.Get(id)
+	err = handler.service.Delete(Term)
+
+	if err != nil {
+		return nil, err
+	}
+	res := pb.DeleteResponse{}
+
+	return &res, nil
+}
+
 func (handler *TermHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)

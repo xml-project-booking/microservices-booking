@@ -14,6 +14,10 @@ type Term struct {
 	Date            time.Time          `bson:"date"`
 }
 
+func NewTermWithId(id primitive.ObjectID, accommodationID primitive.ObjectID, userID primitive.ObjectID, priceType string, value int32, date time.Time) *Term {
+	return &Term{Id: id, AccommodationID: accommodationID, UserID: userID, PriceType: priceType, Value: value, Date: date}
+}
+
 func NewTerm(accommodationID primitive.ObjectID, userID primitive.ObjectID, priceType string, value int32, date time.Time) *Term {
 	return &Term{AccommodationID: accommodationID, UserID: userID, PriceType: priceType, Value: value, Date: date}
 }

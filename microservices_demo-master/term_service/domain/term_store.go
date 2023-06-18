@@ -8,6 +8,7 @@ type TermStore interface {
 	Get(id primitive.ObjectID) (*Term, error)
 	GetAll() ([]*Term, error)
 	Insert(term *Term) error
+	Delete(term *Term) error
 	DeleteAll()
-	UpdateStatus(term *Term) error
+	Update(term *Term) error
 }

@@ -94,8 +94,9 @@ func MiddlewareContentTypeSetWithCORS(next http.Handler) http.Handler {
 	})
 }
 func AuthMiddleware(next http.Handler) http.Handler {
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/users/register" || r.URL.Path == "/users/login" || strings.Contains(r.URL.Path, "/users/user/existsUsername") || strings.Contains(r.URL.Path, "/users/user/existsEmail") || strings.Contains(r.URL.Path, "/users/authenticate") {
+		/*if r.URL.Path == "/users/register" || r.URL.Path == "/users/login" || strings.Contains(r.URL.Path, "/users/user/existsUsername") || strings.Contains(r.URL.Path, "/users/user/existsEmail") || strings.Contains(r.URL.Path, "/users/authenticate") {
 			// Call the next handler without performing authentication
 			next.ServeHTTP(w, r)
 			return
@@ -107,12 +108,12 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Content-Length, Accept-Encoding, X-CSRF-Token, accept, origin, Cache-Control, X-Requested-With")
 			w.WriteHeader(http.StatusOK)
 			return
-		}
+		}*/
 		//otkom ovo i zakom ovo iznad ako testiratenesto bez aut
-		//if true {
-		//	next.ServeHTTP(w, r)
-		//	return
-		//}
+		if true {
+			next.ServeHTTP(w, r)
+			return
+		}
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)

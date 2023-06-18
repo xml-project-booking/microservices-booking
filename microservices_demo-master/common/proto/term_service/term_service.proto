@@ -76,10 +76,9 @@ message UpdateRequest {
   string id = 1;
   string accommodationId = 2;
   string userId = 3;
-  string StartDate = 4;
-  string EndDate = 5;
-  string PriceType = 6;
-  double Value = 7;
+  string Date = 4;
+  string PriceType = 5;
+  double Value = 6;
 }
 
 message UpdateResponse {}

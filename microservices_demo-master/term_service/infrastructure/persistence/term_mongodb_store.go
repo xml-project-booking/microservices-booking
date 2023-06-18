@@ -18,9 +18,24 @@ type TermMongoDBStore struct {
 	terms *mongo.Collection
 }
 
-func (store *TermMongoDBStore) UpdateStatus(user *domain.Term) error {
-	//TODO implement me
-	panic("implement me")
+func (store *TermMongoDBStore) Delete(term *domain.Term) error {
+
+	_, err := store.terms.DeleteOne(context.TODO(), bson.D{{}})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (store *TermMongoDBStore) Update(term *domain.Term) error {
+
+	_, err := store.terms.ReplaceOne(context.TODO(), bson.M{"_id": term.Id}, term)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewTermMongoDBStore(client *mongo.Client) domain.TermStore {

@@ -87,8 +87,8 @@ message GetAllResponse {
 message Accommodation {
   string id = 1;
   string AccommodationReservationType=2;
-  string name = 2;
-  string hostId = 3;
+  string name = 3;
+  string hostId = 4;
 }
 message GetAllIdsByHostRequest {
   string id = 1;

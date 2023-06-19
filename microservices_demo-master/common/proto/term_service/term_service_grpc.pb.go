@@ -19,11 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TermService_Get_FullMethodName    = "/terms.TermService/Get"
-	TermService_GetAll_FullMethodName = "/terms.TermService/GetAll"
-	TermService_Create_FullMethodName = "/terms.TermService/Create"
-	TermService_Update_FullMethodName = "/terms.TermService/Update"
-	TermService_Delete_FullMethodName = "/terms.TermService/Delete"
+	TermService_Get_FullMethodName            = "/terms.TermService/Get"
+	TermService_GetAll_FullMethodName         = "/terms.TermService/GetAll"
+	TermService_Create_FullMethodName         = "/terms.TermService/Create"
+	TermService_Update_FullMethodName         = "/terms.TermService/Update"
+	TermService_Delete_FullMethodName         = "/terms.TermService/Delete"
+	TermService_DeleteInPeriod_FullMethodName = "/terms.TermService/DeleteInPeriod"
+	TermService_UpdateInPeriod_FullMethodName = "/terms.TermService/UpdateInPeriod"
 )
 
 // TermServiceClient is the client API for TermService service.
@@ -35,6 +37,8 @@ type TermServiceClient interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	DeleteInPeriod(ctx context.Context, in *DeleteInPeriodRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	UpdateInPeriod(ctx context.Context, in *UpdateInPeriodRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 }
 
 type termServiceClient struct {
@@ -90,6 +94,24 @@ func (c *termServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts 
 	return out, nil
 }
 
+func (c *termServiceClient) DeleteInPeriod(ctx context.Context, in *DeleteInPeriodRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
+	out := new(DeleteResponse)
+	err := c.cc.Invoke(ctx, TermService_DeleteInPeriod_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *termServiceClient) UpdateInPeriod(ctx context.Context, in *UpdateInPeriodRequest, opts ...grpc.CallOption) (*UpdateResponse, error) {
+	out := new(UpdateResponse)
+	err := c.cc.Invoke(ctx, TermService_UpdateInPeriod_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TermServiceServer is the server API for TermService service.
 // All implementations must embed UnimplementedTermServiceServer
 // for forward compatibility
@@ -99,6 +121,8 @@ type TermServiceServer interface {
 	Create(context.Context, *CreateRequest) (*GetAllResponse, error)
 	Update(context.Context, *UpdateRequest) (*UpdateResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	DeleteInPeriod(context.Context, *DeleteInPeriodRequest) (*DeleteResponse, error)
+	UpdateInPeriod(context.Context, *UpdateInPeriodRequest) (*UpdateResponse, error)
 	mustEmbedUnimplementedTermServiceServer()
 }
 
@@ -120,6 +144,12 @@ func (UnimplementedTermServiceServer) Update(context.Context, *UpdateRequest) (*
 }
 func (UnimplementedTermServiceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedTermServiceServer) DeleteInPeriod(context.Context, *DeleteInPeriodRequest) (*DeleteResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteInPeriod not implemented")
+}
+func (UnimplementedTermServiceServer) UpdateInPeriod(context.Context, *UpdateInPeriodRequest) (*UpdateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateInPeriod not implemented")
 }
 func (UnimplementedTermServiceServer) mustEmbedUnimplementedTermServiceServer() {}
 
@@ -224,6 +254,42 @@ func _TermService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TermService_DeleteInPeriod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteInPeriodRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TermServiceServer).DeleteInPeriod(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TermService_DeleteInPeriod_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TermServiceServer).DeleteInPeriod(ctx, req.(*DeleteInPeriodRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TermService_UpdateInPeriod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateInPeriodRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TermServiceServer).UpdateInPeriod(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TermService_UpdateInPeriod_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TermServiceServer).UpdateInPeriod(ctx, req.(*UpdateInPeriodRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TermService_ServiceDesc is the grpc.ServiceDesc for TermService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +316,14 @@ var TermService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _TermService_Delete_Handler,
+		},
+		{
+			MethodName: "DeleteInPeriod",
+			Handler:    _TermService_DeleteInPeriod_Handler,
+		},
+		{
+			MethodName: "UpdateInPeriod",
+			Handler:    _TermService_UpdateInPeriod_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

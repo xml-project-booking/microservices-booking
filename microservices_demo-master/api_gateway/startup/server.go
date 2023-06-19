@@ -80,6 +80,10 @@ func (server *Server) initCustomHandlers() {
 	orderingHandler := api.NewOrderingHandler(orderingEmdpoint, catalogueEmdpoint, shippingEmdpoint)
 	orderingHandler.Init(server.mux)
 	reservationHandler.Init(server.mux)
+
+	//delete-user
+	userHandler := api.NewUserHandler(userEndpoint, reservationEndpoint, accommodationEndpoint)
+	userHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {

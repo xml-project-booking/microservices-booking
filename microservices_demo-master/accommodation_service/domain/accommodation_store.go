@@ -9,4 +9,5 @@ type AccommodationStore interface {
 	UpdateReservationConfirmationType(accommodation *Accommodation) error
 	DeleteAll()
 	UpdateStatus(user *Accommodation) error
+	DeleteAccommodation(id primitive.ObjectID) error
 }

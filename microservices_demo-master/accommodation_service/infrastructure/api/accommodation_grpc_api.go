@@ -128,3 +128,47 @@ func (handler *AccommodationHandler) GetAll(ctx context.Context, request *pb.Get
 	}
 	return response, nil
 }
+func (handler *AccommodationHandler) GetAllIdsByHost(ctx context.Context, request *pb.GetAllIdsByHostRequest) (*pb.GetAllIdsByHostResponse, error) {
+	id := request.Id
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	allAccommodations, err2 := handler.service.GetAll()
+	if err2 != nil {
+		return nil, err2
+	}
+	accommodations := []*domain.Accommodation{}
+	for _, a := range allAccommodations {
+		if a.HostId == objectId {
+			accommodations = append(accommodations, a)
+		}
+	}
+
+	accommodationIds := []string{}
+	for _, accommodation := range accommodations {
+		accommodationIds = append(accommodationIds, accommodation.HostId.Hex())
+	}
+	response := &pb.GetAllIdsByHostResponse{
+		Ids: accommodationIds,
+	}
+	return response, nil
+}
+func (handler *AccommodationHandler) DeleteAllByHost(ctx context.Context, request *pb.DeleteAllByHostRequest) (*pb.DeleteAllByHostResponse, error) {
+	err := handler.service.DeleteAllAccommodationsByHost(request.Id)
+
+	if err != nil {
+		return &pb.DeleteAllByHostResponse{
+			RequestResult: &pb.RequestResult{
+				Code:    400,
+				Message: err.Error(),
+			},
+		}, err
+	}
+
+	return &pb.DeleteAllByHostResponse{
+		RequestResult: &pb.RequestResult{
+			Code: 200,
+		},
+	}, nil
+}

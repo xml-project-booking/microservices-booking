@@ -35,3 +35,28 @@ func (service *AccommodationService) Create(accommodation *domain.Accommodation)
 func (service *AccommodationService) Cancel(user *domain.Accommodation) error {
 	return service.store.UpdateStatus(user)
 }
+func (service *AccommodationService) GetAllAccommodationsByHost(id string) []domain.Accommodation {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil
+	}
+	filteredAccommodations := []domain.Accommodation{}
+	accomodations, _ := service.store.GetAll()
+	for _, accomodation := range accomodations {
+		if accomodation.HostId == objectId {
+			filteredAccommodations = append(filteredAccommodations, *accomodation)
+		}
+	}
+	return filteredAccommodations
+}
+
+func (service *AccommodationService) DeleteAllAccommodationsByHost(id string) error {
+	for _, accommodation := range service.GetAllAccommodationsByHost(id) {
+		err := service.store.DeleteAccommodation(accommodation.Id)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+

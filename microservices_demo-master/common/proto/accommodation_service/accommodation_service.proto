@@ -30,6 +30,16 @@ service AccommodationService{
       body:"*"
     };
   }
+  rpc GetAllIdsByHost(GetAllIdsByHostRequest) returns(GetAllIdsByHostResponse) {
+    option (google.api.http) = {
+      get: "/accommodations/accommodationIds/{id}"
+    };
+  }
+  rpc DeleteAllByHost(DeleteAllByHostRequest) returns (DeleteAllByHostResponse) {
+    option (google.api.http) = {
+      delete: "/accommodations/delete-host/{id}"
+    };
+  }
 
 }
 message ChangeReservationTypeRequest{
@@ -77,4 +87,24 @@ message GetAllResponse {
 message Accommodation {
   string id = 1;
   string AccommodationReservationType=2;
+  string name = 2;
+  string hostId = 3;
+}
+message GetAllIdsByHostRequest {
+  string id = 1;
+}
+
+message GetAllIdsByHostResponse {
+  repeated string ids = 1;
+}
+message DeleteAllByHostRequest {
+  string id = 1;
+}
+
+message DeleteAllByHostResponse {
+  RequestResult requestResult = 1;
+}
+message RequestResult {
+  int32 code = 1;
+  string message = 2;
 }

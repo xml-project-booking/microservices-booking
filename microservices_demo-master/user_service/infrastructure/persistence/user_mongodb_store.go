@@ -22,6 +22,7 @@ type UserMongoDBStore struct {
 }
 
 var ErrorUsernameTaken = errors.New("Username is already taken")
+var ErrorUserNotFound = errors.New("User not found")
 
 func (store *UserMongoDBStore) UpdateStatus(user *domain.User) error {
 	//TODO implement me
@@ -151,6 +152,16 @@ func (store *UserMongoDBStore) UpdateUser(user *domain.User) error {
 		}
 	}
 	_, err := store.users.ReplaceOne(context.TODO(), bson.M{"_id": user.Id}, user)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+func (store *UserMongoDBStore) DeleteUser(id string) error {
+	objectId, err := primitive.ObjectIDFromHex(id)
+	_, err = store.users.DeleteOne(context.TODO(), bson.M{"_id": objectId})
 
 	if err != nil {
 		return err

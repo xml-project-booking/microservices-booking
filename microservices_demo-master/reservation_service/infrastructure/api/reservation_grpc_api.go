@@ -165,6 +165,72 @@ func (handler *ReservationHandler) GetAll(ctx context.Context, request *pb.GetAl
 	}
 	return response, nil
 }
+func (handler *ReservationHandler) GetAll(ctx context.Context, request *pb.GetAllRequest) (*pb.GetAllResponse, error) {
+	Reservations, err := handler.service.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllResponse{
+		Reservations: []*pb.Reservation{},
+	}
+	for _, Reservation := range Reservations {
+		current := mapReservation(Reservation)
+		response.Reservations = append(response.Reservations, current)
+	}
+	return response, nil
+}
+func (handler *ReservationHandler) GetAllFuture(ctx context.Context, request *pb.GetAllFutureRequest) (*pb.GetAllFutureResponse, error) {
+	reservations, err := handler.service.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	allReservations := []*domain.Reservation{}
+	for _, reservation := range reservations {
+		if reservation.StartDate.After(time.Now()) {
+			allReservations = append(allReservations, reservation)
+		}
+	}
+	response := &pb.GetAllFutureResponse{
+		Reservations: []*pb.Reservation{},
+	}
+	for _, r := range allReservations {
+		current := mapReservation(r)
+		response.Reservations = append(response.Reservations, current)
+	}
+
+	return response, nil
+}
+func (handler *ReservationHandler) HasActiveReservations(ctx context.Context, request *pb.HasActiveReservationsRequest) (response *pb.HasActiveReservationsResponse, err error) {
+	id := request.Id
+	guestId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+
+	reservations, err := handler.service.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	//ako se promeni na enum ovde menjaj
+	allReservations := []*domain.Reservation{}
+	for _, reservation := range reservations {
+		if reservation.GuestId == guestId && reservation.Confirmation == true {
+			allReservations = append(allReservations, reservation)
+		}
+	}
+	hasReservations := false
+	if len(allReservations) != 0 {
+		hasReservations = true
+	}
+
+	// Prepare the response
+	response = &pb.HasActiveReservationsResponse{
+		HasReservations: hasReservations,
+	}
+	return response, nil
+}
 
 func (handler *ReservationHandler) AutomaticallyMakeReservation(ctx context.Context, request *pb.ReservationRequest) (*pb.ReservationRequestResponse, error) {
 	var reservationDTO domain.ReservationDTO

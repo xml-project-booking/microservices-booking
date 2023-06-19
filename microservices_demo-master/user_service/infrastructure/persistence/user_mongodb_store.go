@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"golang.org/x/crypto/bcrypt"
+
 	"user_service/domain"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -25,6 +26,24 @@ var ErrorUsernameTaken = errors.New("Username is already taken")
 func (store *UserMongoDBStore) UpdateStatus(user *domain.User) error {
 	//TODO implement me
 	panic("implement me")
+}
+func (store *UserMongoDBStore) UpdateCancellationNumber(user *domain.User) error {
+	number := user.CancellationNumber + 1
+	result, err := store.users.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": user.Id},
+		bson.D{
+			{"$set", bson.D{{"cancellation_number", number}}},
+		},
+	)
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount != 1 {
+		return errors.New("one document should've been updated")
+	}
+	return nil
+
 }
 
 func NewUserMongoDBStore(client *mongo.Client) domain.UserStore {

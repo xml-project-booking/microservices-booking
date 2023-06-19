@@ -8,23 +8,25 @@ import (
 )
 
 type ReservationDTO struct {
-	Id              primitive.ObjectID `bson:"_id"`
-	AccommodationID primitive.ObjectID `bson:"accommodation_id"`
-	StartDate       string             `bson:"start_date"`
-	EndDate         string             `bson:"end_date"`
-	GuestNumber     string             `bson:"guest_number"`
-	Confirmation    string             `bson:"confirmation"`
-	GuestId         primitive.ObjectID `bson:"guest_id"`
+	Id                primitive.ObjectID `bson:"_id"`
+	AccommodationID   primitive.ObjectID `bson:"accommodation_id"`
+	StartDate         string             `bson:"start_date"`
+	EndDate           string             `bson:"end_date"`
+	GuestNumber       string             `bson:"guest_number"`
+	Confirmation      string             `bson:"confirmation"`
+	GuestId           primitive.ObjectID `bson:"guest_id"`
+	ReservationStatus string             `bson:"reservation_status"`
 }
 
 type Reservation struct {
-	Id              primitive.ObjectID `bson:"_id"`
-	AccommodationID primitive.ObjectID `bson:"accommodation_id"`
-	StartDate       time.Time          `bson:"start_date"`
-	EndDate         time.Time          `bson:"end_date"`
-	GuestNumber     int64              `bson:"guest_number"`
-	Confirmation    bool               `bson:"confirmation"`
-	GuestId         primitive.ObjectID `bson:"guest_id"`
+	Id                primitive.ObjectID `bson:"_id"`
+	AccommodationID   primitive.ObjectID `bson:"accommodation_id"`
+	StartDate         time.Time          `bson:"start_date"`
+	EndDate           time.Time          `bson:"end_date"`
+	GuestNumber       int64              `bson:"guest_number"`
+	Confirmation      bool               `bson:"confirmation"`
+	GuestId           primitive.ObjectID `bson:"guest_id"`
+	ReservationStatus string             `bson:"reservation_status"`
 }
 
 type AccommodationRequest struct {

@@ -23,7 +23,9 @@ func (service *ReservationService) Get(id primitive.ObjectID) (*domain.Reservati
 func (service *ReservationService) GetAllReservationRequests() ([]*domain.Reservation, error) {
 	return service.store.GetAllReservationRequests()
 }
-
+func (service *ReservationService) GetAllReservationsByAccommodation(accommodationId primitive.ObjectID) ([]*domain.Reservation, error) {
+	return service.store.GetAllReservationByAccommodation(accommodationId)
+}
 func (service *ReservationService) GetAllReservation() ([]*domain.Reservation, error) {
 	return service.store.GetAllReservation()
 }

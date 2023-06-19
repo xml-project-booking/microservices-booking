@@ -3,6 +3,8 @@ package persistence
 import (
 	"accommodation_service/domain"
 	"context"
+	"errors"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -40,12 +42,31 @@ func (store *AccommodationMongoDBStore) GetAll() ([]*domain.Accommodation, error
 	return store.filter(filter)
 }
 
-func (store *AccommodationMongoDBStore) Insert(User *domain.Accommodation) error {
-	result, err := store.accommodations.InsertOne(context.TODO(), User)
+func (store *AccommodationMongoDBStore) UpdateReservationConfirmationType(accommodation *domain.Accommodation) error {
+	result, err := store.accommodations.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": accommodation.Id},
+		bson.D{
+			{"$set", bson.D{{"reservation_confirmation", accommodation.ReservationConfirmation}}},
+		},
+	)
 	if err != nil {
 		return err
 	}
-	User.Id = result.InsertedID.(primitive.ObjectID)
+	if result.MatchedCount != 1 {
+		return errors.New("one document should've been updated")
+	}
+	return nil
+}
+
+func (store *AccommodationMongoDBStore) Insert(Accommodation *domain.Accommodation) error {
+	Accommodation.Id = primitive.NewObjectID()
+	result, err := store.accommodations.InsertOne(context.TODO(), &Accommodation)
+	fmt.Println(result)
+	if err != nil {
+		return err
+	}
+	Accommodation.Id = result.InsertedID.(primitive.ObjectID)
 	return nil
 }
 

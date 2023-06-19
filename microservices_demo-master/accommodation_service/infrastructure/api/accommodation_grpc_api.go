@@ -2,10 +2,15 @@ package api
 
 import (
 	"accommodation_service/application"
+	"accommodation_service/domain"
 	"context"
-	pb "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
+	"encoding/json"
+	"fmt"
 
+	pb "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"google.golang.org/protobuf/encoding/protojson"
+	"strconv"
 )
 
 type AccommodationHandler struct {
@@ -18,7 +23,80 @@ func NewAccommodationHandler(service *application.AccommodationService) *Accommo
 		service: service,
 	}
 }
+func (handler *AccommodationHandler) ChangeAccommodationReservationType(ctx context.Context, request *pb.ChangeReservationTypeRequest) (*pb.ChangeReservationTypeResponse, error) {
+	accommodationId := request.Id
+	objectId, err := primitive.ObjectIDFromHex(accommodationId)
+	confirmationType := request.ConfirmationReservationType
 
+	if err != nil {
+		return nil, err
+	}
+	accommodation := domain.Accommodation{
+		Id:                      objectId,
+		ReservationConfirmation: confirmationType,
+	}
+	err = handler.service.UpdateReservationConfirmationType(&accommodation)
+
+	response := &pb.ChangeReservationTypeResponse{
+		Id:  objectId.Hex(),
+		Err: err.Error(),
+	}
+	return response, nil
+}
+func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, request *pb.CreateAccommodationRequest) (*pb.CreateAccommodationResponse, error) {
+	var accommodationDTO domain.AccommodationDTO
+	fmt.Print("request: ")
+	fmt.Println(request)
+
+	jsonBytes, err := protojson.Marshal(request)
+
+	err = json.Unmarshal(jsonBytes, &accommodationDTO)
+	if err != nil {
+		// Handle error
+	}
+	fmt.Println("kako se ispisati  resefvationdto")
+	fmt.Println(accommodationDTO)
+
+	/*if err != nil {
+		handler.LogError.WithFields(logrus.Fields{
+			"status":    "failure",
+			"location":  "AdvertisementHandler",
+			"action":    "CRADA731",
+			"timestamp": time.Now().String(),
+		}).Error("Wrong cast json to AdvertisementDTO!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}*/
+	//layout := "2006-01-02T15:04:05.000Z"
+
+	minGuest, err := strconv.Atoi(accommodationDTO.MinGuest)
+	maxGuest, err := strconv.Atoi(accommodationDTO.MaxGuest)
+
+	/*address := domain.Address{
+		Street: accommodationDTO.Street,
+		StreetNumber: accommodationDTO.StreetNumber,
+		City: accommodationDTO.City,
+		Country: accommodationDTO.Country,
+	}*/
+
+	createAccommodation := domain.Accommodation{
+		Name:                    accommodationDTO.Name,
+		ReservationConfirmation: accommodationDTO.ReservationConfirmation,
+		Street:                  accommodationDTO.Street,
+		StreetNumber:            accommodationDTO.StreetNumber,
+		City:                    accommodationDTO.City,
+		Country:                 accommodationDTO.Country,
+		MinGuest:                minGuest,
+		MaxGuest:                maxGuest,
+	}
+
+	err = handler.service.Create(&createAccommodation)
+	AccommodationPb := mapAccommodation(&createAccommodation)
+	response := &pb.CreateAccommodationResponse{
+		Id: AccommodationPb.Id,
+	}
+	return response, nil
+}
 func (handler *AccommodationHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)

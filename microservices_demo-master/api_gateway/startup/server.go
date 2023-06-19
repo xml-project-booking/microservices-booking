@@ -7,6 +7,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/api"
 	cfg "github.com/tamararankovic/microservices_demo/api_gateway/startup/config"
+	accommodationGw "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
 	reservationGw "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	termGw "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	userGw "github.com/tamararankovic/microservices_demo/common/proto/user_service"
@@ -59,14 +60,26 @@ func (server *Server) initHandlers() {
 		panic(err)
 	}
 
+	accommodationPoint := fmt.Sprintf("%s:%s", server.config.AccommodationHost, server.config.AccommodationPort)
+	err3 := accommodationGw.RegisterAccommodationServiceHandlerFromEndpoint(context.TODO(), server.mux, accommodationPoint, opts)
+	if err3 != nil {
+		fmt.Printf("dhhdhdhdhdhddhdhdhdhdhdhdhdhdhdhdhdhdh")
+		panic(err)
+	}
+
 }
 
 func (server *Server) initCustomHandlers() {
 	catalogueEmdpoint := fmt.Sprintf("%s:%s", server.config.CatalogueHost, server.config.CataloguePort)
 	orderingEmdpoint := fmt.Sprintf("%s:%s", server.config.OrderingHost, server.config.OrderingPort)
 	shippingEmdpoint := fmt.Sprintf("%s:%s", server.config.ShippingHost, server.config.ShippingPort)
+	reservationEndpoint := fmt.Sprintf("%s:%s", server.config.ReservationHost, server.config.ReservationPort)
+	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
+	accommodationEndpoint := fmt.Sprintf("%s:%s", server.config.AccommodationHost, server.config.AccommodationPort)
+	reservationHandler := api.NewReservationHandler(reservationEndpoint, userEndpoint, accommodationEndpoint)
 	orderingHandler := api.NewOrderingHandler(orderingEmdpoint, catalogueEmdpoint, shippingEmdpoint)
 	orderingHandler.Init(server.mux)
+	reservationHandler.Init(server.mux)
 }
 
 func (server *Server) Start() {

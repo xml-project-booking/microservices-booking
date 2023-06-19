@@ -19,15 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserService_Get_FullMethodName            = "/users.UserService/Get"
-	UserService_ExistsUsername_FullMethodName = "/users.UserService/ExistsUsername"
-	UserService_ExistsEmail_FullMethodName    = "/users.UserService/ExistsEmail"
-	UserService_GetAll_FullMethodName         = "/users.UserService/GetAll"
-	UserService_Authenticate_FullMethodName   = "/users.UserService/Authenticate"
-	UserService_Login_FullMethodName          = "/users.UserService/Login"
-	UserService_Register_FullMethodName       = "/users.UserService/Register"
-	UserService_UpdateUser_FullMethodName     = "/users.UserService/UpdateUser"
-	UserService_Delete_FullMethodName         = "/users.UserService/Delete"
+	UserService_Get_FullMethodName                      = "/users.UserService/Get"
+	UserService_ExistsUsername_FullMethodName           = "/users.UserService/ExistsUsername"
+	UserService_ExistsEmail_FullMethodName              = "/users.UserService/ExistsEmail"
+	UserService_GetAll_FullMethodName                   = "/users.UserService/GetAll"
+	UserService_Authenticate_FullMethodName             = "/users.UserService/Authenticate"
+	UserService_Login_FullMethodName                    = "/users.UserService/Login"
+	UserService_Register_FullMethodName                 = "/users.UserService/Register"
+	UserService_UpdateUser_FullMethodName               = "/users.UserService/UpdateUser"
+	UserService_Delete_FullMethodName                   = "/users.UserService/Delete"
+	UserService_UpdateCancellationNumber_FullMethodName = "/users.UserService/UpdateCancellationNumber"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -43,6 +44,7 @@ type UserServiceClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+	UpdateCancellationNumber(ctx context.Context, in *UpdateCancellationNumberRequest, opts ...grpc.CallOption) (*UpdateCancellationNumberResponse, error)
 }
 
 type userServiceClient struct {
@@ -134,6 +136,15 @@ func (c *userServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts 
 	return out, nil
 }
 
+func (c *userServiceClient) UpdateCancellationNumber(ctx context.Context, in *UpdateCancellationNumberRequest, opts ...grpc.CallOption) (*UpdateCancellationNumberResponse, error) {
+	out := new(UpdateCancellationNumberResponse)
+	err := c.cc.Invoke(ctx, UserService_UpdateCancellationNumber_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -147,6 +158,7 @@ type UserServiceServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+	UpdateCancellationNumber(context.Context, *UpdateCancellationNumberRequest) (*UpdateCancellationNumberResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -180,6 +192,9 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserReq
 }
 func (UnimplementedUserServiceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateCancellationNumber(context.Context, *UpdateCancellationNumberRequest) (*UpdateCancellationNumberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCancellationNumber not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -356,6 +371,24 @@ func _UserService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UpdateCancellationNumber_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCancellationNumberRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateCancellationNumber(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UpdateCancellationNumber_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateCancellationNumber(ctx, req.(*UpdateCancellationNumberRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -398,6 +431,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _UserService_Delete_Handler,
+		},
+		{
+			MethodName: "UpdateCancellationNumber",
+			Handler:    _UserService_UpdateCancellationNumber_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

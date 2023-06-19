@@ -5,9 +5,13 @@ import (
 	"resevation/domain"
 )
 
-func mapReservation(order *domain.Reservation) *pb.Reservation {
+func mapReservation(reservation *domain.Reservation) *pb.Reservation {
 	orderPb := &pb.Reservation{
-		Id: order.Id.Hex(),
+		Id:          reservation.Id.Hex(),
+		StartDate:   reservation.StartDate.String(),
+		EndDate:     reservation.EndDate.String(),
+		GuestNumber: reservation.GuestNumber,
+		GuestId:     reservation.GuestId.Hex(),
 	}
 	return orderPb
 }

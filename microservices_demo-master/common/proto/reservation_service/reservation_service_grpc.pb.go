@@ -19,10 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ReservationService_Get_FullMethodName                       = "/accommodations.ReservationService/Get"
-	ReservationService_GetAll_FullMethodName                    = "/accommodations.ReservationService/GetAll"
-	ReservationService_MakeRequestForReservation_FullMethodName = "/accommodations.ReservationService/MakeRequestForReservation"
-	ReservationService_CancelReservation_FullMethodName         = "/accommodations.ReservationService/CancelReservation"
+	ReservationService_Get_FullMethodName                             = "/reservations.ReservationService/Get"
+	ReservationService_GetAll_FullMethodName                          = "/reservations.ReservationService/GetAll"
+	ReservationService_GetAllByAccommodation_FullMethodName           = "/reservations.ReservationService/GetAllByAccommodation"
+	ReservationService_MakeRequestForReservation_FullMethodName       = "/reservations.ReservationService/MakeRequestForReservation"
+	ReservationService_CancelReservation_FullMethodName               = "/reservations.ReservationService/CancelReservation"
+	ReservationService_ConfirmReservationManually_FullMethodName      = "/reservations.ReservationService/ConfirmReservationManually"
+	ReservationService_CancelReservationManually_FullMethodName       = "/reservations.ReservationService/CancelReservationManually"
+	ReservationService_ConfirmReservationAutomatically_FullMethodName = "/reservations.ReservationService/ConfirmReservationAutomatically"
 )
 
 // ReservationServiceClient is the client API for ReservationService service.
@@ -31,8 +35,12 @@ const (
 type ReservationServiceClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	GetAllByAccommodation(ctx context.Context, in *GetAllByAccommodationRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error)
 	MakeRequestForReservation(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*ReservationRequestResponse, error)
 	CancelReservation(ctx context.Context, in *CancelReservationRequest, opts ...grpc.CallOption) (*CancelReservationResponse, error)
+	ConfirmReservationManually(ctx context.Context, in *ConfirmReservationManuallyRequest, opts ...grpc.CallOption) (*ConfirmReservationManuallyResponse, error)
+	CancelReservationManually(ctx context.Context, in *CancelReservationManuallyRequest, opts ...grpc.CallOption) (*CancelReservationManuallyResponse, error)
+	ConfirmReservationAutomatically(ctx context.Context, in *CancelReservationManuallyRequest, opts ...grpc.CallOption) (*CancelReservationManuallyResponse, error)
 }
 
 type reservationServiceClient struct {
@@ -61,6 +69,15 @@ func (c *reservationServiceClient) GetAll(ctx context.Context, in *GetAllRequest
 	return out, nil
 }
 
+func (c *reservationServiceClient) GetAllByAccommodation(ctx context.Context, in *GetAllByAccommodationRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error) {
+	out := new(GetAllByAccommodationResponse)
+	err := c.cc.Invoke(ctx, ReservationService_GetAllByAccommodation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *reservationServiceClient) MakeRequestForReservation(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*ReservationRequestResponse, error) {
 	out := new(ReservationRequestResponse)
 	err := c.cc.Invoke(ctx, ReservationService_MakeRequestForReservation_FullMethodName, in, out, opts...)
@@ -79,14 +96,45 @@ func (c *reservationServiceClient) CancelReservation(ctx context.Context, in *Ca
 	return out, nil
 }
 
+func (c *reservationServiceClient) ConfirmReservationManually(ctx context.Context, in *ConfirmReservationManuallyRequest, opts ...grpc.CallOption) (*ConfirmReservationManuallyResponse, error) {
+	out := new(ConfirmReservationManuallyResponse)
+	err := c.cc.Invoke(ctx, ReservationService_ConfirmReservationManually_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reservationServiceClient) CancelReservationManually(ctx context.Context, in *CancelReservationManuallyRequest, opts ...grpc.CallOption) (*CancelReservationManuallyResponse, error) {
+	out := new(CancelReservationManuallyResponse)
+	err := c.cc.Invoke(ctx, ReservationService_CancelReservationManually_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reservationServiceClient) ConfirmReservationAutomatically(ctx context.Context, in *CancelReservationManuallyRequest, opts ...grpc.CallOption) (*CancelReservationManuallyResponse, error) {
+	out := new(CancelReservationManuallyResponse)
+	err := c.cc.Invoke(ctx, ReservationService_ConfirmReservationAutomatically_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReservationServiceServer is the server API for ReservationService service.
 // All implementations must embed UnimplementedReservationServiceServer
 // for forward compatibility
 type ReservationServiceServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+	GetAllByAccommodation(context.Context, *GetAllByAccommodationRequest) (*GetAllByAccommodationResponse, error)
 	MakeRequestForReservation(context.Context, *ReservationRequest) (*ReservationRequestResponse, error)
 	CancelReservation(context.Context, *CancelReservationRequest) (*CancelReservationResponse, error)
+	ConfirmReservationManually(context.Context, *ConfirmReservationManuallyRequest) (*ConfirmReservationManuallyResponse, error)
+	CancelReservationManually(context.Context, *CancelReservationManuallyRequest) (*CancelReservationManuallyResponse, error)
+	ConfirmReservationAutomatically(context.Context, *CancelReservationManuallyRequest) (*CancelReservationManuallyResponse, error)
 	mustEmbedUnimplementedReservationServiceServer()
 }
 
@@ -100,11 +148,23 @@ func (UnimplementedReservationServiceServer) Get(context.Context, *GetRequest) (
 func (UnimplementedReservationServiceServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
+func (UnimplementedReservationServiceServer) GetAllByAccommodation(context.Context, *GetAllByAccommodationRequest) (*GetAllByAccommodationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllByAccommodation not implemented")
+}
 func (UnimplementedReservationServiceServer) MakeRequestForReservation(context.Context, *ReservationRequest) (*ReservationRequestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakeRequestForReservation not implemented")
 }
 func (UnimplementedReservationServiceServer) CancelReservation(context.Context, *CancelReservationRequest) (*CancelReservationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CancelReservation not implemented")
+}
+func (UnimplementedReservationServiceServer) ConfirmReservationManually(context.Context, *ConfirmReservationManuallyRequest) (*ConfirmReservationManuallyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmReservationManually not implemented")
+}
+func (UnimplementedReservationServiceServer) CancelReservationManually(context.Context, *CancelReservationManuallyRequest) (*CancelReservationManuallyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CancelReservationManually not implemented")
+}
+func (UnimplementedReservationServiceServer) ConfirmReservationAutomatically(context.Context, *CancelReservationManuallyRequest) (*CancelReservationManuallyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ConfirmReservationAutomatically not implemented")
 }
 func (UnimplementedReservationServiceServer) mustEmbedUnimplementedReservationServiceServer() {}
 
@@ -155,6 +215,24 @@ func _ReservationService_GetAll_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReservationService_GetAllByAccommodation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllByAccommodationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).GetAllByAccommodation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_GetAllByAccommodation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).GetAllByAccommodation(ctx, req.(*GetAllByAccommodationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ReservationService_MakeRequestForReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReservationRequest)
 	if err := dec(in); err != nil {
@@ -191,11 +269,65 @@ func _ReservationService_CancelReservation_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReservationService_ConfirmReservationManually_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfirmReservationManuallyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).ConfirmReservationManually(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_ConfirmReservationManually_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).ConfirmReservationManually(ctx, req.(*ConfirmReservationManuallyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReservationService_CancelReservationManually_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelReservationManuallyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).CancelReservationManually(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_CancelReservationManually_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).CancelReservationManually(ctx, req.(*CancelReservationManuallyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReservationService_ConfirmReservationAutomatically_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CancelReservationManuallyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).ConfirmReservationAutomatically(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_ConfirmReservationAutomatically_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).ConfirmReservationAutomatically(ctx, req.(*CancelReservationManuallyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReservationService_ServiceDesc is the grpc.ServiceDesc for ReservationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ReservationService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "accommodations.ReservationService",
+	ServiceName: "reservations.ReservationService",
 	HandlerType: (*ReservationServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -207,12 +339,28 @@ var ReservationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ReservationService_GetAll_Handler,
 		},
 		{
+			MethodName: "GetAllByAccommodation",
+			Handler:    _ReservationService_GetAllByAccommodation_Handler,
+		},
+		{
 			MethodName: "MakeRequestForReservation",
 			Handler:    _ReservationService_MakeRequestForReservation_Handler,
 		},
 		{
 			MethodName: "CancelReservation",
 			Handler:    _ReservationService_CancelReservation_Handler,
+		},
+		{
+			MethodName: "ConfirmReservationManually",
+			Handler:    _ReservationService_ConfirmReservationManually_Handler,
+		},
+		{
+			MethodName: "CancelReservationManually",
+			Handler:    _ReservationService_CancelReservationManually_Handler,
+		},
+		{
+			MethodName: "ConfirmReservationAutomatically",
+			Handler:    _ReservationService_ConfirmReservationAutomatically_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

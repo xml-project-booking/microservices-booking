@@ -6,6 +6,7 @@ type AccommodationStore interface {
 	Get(id primitive.ObjectID) (*Accommodation, error)
 	GetAll() ([]*Accommodation, error)
 	Insert(user *Accommodation) error
+	UpdateReservationConfirmationType(accommodation *Accommodation) error
 	DeleteAll()
 	UpdateStatus(user *Accommodation) error
 }

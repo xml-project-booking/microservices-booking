@@ -2,7 +2,7 @@
 syntax = "proto3";
 option go_package = "github.com/tamararankovic/microservices_demo/common/reservations";
 
-package accommodations;
+package reservations;
 
 
 import "google/api/annotations.proto";
@@ -18,6 +18,12 @@ service ReservationService{
       get: "/reservations/reservation"
     };
   }
+
+  rpc GetAllByAccommodation(GetAllByAccommodationRequest) returns(GetAllByAccommodationResponse) {
+    option (google.api.http) = {
+      get: "/reservations/accommodation/{id}"
+    };
+  }
   rpc MakeRequestForReservation(ReservationRequest) returns (ReservationRequestResponse){
     option (google.api.http) = {
       post: "/reservations/reservation-request"
@@ -27,6 +33,24 @@ service ReservationService{
   rpc CancelReservation(CancelReservationRequest) returns (CancelReservationResponse){
     option (google.api.http) = {
       get: "/reservations/cancel-request/{id}"
+    };
+  }
+  rpc ConfirmReservationManually(ConfirmReservationManuallyRequest) returns (ConfirmReservationManuallyResponse){
+    option (google.api.http) = {
+      post: "/reservations/manually-confirm"
+      body:"*"
+    };
+  }
+  rpc CancelReservationManually(CancelReservationManuallyRequest) returns (CancelReservationManuallyResponse){
+    option (google.api.http) = {
+      post: "/reservations/manually-cancel"
+      body:"*"
+    };
+  }
+  rpc ConfirmReservationAutomatically(CancelReservationManuallyRequest) returns (CancelReservationManuallyResponse){
+    option (google.api.http) = {
+      post: "/reservations/automatically-confirm"
+      body:"*"
     };
   }
 }
@@ -50,10 +74,28 @@ message ReservationRequest {
 message CancelReservationRequest {
   string id = 1;
 }
+message CancelReservationManuallyRequest{
+  string id = 1;
+  string accommodationId = 2;
+}
+message CancelReservationManuallyResponse{
+  string id = 1;
 
+}
+message ConfirmReservationManuallyRequest{
+  string id = 1;
+  string accommodationId = 2;
+}
+message ConfirmReservationManuallyResponse{
+  string id = 1;
+}
 message CancelReservationResponse {
   string id = 1;
   bool isDeleted = 2;
+}
+
+message ConfirmReservationAutomatically{
+
 }
 
 message GetResponse {
@@ -73,6 +115,12 @@ message ReservationRequestResponse{
 }
 message Reservation {
   string id = 1;
+  string accommodationID = 2;
+  string  startDate = 3;
+  string endDate = 4;
+  int64 guestNumber = 5;
+  bool  isConfirmed = 6;
+  string guestId = 7;
 }
 
 message ReservationDTO {
@@ -84,3 +132,10 @@ message ReservationDTO {
   bool  isConfirmed = 6;
 
 }
+
+message GetAllByAccommodationRequest{
+  string id = 1;
+}
+ message GetAllByAccommodationResponse {
+   repeated Reservation reservations = 1;
+ }

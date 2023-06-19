@@ -14,4 +14,5 @@ type UserStore interface {
 	GetUserByUsername(username string) (*User, error)
 	CheckIfEmailExists(email string) (bool, error)
 	UpdateUser(user *User) error
+	UpdateCancellationNumber(user *User) error
 }

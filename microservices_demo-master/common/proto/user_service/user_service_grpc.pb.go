@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+<<<<<<< HEAD
 	UserService_Get_FullMethodName            = "/users.UserService/Get"
 	UserService_ExistsUsername_FullMethodName = "/users.UserService/ExistsUsername"
 	UserService_ExistsEmail_FullMethodName    = "/users.UserService/ExistsEmail"
@@ -28,6 +29,11 @@ const (
 	UserService_Register_FullMethodName       = "/users.UserService/Register"
 	UserService_UpdateUser_FullMethodName     = "/users.UserService/UpdateUser"
 	UserService_Delete_FullMethodName         = "/users.UserService/Delete"
+=======
+	UserService_Get_FullMethodName                      = "/users.UserService/Get"
+	UserService_GetAll_FullMethodName                   = "/users.UserService/GetAll"
+	UserService_UpdateCancellationNumber_FullMethodName = "/users.UserService/UpdateCancellationNumber"
+>>>>>>> 859ba3a (implemented creating of accommodation)
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -38,11 +44,15 @@ type UserServiceClient interface {
 	ExistsUsername(ctx context.Context, in *ExistsUsernameRequest, opts ...grpc.CallOption) (*ExistsUsernameResponse, error)
 	ExistsEmail(ctx context.Context, in *ExistsEmailRequest, opts ...grpc.CallOption) (*ExistsEmailResponse, error)
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+<<<<<<< HEAD
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
+=======
+	UpdateCancellationNumber(ctx context.Context, in *UpdateCancellationNumberRequest, opts ...grpc.CallOption) (*UpdateCancellationNumberResponse, error)
+>>>>>>> 859ba3a (implemented creating of accommodation)
 }
 
 type userServiceClient struct {
@@ -89,6 +99,7 @@ func (c *userServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opts 
 	return out, nil
 }
 
+<<<<<<< HEAD
 func (c *userServiceClient) Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error) {
 	out := new(AuthenticateResponse)
 	err := c.cc.Invoke(ctx, UserService_Authenticate_FullMethodName, in, out, opts...)
@@ -128,6 +139,11 @@ func (c *userServiceClient) UpdateUser(ctx context.Context, in *UpdateUserReques
 func (c *userServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error) {
 	out := new(DeleteResponse)
 	err := c.cc.Invoke(ctx, UserService_Delete_FullMethodName, in, out, opts...)
+=======
+func (c *userServiceClient) UpdateCancellationNumber(ctx context.Context, in *UpdateCancellationNumberRequest, opts ...grpc.CallOption) (*UpdateCancellationNumberResponse, error) {
+	out := new(UpdateCancellationNumberResponse)
+	err := c.cc.Invoke(ctx, UserService_UpdateCancellationNumber_FullMethodName, in, out, opts...)
+>>>>>>> 859ba3a (implemented creating of accommodation)
 	if err != nil {
 		return nil, err
 	}
@@ -142,11 +158,15 @@ type UserServiceServer interface {
 	ExistsUsername(context.Context, *ExistsUsernameRequest) (*ExistsUsernameResponse, error)
 	ExistsEmail(context.Context, *ExistsEmailRequest) (*ExistsEmailResponse, error)
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+<<<<<<< HEAD
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
+=======
+	UpdateCancellationNumber(context.Context, *UpdateCancellationNumberRequest) (*UpdateCancellationNumberResponse, error)
+>>>>>>> 859ba3a (implemented creating of accommodation)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -166,6 +186,7 @@ func (UnimplementedUserServiceServer) ExistsEmail(context.Context, *ExistsEmailR
 func (UnimplementedUserServiceServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
+<<<<<<< HEAD
 func (UnimplementedUserServiceServer) Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Authenticate not implemented")
 }
@@ -180,6 +201,10 @@ func (UnimplementedUserServiceServer) UpdateUser(context.Context, *UpdateUserReq
 }
 func (UnimplementedUserServiceServer) Delete(context.Context, *DeleteRequest) (*DeleteResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+=======
+func (UnimplementedUserServiceServer) UpdateCancellationNumber(context.Context, *UpdateCancellationNumberRequest) (*UpdateCancellationNumberResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCancellationNumber not implemented")
+>>>>>>> 859ba3a (implemented creating of accommodation)
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -266,12 +291,18 @@ func _UserService_GetAll_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+<<<<<<< HEAD
 func _UserService_Authenticate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AuthenticateRequest)
+=======
+func _UserService_UpdateCancellationNumber_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCancellationNumberRequest)
+>>>>>>> 859ba3a (implemented creating of accommodation)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
+<<<<<<< HEAD
 		return srv.(UserServiceServer).Authenticate(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
@@ -352,6 +383,16 @@ func _UserService_Delete_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).Delete(ctx, req.(*DeleteRequest))
+=======
+		return srv.(UserServiceServer).UpdateCancellationNumber(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UpdateCancellationNumber_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateCancellationNumber(ctx, req.(*UpdateCancellationNumberRequest))
+>>>>>>> 859ba3a (implemented creating of accommodation)
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -380,6 +421,7 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetAll_Handler,
 		},
 		{
+<<<<<<< HEAD
 			MethodName: "Authenticate",
 			Handler:    _UserService_Authenticate_Handler,
 		},
@@ -398,6 +440,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _UserService_Delete_Handler,
+=======
+			MethodName: "UpdateCancellationNumber",
+			Handler:    _UserService_UpdateCancellationNumber_Handler,
+>>>>>>> 859ba3a (implemented creating of accommodation)
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -134,6 +134,22 @@ func (handler *ReservationHandler) Get(ctx context.Context, request *pb.GetReque
 	}
 	return response, nil
 }
+func (handler *ReservationHandler) GetAllByAccommodation(ctx context.Context, request *pb.GetAllByAccommodationRequest) (*pb.GetAllByAccommodationResponse, error) {
+	accommodationId := request.Id
+	objectId, err := primitive.ObjectIDFromHex(accommodationId)
+	Reservations, err := handler.service.GetAllReservationsByAccommodation(objectId)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllByAccommodationResponse{
+		Reservations: []*pb.Reservation{},
+	}
+	for _, Reservation := range Reservations {
+		current := mapReservation(Reservation)
+		response.Reservations = append(response.Reservations, current)
+	}
+	return response, nil
+}
 
 func (handler *ReservationHandler) GetAll(ctx context.Context, request *pb.GetAllRequest) (*pb.GetAllResponse, error) {
 	Reservations, err := handler.service.GetAll()
@@ -150,22 +166,70 @@ func (handler *ReservationHandler) GetAll(ctx context.Context, request *pb.GetAl
 	return response, nil
 }
 
-/*if err != nil {
-	handler.LogError.WithFields(logrus.Fields{
-		"status":    "failure",
-		"location":  "AdvertisementHandler",
-		"action":    "CRADA731",
-		"timestamp": time.Now().String(),
-	}).Error("Failed creating reservation!")
-	.WriteHeader(http.StatusExpectationFailed)
-	return
-}*/
+func (handler *ReservationHandler) AutomaticallyMakeReservation(ctx context.Context, request *pb.ReservationRequest) (*pb.ReservationRequestResponse, error) {
+	var reservationDTO domain.ReservationDTO
+	fmt.Print("request: ")
+	fmt.Println(request)
 
-/*handler.LogInfo.WithFields(logrus.Fields{
-	"status":    "success",
-	"location":  "ReservationHandler",
-	"action":    "CRADA731",
-	"timestamp": time.Now().String(),
-}).Info("Successfully created reservation request!")
-w.WriteHeader(http.StatusCreated)
-w.Header().Set("Content-Type", "application/json")*/
+	jsonBytes, err := protojson.Marshal(request)
+	if err != nil {
+		{
+			handler.LogError.WithFields(logrus.Fields{
+				"status":    "failure",
+				"location":  "Reservation Handler",
+				"action":    "CRADA731",
+				"timestamp": time.Now().String(),
+			}).Error("Wrong cast json to ReservationDTO!")
+		}
+	}
+
+	err = json.Unmarshal(jsonBytes, &reservationDTO)
+	if err != nil {
+		// Handle error
+	}
+	fmt.Println("kako se ispisati  resefvationdto")
+	fmt.Println(reservationDTO)
+
+	/*if err != nil {
+		handler.LogError.WithFields(logrus.Fields{
+			"status":    "failure",
+			"location":  "AdvertisementHandler",
+			"action":    "CRADA731",
+			"timestamp": time.Now().String(),
+		}).Error("Wrong cast json to AdvertisementDTO!")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}*/
+	layout := "2006-01-02T15:04:05.000Z"
+	startDate, _ := time.Parse(layout, reservationDTO.StartDate)
+	endDate, _ := time.Parse(layout, reservationDTO.EndDate)
+	num, err := strconv.Atoi(reservationDTO.GuestNumber)
+	b, err := strconv.ParseBool(reservationDTO.Confirmation)
+
+	var isTaken = handler.service.CheckForReservationInDateRange(reservationDTO.AccommodationID, startDate, endDate)
+	re := &pb.ReservationRequestResponse{Id: "greska"}
+	if isTaken == true {
+		return re, nil
+	}
+
+	reservationRequest := domain.Reservation{
+		AccommodationID: reservationDTO.AccommodationID,
+		StartDate:       startDate,
+		EndDate:         endDate,
+		Confirmation:    b,
+		GuestNumber:     int64(num),
+		GuestId:         reservationDTO.GuestId,
+	}
+	fmt.Println(reservationDTO.AccommodationID)
+	fmt.Println("ahhahahahahahahaahahahah")
+	fmt.Println(reservationDTO.AccommodationID)
+	fmt.Println(reservationDTO.StartDate)
+	fmt.Println(reservationDTO.EndDate)
+
+	err = handler.service.CreateReservationRequest(&reservationRequest)
+	ReservationPb := mapReservation(&reservationRequest)
+	response := &pb.ReservationRequestResponse{
+		Id: ReservationPb.Id,
+	}
+	return response, nil
+}

@@ -8,6 +8,7 @@ import (
 )
 
 type User struct {
+<<<<<<< HEAD
 	Id       primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Name     string             `bson:"name" json:"name"`
 	Surname  string             `bson:"surname,omitempty" json:"surname"`
@@ -67,4 +68,8 @@ func (user *User) CheckPassword(providedPassword string) error {
 		return err
 	}
 	return nil
+=======
+	Id                 primitive.ObjectID `bson:"_id"`
+	CancellationNumber int                `bson:"cancellation_number"`
+>>>>>>> 859ba3a (implemented creating of accommodation)
 }

@@ -3,8 +3,11 @@ package services
 import (
 	"log"
 
+	accommodations "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
+
 	catalogue "github.com/tamararankovic/microservices_demo/common/proto/catalogue_service"
 	ordering "github.com/tamararankovic/microservices_demo/common/proto/ordering_service"
+	reservations "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	shipping "github.com/tamararankovic/microservices_demo/common/proto/shipping_service"
 	user "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"google.golang.org/grpc"
@@ -40,6 +43,23 @@ func NewUserClient(address string) user.UserServiceClient {
 		log.Fatalf("Failed to start gRPC connection to Shipping service: %v", err)
 	}
 	return user.NewUserServiceClient(conn)
+}
+
+func NewReservationClient(address string) reservations.ReservationServiceClient {
+	conn, err := getConnection(address)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC connection to Shipping service: %v", err)
+	}
+	return reservations.NewReservationServiceClient(conn)
+
+}
+func NewAccommodationClient(address string) accommodations.AccommodationServiceClient {
+	conn, err := getConnection(address)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC connection to Shipping service: %v", err)
+	}
+	return accommodations.NewAccommodationServiceClient(conn)
+
 }
 
 func getConnection(address string) (*grpc.ClientConn, error) {

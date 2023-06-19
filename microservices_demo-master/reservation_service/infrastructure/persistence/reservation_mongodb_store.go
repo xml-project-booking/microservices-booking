@@ -64,14 +64,18 @@ func (store *ReservationMongoDBStore) GetAllReservation() ([]*domain.Reservation
 	return store.filter(filter)
 }
 
+func (store *ReservationMongoDBStore) GetAllReservationByAccommodation(accommodationId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"accommodation_id": accommodationId}
+	return store.filter(filter)
+}
+
 func (store *ReservationMongoDBStore) GetAll() ([]*domain.Reservation, error) {
 	filter := bson.D{{}}
 	return store.filter(filter)
 }
 
 func (store *ReservationMongoDBStore) Insert(Reservation *domain.Reservation) error {
-	fmt.Println("dosao si dovdee majnmuneeeeee")
-	fmt.Println(Reservation)
+
 	Reservation.Id = primitive.NewObjectID()
 	result, err := store.reservations.InsertOne(context.TODO(), &Reservation)
 	fmt.Println(result)

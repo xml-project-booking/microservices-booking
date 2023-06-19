@@ -165,20 +165,6 @@ func (handler *ReservationHandler) GetAll(ctx context.Context, request *pb.GetAl
 	}
 	return response, nil
 }
-func (handler *ReservationHandler) GetAll(ctx context.Context, request *pb.GetAllRequest) (*pb.GetAllResponse, error) {
-	Reservations, err := handler.service.GetAll()
-	if err != nil {
-		return nil, err
-	}
-	response := &pb.GetAllResponse{
-		Reservations: []*pb.Reservation{},
-	}
-	for _, Reservation := range Reservations {
-		current := mapReservation(Reservation)
-		response.Reservations = append(response.Reservations, current)
-	}
-	return response, nil
-}
 func (handler *ReservationHandler) GetAllFuture(ctx context.Context, request *pb.GetAllFutureRequest) (*pb.GetAllFutureResponse, error) {
 	reservations, err := handler.service.GetAll()
 	if err != nil {

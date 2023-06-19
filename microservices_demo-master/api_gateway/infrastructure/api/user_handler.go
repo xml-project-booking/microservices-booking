@@ -9,7 +9,7 @@ import (
 	accommodationGw "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
 	reservationGw "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	userGw "github.com/tamararankovic/microservices_demo/common/proto/user_service"
-	"log"
+	//"log"
 	"net/http"
 )
 

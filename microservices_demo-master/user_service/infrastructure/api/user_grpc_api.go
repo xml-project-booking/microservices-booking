@@ -6,6 +6,7 @@ import (
 	"strings"
 	"user_service/application"
 	"user_service/domain"
+	"user_service/infrastructure/persistence"
 
 	pb "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 

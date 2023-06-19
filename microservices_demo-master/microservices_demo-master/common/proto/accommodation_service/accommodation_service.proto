@@ -1,0 +1,70 @@
+
+syntax = "proto3";
+option go_package = "github.com/tamararankovic/microservices_demo/common/accommodations";
+
+package accommodations;
+
+
+import "google/api/annotations.proto";
+
+service AccommodationService{
+  rpc Get(GetRequest) returns(GetResponse) {
+    option (google.api.http) = {
+      get: "/accommodations/accommodation/{id}"
+    };
+  }
+  rpc GetAll(GetAllRequest) returns(GetAllResponse) {
+    option (google.api.http) = {
+      get: "/accommodations/accommodation"
+    };
+  }
+  rpc GetAllIdsByHost(GetAllIdsByHostRequest) returns(GetAllIdsByHostResponse) {
+    option (google.api.http) = {
+      get: "/accommodations/accommodationIds/{id}"
+    };
+  }
+  rpc DeleteAllByHost(DeleteAllByHostRequest) returns (DeleteAllByHostResponse) {
+    option (google.api.http) = {
+      delete: "/accommodations/delete-host/{id}"
+    };
+  }
+}
+
+message GetRequest {
+  string id = 1;
+}
+
+message GetResponse {
+  Accommodation accommodation = 1;
+}
+
+message GetAllRequest {
+}
+
+message GetAllResponse {
+  repeated Accommodation accommodations = 1;
+}
+
+message Accommodation {
+  string id = 1;
+  string name = 2;
+  string hostId = 3;
+}
+message GetAllIdsByHostRequest {
+  string id = 1;
+}
+
+message GetAllIdsByHostResponse {
+  repeated string ids = 1;
+}
+message DeleteAllByHostRequest {
+  string id = 1;
+}
+
+message DeleteAllByHostResponse {
+  RequestResult requestResult = 1;
+}
+message RequestResult {
+  int32 code = 1;
+  string message = 2;
+}

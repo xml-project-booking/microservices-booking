@@ -1,0 +1,165 @@
+version: "3.8"
+
+services:
+
+  accommodation_service:
+    image: accommodation_service
+    container_name: accommodation_service
+    build:
+      context: .
+      dockerfile: ./accommodation_service/Dockerfile
+    restart: on-failure
+    environment:
+      ACCOMMODATION_DB_HOST: ${ACCOMMODATION_DB_HOST}
+      ACCOMMODATION_DB_PORT: ${ACCOMMODATION_DB_PORT}
+      ACCOMMODATION_SERVICE_PORT: ${ACCOMMODATION_SERVICE_PORT}
+    depends_on:
+      - accommodation_db
+    networks:
+      - network
+
+  reservation_service:
+    image: reservation_service
+    container_name: reservation_service
+    build:
+      context: .
+      dockerfile: ./reservation_service/Dockerfile
+    restart: on-failure
+    environment:
+      RESERVATION_DB_HOST: ${RESERVATION_DB_HOST}
+      RESERVATION_DB_PORT: ${RESERVATION_DB_PORT}
+      RESERVATION_SERVICE_PORT: ${RESERVATION_SERVICE_PORT}
+    depends_on:
+      - reservation_db
+    networks:
+      - network
+
+  user_service:
+    image: user_service
+    container_name: user_service
+    build:
+      context: .
+      dockerfile: ./user_service/Dockerfile
+    restart: on-failure
+    environment:
+      USER_DB_HOST: ${USER_DB_HOST}
+      USER_DB_PORT: ${USER_DB_PORT}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+    depends_on:
+      - user_db
+    networks:
+      - network
+
+  term_service:
+    image: term_service
+    container_name: term_service
+    build:
+      context: .
+      dockerfile: ./term_service/Dockerfile
+    restart: on-failure
+    environment:
+      ACCOMMODATION_DB_HOST: ${ACCOMMODATION_DB_HOST}
+      ACCOMMODATION_DB_PORT: ${ACCOMMODATION_DB_PORT}
+      ACCOMMODATION_SERVICE_PORT: ${ACCOMMODATION_SERVICE_PORT}
+    depends_on:
+      - term_db
+    networks:
+      - network
+
+
+
+
+
+  api_gateway:
+    image: api_gateway
+    container_name: api_gateway
+    build:
+      context: .
+      dockerfile: ./api_gateway/Dockerfile
+    restart: on-failure
+    ports:
+      - ${GATEWAY_PORT}:${GATEWAY_PORT}
+    environment:
+      GATEWAY_PORT: ${GATEWAY_PORT}
+      RESERVATION_SERVICE_HOST: ${RESERVATION_SERVICE_HOST}
+      RESERVATION_SERVICE_PORT: ${RESERVATION_SERVICE_PORT}
+      ORDERING_SERVICE_HOST: ${ORDERING_SERVICE_HOST}
+      ORDERING_SERVICE_PORT: ${ORDERING_SERVICE_PORT}
+      SHIPPING_SERVICE_HOST: ${SHIPPING_SERVICE_HOST}
+      SHIPPING_SERVICE_PORT: ${SHIPPING_SERVICE_PORT}
+      INVENTORY_SERVICE_HOST: ${INVENTORY_SERVICE_HOST}
+      INVENTORY_SERVICE_PORT: ${INVENTORY_SERVICE_PORT}
+      TERM_SERVICE_HOST: ${TERM_SERVICE_HOST}
+      TERM_SERVICE_PORT: ${TERM_SERVICE_PORT}
+      USER_SERVICE_HOST: ${USER_SERVICE_HOST}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT}
+      ACCOMMODATION_SERVICE_HOST: ${ACCOMMODATION_SERVICE_HOST}
+      ACCOMMODATION_SERVICE_PORT: ${ACCOMMODATION_SERVICE_PORT}
+    networks:
+      - network
+
+  accommodation_db:
+    image: mongo
+    container_name: accommodation_db
+    restart: on-failure
+    ports:
+      - "27022:27017"
+    networks:
+      - network
+
+  reservation_db:
+    image: mongo
+    container_name: reservation_db
+    restart: on-failure
+    ports:
+      - "27023:27017"
+    networks:
+      - network
+
+
+
+
+  term_db:
+    image: mongo
+    container_name: term_db
+    restart: on-failure
+    ports:
+      - "27033:27017"
+    networks:
+      - network
+
+  user_db:
+    image: mongo
+    container_name: user_db
+    restart: on-failure
+    ports:
+      - "27017:27017"
+    networks:
+      - network
+
+  mongo-express-2:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=user_db
+      - ME_CONFIG_MONGODB_PORT=27017
+    links:
+      - user_db
+    depends_on:
+      - user_db
+    networks:
+      - network
+
+
+
+  nats:
+    image: nats
+    container_name: nats
+    restart: on-failure
+    networks:
+      - network
+
+networks:
+  network:
+    driver: bridge

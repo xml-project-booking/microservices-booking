@@ -1,0 +1,114 @@
+
+syntax = "proto3";
+option go_package = "github.com/tamararankovic/microservices_demo/common/reservations";
+
+package reservations;
+
+
+import "google/api/annotations.proto";
+
+service ReservationService{
+  rpc Get(GetRequest) returns(GetResponse) {
+    option (google.api.http) = {
+      get: "/reservations/reservation/{id}"
+    };
+  }
+  rpc GetAll(GetAllRequest) returns(GetAllResponse) {
+    option (google.api.http) = {
+      get: "/reservations/reservation"
+    };
+  }
+  rpc MakeRequestForReservation(ReservationRequest) returns (ReservationRequestResponse){
+    option (google.api.http) = {
+      post: "/reservations/reservation-request"
+      body:"*"
+    };
+  }
+  rpc CancelReservation(CancelReservationRequest) returns (CancelReservationResponse){
+    option (google.api.http) = {
+      get: "/reservations/cancel-request/{id}"
+    };
+  }
+  rpc HasActiveReservations(HasActiveReservationsRequest) returns (HasActiveReservationsResponse) {
+    option (google.api.http) = {
+      get: "/reservations/active-reservations/{id}"
+    };
+  }
+  rpc GetAllFuture(GetAllFutureRequest) returns(GetAllFutureResponse) {
+    option (google.api.http) = {
+      get: "/reservations/future"
+    };
+  }
+}
+
+
+message GetRequest {
+  string id = 1;
+}
+
+message ReservationRequest {
+  string id  = 1;
+  string AccommodationID = 2;
+  string  StartDate = 3;
+  string EndDate = 4;
+  string GuestNumber = 5;
+  string  Confirmation = 6;
+  string GuestId = 7;
+
+}
+
+message CancelReservationRequest {
+  string id = 1;
+}
+
+message CancelReservationResponse {
+  string id = 1;
+  bool isDeleted = 2;
+}
+
+message GetResponse {
+  Reservation reservation = 1;
+}
+
+message GetAllRequest {
+}
+
+message GetAllResponse {
+  repeated Reservation reservations = 1;
+}
+message GetAllFutureRequest {
+}
+
+message GetAllFutureResponse {
+  repeated Reservation reservations = 1;
+}
+
+message ReservationRequestResponse{
+  string id = 1;
+
+}
+message Reservation {
+  string id = 1;
+  string accommodationID = 2;
+  string  startDate = 3;
+  string endDate = 4;
+  int64 guestNumber = 5;
+  bool  isConfirmed = 6;
+}
+
+message ReservationDTO {
+   string id  = 1;
+   string accommodationID = 2;
+   string  startDate = 3;
+   string endDate = 4;
+  int64 guestNumber = 5;
+  bool  isConfirmed = 6;
+
+}
+message HasActiveReservationsRequest {
+  string id = 1;
+}
+
+message HasActiveReservationsResponse {
+  bool hasReservations=1;
+}

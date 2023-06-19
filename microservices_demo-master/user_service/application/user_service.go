@@ -37,3 +37,6 @@ func (service *UserService) Cancel(user *domain.User) error {
 func (service *UserService) UpdateUser(user *domain.User) error {
 	return service.store.UpdateUser(user)
 }
+func (service *UserService) DeleteUser(id string) error {
+	return service.store.DeleteUser(id)
+}

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"user_service/application"
 	"user_service/domain"
+	"user_service/infrastructure/persistence"
 
 	pb "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 
@@ -231,6 +232,28 @@ func (handler *UserHandler) UpdateUser(ctx context.Context, request *pb.UpdateUs
 	}
 
 	return &pb.UpdateUserResponse{
+		RequestResult: &pb.RequestResult{
+			Code: 200,
+		},
+	}, nil
+}
+func (handler *UserHandler) Delete(ctx context.Context, request *pb.DeleteRequest) (response *pb.DeleteResponse, err error) {
+	err = handler.service.DeleteUser(request.Id)
+
+	if err != nil {
+		if err == persistence.ErrorUserNotFound {
+			return &pb.DeleteResponse{
+				RequestResult: &pb.RequestResult{
+					Code:    400,
+					Message: err.Error(),
+				},
+			}, nil
+		}
+
+		return nil, err
+	}
+
+	return &pb.DeleteResponse{
 		RequestResult: &pb.RequestResult{
 			Code: 200,
 		},

@@ -15,4 +15,5 @@ type UserStore interface {
 	CheckIfEmailExists(email string) (bool, error)
 	UpdateUser(user *User) error
 	UpdateCancellationNumber(user *User) error
+	DeleteUser(id string) error
 }

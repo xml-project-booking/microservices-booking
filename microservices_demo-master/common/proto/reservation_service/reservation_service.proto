@@ -53,6 +53,16 @@ service ReservationService{
       body:"*"
     };
   }
+  rpc HasActiveReservations(HasActiveReservationsRequest) returns (HasActiveReservationsResponse) {
+    option (google.api.http) = {
+      get: "/reservations/active-reservations/{id}"
+    };
+  }
+  rpc GetAllFuture(GetAllFutureRequest) returns(GetAllFutureResponse) {
+    option (google.api.http) = {
+      get: "/reservations/future"
+    };
+  }
 }
 
 
@@ -108,6 +118,12 @@ message GetAllRequest {
 message GetAllResponse {
   repeated Reservation reservations = 1;
 }
+message GetAllFutureRequest {
+}
+
+message GetAllFutureResponse {
+  repeated Reservation reservations = 1;
+}
 
 message ReservationRequestResponse{
   string id = 1;
@@ -139,3 +155,10 @@ message GetAllByAccommodationRequest{
  message GetAllByAccommodationResponse {
    repeated Reservation reservations = 1;
  }
+message HasActiveReservationsRequest {
+  string id = 1;
+}
+
+message HasActiveReservationsResponse {
+  bool hasReservations=1;
+}

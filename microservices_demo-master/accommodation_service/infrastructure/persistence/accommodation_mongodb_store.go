@@ -89,6 +89,15 @@ func (store *AccommodationMongoDBStore) filterOne(filter interface{}) (User *dom
 	err = result.Decode(&User)
 	return
 }
+func (store *AccommodationMongoDBStore) DeleteAccommodation(id primitive.ObjectID) error {
+	_, err := store.accommodations.DeleteOne(context.TODO(), bson.M{"_id": id})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func decode(cursor *mongo.Cursor) (accommodations []*domain.Accommodation, err error) {
 	for cursor.Next(context.TODO()) {

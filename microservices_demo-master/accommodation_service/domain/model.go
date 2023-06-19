@@ -14,6 +14,7 @@ type Accommodation struct {
 	StreetNumber            string             `bson:"street_number"`
 	MinGuest                int                `bson:"min_guest"`
 	MaxGuest                int
+	HostId                  primitive.ObjectID `bson:"host_id"`
 }
 
 type ConfirmationType int

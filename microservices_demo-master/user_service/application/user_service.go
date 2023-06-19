@@ -30,7 +30,6 @@ func (service *UserService) GetAll() ([]*domain.User, error) {
 func (service *UserService) Create(user *domain.User) error {
 	return service.store.Insert(user)
 }
-<<<<<<< HEAD
 
 func (service *UserService) Cancel(user *domain.User) error {
 	return service.store.UpdateStatus(user)
@@ -38,5 +37,3 @@ func (service *UserService) Cancel(user *domain.User) error {
 func (service *UserService) UpdateUser(user *domain.User) error {
 	return service.store.UpdateUser(user)
 }
-=======
->>>>>>> 859ba3a (implemented creating of accommodation)

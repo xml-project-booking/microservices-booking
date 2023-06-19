@@ -44,7 +44,7 @@ func (handler *UserHandler) Get(ctx context.Context, request *pb.GetRequest) (*p
 	}
 	return response, nil
 }
-<<<<<<< HEAD
+
 func (handler *UserHandler) ExistsUsername(ctx context.Context, request *pb.ExistsUsernameRequest) (*pb.ExistsUsernameResponse, error) {
 	username := request.Username
 	exists, err := handler.serviceAuth.ExistsUsername(username)
@@ -64,7 +64,9 @@ func (handler *UserHandler) ExistsEmail(ctx context.Context, request *pb.ExistsE
 	}
 	response := &pb.ExistsEmailResponse{
 		Exists: exists,
-=======
+	}
+	return response, err
+}
 func (handler *UserHandler) UpdateCancellationNumber(ctx context.Context, request *pb.UpdateCancellationNumberRequest) (*pb.UpdateCancellationNumberResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -79,7 +81,6 @@ func (handler *UserHandler) UpdateCancellationNumber(ctx context.Context, reques
 	error := handler.service.UpdateCancellationNumber(User)
 	response := &pb.UpdateCancellationNumberResponse{
 		CancelNumber: error.Error(),
->>>>>>> 859ba3a (implemented creating of accommodation)
 	}
 	return response, nil
 }

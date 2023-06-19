@@ -205,7 +205,6 @@ func local_request_UserService_GetAll_0(ctx context.Context, marshaler runtime.M
 
 }
 
-<<<<<<< HEAD
 func request_UserService_Authenticate_0(ctx context.Context, marshaler runtime.Marshaler, client UserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq AuthenticateRequest
 	var metadata runtime.ServerMetadata
@@ -362,10 +361,6 @@ func local_request_UserService_UpdateUser_0(ctx context.Context, marshaler runti
 
 func request_UserService_Delete_0(ctx context.Context, marshaler runtime.Marshaler, client UserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq DeleteRequest
-=======
-func request_UserService_UpdateCancellationNumber_0(ctx context.Context, marshaler runtime.Marshaler, client UserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UpdateCancellationNumberRequest
->>>>>>> 859ba3a (implemented creating of accommodation)
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -385,22 +380,13 @@ func request_UserService_UpdateCancellationNumber_0(ctx context.Context, marshal
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-<<<<<<< HEAD
 	msg, err := client.Delete(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-=======
-	msg, err := client.UpdateCancellationNumber(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
->>>>>>> 859ba3a (implemented creating of accommodation)
 	return msg, metadata, err
 
 }
 
-<<<<<<< HEAD
 func local_request_UserService_Delete_0(ctx context.Context, marshaler runtime.Marshaler, server UserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq DeleteRequest
-=======
-func local_request_UserService_UpdateCancellationNumber_0(ctx context.Context, marshaler runtime.Marshaler, server UserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq UpdateCancellationNumberRequest
->>>>>>> 859ba3a (implemented creating of accommodation)
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -420,11 +406,59 @@ func local_request_UserService_UpdateCancellationNumber_0(ctx context.Context, m
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-<<<<<<< HEAD
 	msg, err := server.Delete(ctx, &protoReq)
-=======
+	return msg, metadata, err
+
+}
+
+func request_UserService_UpdateCancellationNumber_0(ctx context.Context, marshaler runtime.Marshaler, client UserServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq UpdateCancellationNumberRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	msg, err := client.UpdateCancellationNumber(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_UserService_UpdateCancellationNumber_0(ctx context.Context, marshaler runtime.Marshaler, server UserServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq UpdateCancellationNumberRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
 	msg, err := server.UpdateCancellationNumber(ctx, &protoReq)
->>>>>>> 859ba3a (implemented creating of accommodation)
 	return msg, metadata, err
 
 }
@@ -535,11 +569,7 @@ func RegisterUserServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-<<<<<<< HEAD
 	mux.Handle("GET", pattern_UserService_Authenticate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-=======
-	mux.Handle("GET", pattern_UserService_UpdateCancellationNumber_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
->>>>>>> 859ba3a (implemented creating of accommodation)
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -547,20 +577,12 @@ func RegisterUserServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-<<<<<<< HEAD
 		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UserService/Authenticate", runtime.WithHTTPPathPattern("/users/authenticate/{token}"))
-=======
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UserService/UpdateCancellationNumber", runtime.WithHTTPPathPattern("/users/cancellation/{id}"))
->>>>>>> 859ba3a (implemented creating of accommodation)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-<<<<<<< HEAD
 		resp, md, err := local_request_UserService_Authenticate_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-=======
-		resp, md, err := local_request_UserService_UpdateCancellationNumber_0(annotatedContext, inboundMarshaler, server, req, pathParams)
->>>>>>> 859ba3a (implemented creating of accommodation)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -568,7 +590,6 @@ func RegisterUserServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			return
 		}
 
-<<<<<<< HEAD
 		forward_UserService_Authenticate_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
@@ -670,9 +691,31 @@ func RegisterUserServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		}
 
 		forward_UserService_Delete_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-=======
+
+	})
+
+	mux.Handle("GET", pattern_UserService_UpdateCancellationNumber_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/users.UserService/UpdateCancellationNumber", runtime.WithHTTPPathPattern("/users/cancellation/{id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_UserService_UpdateCancellationNumber_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
 		forward_UserService_UpdateCancellationNumber_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
->>>>>>> 859ba3a (implemented creating of accommodation)
 
 	})
 
@@ -805,37 +848,24 @@ func RegisterUserServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 
 	})
 
-<<<<<<< HEAD
 	mux.Handle("GET", pattern_UserService_Authenticate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-=======
-	mux.Handle("GET", pattern_UserService_UpdateCancellationNumber_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
->>>>>>> 859ba3a (implemented creating of accommodation)
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-<<<<<<< HEAD
 		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/users.UserService/Authenticate", runtime.WithHTTPPathPattern("/users/authenticate/{token}"))
-=======
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/users.UserService/UpdateCancellationNumber", runtime.WithHTTPPathPattern("/users/cancellation/{id}"))
->>>>>>> 859ba3a (implemented creating of accommodation)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-<<<<<<< HEAD
 		resp, md, err := request_UserService_Authenticate_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-=======
-		resp, md, err := request_UserService_UpdateCancellationNumber_0(annotatedContext, inboundMarshaler, client, req, pathParams)
->>>>>>> 859ba3a (implemented creating of accommodation)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-<<<<<<< HEAD
 		forward_UserService_Authenticate_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
@@ -925,9 +955,28 @@ func RegisterUserServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		}
 
 		forward_UserService_Delete_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-=======
+
+	})
+
+	mux.Handle("GET", pattern_UserService_UpdateCancellationNumber_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/users.UserService/UpdateCancellationNumber", runtime.WithHTTPPathPattern("/users/cancellation/{id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_UserService_UpdateCancellationNumber_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
 		forward_UserService_UpdateCancellationNumber_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
->>>>>>> 859ba3a (implemented creating of accommodation)
 
 	})
 
@@ -943,7 +992,6 @@ var (
 
 	pattern_UserService_GetAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "user"}, ""))
 
-<<<<<<< HEAD
 	pattern_UserService_Authenticate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"users", "authenticate", "token"}, ""))
 
 	pattern_UserService_Login_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "login"}, ""))
@@ -953,9 +1001,8 @@ var (
 	pattern_UserService_UpdateUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"users", "update"}, ""))
 
 	pattern_UserService_Delete_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"users", "delete", "id"}, ""))
-=======
+
 	pattern_UserService_UpdateCancellationNumber_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"users", "cancellation", "id"}, ""))
->>>>>>> 859ba3a (implemented creating of accommodation)
 )
 
 var (
@@ -967,7 +1014,6 @@ var (
 
 	forward_UserService_GetAll_0 = runtime.ForwardResponseMessage
 
-<<<<<<< HEAD
 	forward_UserService_Authenticate_0 = runtime.ForwardResponseMessage
 
 	forward_UserService_Login_0 = runtime.ForwardResponseMessage
@@ -977,7 +1023,6 @@ var (
 	forward_UserService_UpdateUser_0 = runtime.ForwardResponseMessage
 
 	forward_UserService_Delete_0 = runtime.ForwardResponseMessage
-=======
+
 	forward_UserService_UpdateCancellationNumber_0 = runtime.ForwardResponseMessage
->>>>>>> 859ba3a (implemented creating of accommodation)
 )

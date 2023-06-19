@@ -8,15 +8,15 @@ import (
 )
 
 type User struct {
-<<<<<<< HEAD
-	Id       primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Name     string             `bson:"name" json:"name"`
-	Surname  string             `bson:"surname,omitempty" json:"surname"`
-	Email    string             `bson:"email" json:"email"`
-	Username string             `bson:"username,omitempty" json:"username"`
-	Password string             `bson:"password" json:"password"`
-	Address  string             `bson:"address,omitempty" json:"address"`
-	Role     Role               `bson:"role" json:"role"`
+	Id                 primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Name               string             `bson:"name" json:"name"`
+	Surname            string             `bson:"surname,omitempty" json:"surname"`
+	Email              string             `bson:"email" json:"email"`
+	Username           string             `bson:"username,omitempty" json:"username"`
+	Password           string             `bson:"password" json:"password"`
+	Address            string             `bson:"address,omitempty" json:"address"`
+	Role               Role               `bson:"role" json:"role"`
+	CancellationNumber int                `bson:"cancellation_number"`
 }
 
 type Role int
@@ -68,8 +68,4 @@ func (user *User) CheckPassword(providedPassword string) error {
 		return err
 	}
 	return nil
-=======
-	Id                 primitive.ObjectID `bson:"_id"`
-	CancellationNumber int                `bson:"cancellation_number"`
->>>>>>> 859ba3a (implemented creating of accommodation)
 }

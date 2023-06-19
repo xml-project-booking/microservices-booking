@@ -3,10 +3,8 @@ package persistence
 import (
 	"context"
 	"errors"
-<<<<<<< HEAD
 	"golang.org/x/crypto/bcrypt"
-=======
->>>>>>> 859ba3a (implemented creating of accommodation)
+
 	"user_service/domain"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -23,13 +21,12 @@ type UserMongoDBStore struct {
 	users *mongo.Collection
 }
 
-<<<<<<< HEAD
 var ErrorUsernameTaken = errors.New("Username is already taken")
 
 func (store *UserMongoDBStore) UpdateStatus(user *domain.User) error {
 	//TODO implement me
 	panic("implement me")
-=======
+}
 func (store *UserMongoDBStore) UpdateCancellationNumber(user *domain.User) error {
 	number := user.CancellationNumber + 1
 	result, err := store.users.UpdateOne(
@@ -46,7 +43,7 @@ func (store *UserMongoDBStore) UpdateCancellationNumber(user *domain.User) error
 		return errors.New("one document should've been updated")
 	}
 	return nil
->>>>>>> 859ba3a (implemented creating of accommodation)
+
 }
 
 func NewUserMongoDBStore(client *mongo.Client) domain.UserStore {

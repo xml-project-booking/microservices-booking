@@ -113,6 +113,7 @@ message User {
   string email = 5;
   string address = 6;
   bool isHost = 7;
+  int64 CancellationNumber = 8;
 
 }
 

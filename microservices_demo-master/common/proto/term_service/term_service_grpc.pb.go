@@ -19,13 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TermService_Get_FullMethodName            = "/terms.TermService/Get"
-	TermService_GetAll_FullMethodName         = "/terms.TermService/GetAll"
-	TermService_Create_FullMethodName         = "/terms.TermService/Create"
-	TermService_Update_FullMethodName         = "/terms.TermService/Update"
-	TermService_Delete_FullMethodName         = "/terms.TermService/Delete"
-	TermService_DeleteInPeriod_FullMethodName = "/terms.TermService/DeleteInPeriod"
-	TermService_UpdateInPeriod_FullMethodName = "/terms.TermService/UpdateInPeriod"
+	TermService_Get_FullMethodName                  = "/terms.TermService/Get"
+	TermService_GetAll_FullMethodName               = "/terms.TermService/GetAll"
+	TermService_Create_FullMethodName               = "/terms.TermService/Create"
+	TermService_Update_FullMethodName               = "/terms.TermService/Update"
+	TermService_Delete_FullMethodName               = "/terms.TermService/Delete"
+	TermService_DeleteInPeriod_FullMethodName       = "/terms.TermService/DeleteInPeriod"
+	TermService_UpdateInPeriod_FullMethodName       = "/terms.TermService/UpdateInPeriod"
+	TermService_GetByAccommodationId_FullMethodName = "/terms.TermService/GetByAccommodationId"
 )
 
 // TermServiceClient is the client API for TermService service.
@@ -39,6 +40,7 @@ type TermServiceClient interface {
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	DeleteInPeriod(ctx context.Context, in *DeleteInPeriodRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	UpdateInPeriod(ctx context.Context, in *UpdateInPeriodRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
+	GetByAccommodationId(ctx context.Context, in *GetByAccommodationIdRequest, opts ...grpc.CallOption) (*GetByAccommodationIdResponse, error)
 }
 
 type termServiceClient struct {
@@ -112,6 +114,15 @@ func (c *termServiceClient) UpdateInPeriod(ctx context.Context, in *UpdateInPeri
 	return out, nil
 }
 
+func (c *termServiceClient) GetByAccommodationId(ctx context.Context, in *GetByAccommodationIdRequest, opts ...grpc.CallOption) (*GetByAccommodationIdResponse, error) {
+	out := new(GetByAccommodationIdResponse)
+	err := c.cc.Invoke(ctx, TermService_GetByAccommodationId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TermServiceServer is the server API for TermService service.
 // All implementations must embed UnimplementedTermServiceServer
 // for forward compatibility
@@ -123,6 +134,7 @@ type TermServiceServer interface {
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	DeleteInPeriod(context.Context, *DeleteInPeriodRequest) (*DeleteResponse, error)
 	UpdateInPeriod(context.Context, *UpdateInPeriodRequest) (*UpdateResponse, error)
+	GetByAccommodationId(context.Context, *GetByAccommodationIdRequest) (*GetByAccommodationIdResponse, error)
 	mustEmbedUnimplementedTermServiceServer()
 }
 
@@ -150,6 +162,9 @@ func (UnimplementedTermServiceServer) DeleteInPeriod(context.Context, *DeleteInP
 }
 func (UnimplementedTermServiceServer) UpdateInPeriod(context.Context, *UpdateInPeriodRequest) (*UpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateInPeriod not implemented")
+}
+func (UnimplementedTermServiceServer) GetByAccommodationId(context.Context, *GetByAccommodationIdRequest) (*GetByAccommodationIdResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetByAccommodationId not implemented")
 }
 func (UnimplementedTermServiceServer) mustEmbedUnimplementedTermServiceServer() {}
 
@@ -290,6 +305,24 @@ func _TermService_UpdateInPeriod_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TermService_GetByAccommodationId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetByAccommodationIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TermServiceServer).GetByAccommodationId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TermService_GetByAccommodationId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TermServiceServer).GetByAccommodationId(ctx, req.(*GetByAccommodationIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TermService_ServiceDesc is the grpc.ServiceDesc for TermService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -324,6 +357,10 @@ var TermService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateInPeriod",
 			Handler:    _TermService_UpdateInPeriod_Handler,
+		},
+		{
+			MethodName: "GetByAccommodationId",
+			Handler:    _TermService_GetByAccommodationId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -138,6 +138,23 @@ func (handler *TermHandler) GetAll(ctx context.Context, request *pb.GetAllReques
 	return response, nil
 }
 
+func (handler *TermHandler) GetByAccommodationId(ctx context.Context, request *pb.GetByAccommodationIdRequest) (*pb.GetByAccommodationIdResponse, error) {
+	accId, _ := primitive.ObjectIDFromHex(request.AccommodationId)
+	Terms, err := handler.service.GetByAccommodationId(accId)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetByAccommodationIdResponse{
+		GetResponses: []*pb.GetResponse{},
+	}
+	for _, Term := range Terms {
+		current := mapTerm(Term)
+		response.GetResponses = append(response.GetResponses, current)
+	}
+	return response, nil
+
+}
+
 func (handler *TermHandler) Create(ctx context.Context, request *pb.CreateRequest) (*pb.GetAllResponse, error) {
 
 	//OVO NZM STA JE VRV JSON U BINARNO

@@ -11,4 +11,5 @@ type TermStore interface {
 	Delete(term *Term) error
 	DeleteAll()
 	Update(term *Term) error
+	GetByAccommodationId(id primitive.ObjectID) ([]*Term, error)
 }

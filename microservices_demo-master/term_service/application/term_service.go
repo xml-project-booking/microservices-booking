@@ -96,3 +96,16 @@ func (service *TermService) CheckIfOverLaps(date time.Time, start time.Time, end
 	}
 	return false
 }
+
+func (service *TermService) GetByAccommodationId(id primitive.ObjectID) ([]*domain.Term, error) {
+	allTerms, _ := service.store.GetAll()
+	var filteredTerms []*domain.Term
+
+	for _, term := range allTerms {
+		if term.AccommodationID == id {
+			filteredTerms = append(filteredTerms, term)
+		}
+	}
+
+	return filteredTerms, nil
+}

@@ -52,6 +52,21 @@ service TermService {
       body: "*"
     };
   }
+
+   rpc GetByAccommodationId(GetByAccommodationIdRequest) returns (GetByAccommodationIdResponse) {
+     option (google.api.http) = {
+        get: "/terms/term/accommodation/{accommodationId}"
+     };
+  }
+}
+
+
+message GetByAccommodationIdRequest {
+  string accommodationId = 1;
+}
+
+message GetByAccommodationIdResponse {
+  repeated GetResponse getResponses = 1;
 }
 
 message DeleteInPeriodRequest {

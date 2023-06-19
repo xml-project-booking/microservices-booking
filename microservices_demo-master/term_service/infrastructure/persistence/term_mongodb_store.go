@@ -18,6 +18,11 @@ type TermMongoDBStore struct {
 	terms *mongo.Collection
 }
 
+func (store *TermMongoDBStore) GetByAccommodationId(id primitive.ObjectID) ([]*domain.Term, error) {
+	filter := bson.M{"accommodationId": id}
+	return store.filter(filter)
+}
+
 func (store *TermMongoDBStore) Delete(term *domain.Term) error {
 
 	_, err := store.terms.DeleteOne(context.TODO(), bson.D{{}})

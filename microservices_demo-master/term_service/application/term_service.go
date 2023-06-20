@@ -1,6 +1,7 @@
 package application
 
 import (
+	pb "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"term_service/domain"
 	"time"
@@ -110,36 +111,86 @@ func (service *TermService) GetByAccommodationId(id primitive.ObjectID) ([]*doma
 	return filteredTerms, nil
 }
 
-func (service *TermService) GetAvailableAccommodationsInPeriod(startDate string, endDate string) ([]string, error) {
+func (service *TermService) GetAvailableAccommodationsInPeriod(startDate string, endDate string) ([]*pb.AccommodationWithPriceResponse, error) {
 	allTerms, _ := service.store.GetAll()
-	var accommodationIds []string
+	var accommodationWithPriceResponse []*pb.AccommodationWithPriceResponse
 	layout := "2006-01-02T15:04:05.000Z"
 	strtDate, _ := time.Parse(layout, startDate)
 	eDate, _ := time.Parse(layout, endDate)
+
+	var cantBeAddedIds []primitive.ObjectID
 
 	//set hours, seconds... to 0
 	strtDate = time.Date(strtDate.Year(), strtDate.Month(), strtDate.Day(), 0, 0, 0, 0, strtDate.Location())
 	eDate = time.Date(eDate.Year(), eDate.Month(), eDate.Day(), 0, 0, 0, 0, eDate.Location())
 
 	for _, term := range allTerms {
-		if term.UserID != primitive.NilObjectID {
+
+		termDateInPeriod := service.CheckIfOverLaps(term.Date, strtDate, eDate)
+		if termDateInPeriod == false {
 			continue
 		}
-		termDateInPeriod := service.CheckIfOverLaps(term.Date, strtDate, eDate)
+		println("START:", term.AccommodationID.String(), term.Date.String(), strtDate.String(), eDate.String())
+		//If cantBeAddedIds contains term.AccommodationID
+		var cantBeAdded = false
+		for _, id := range cantBeAddedIds {
+			cantBeAdded = (id == term.AccommodationID)
+			if cantBeAdded == true {
+				break
+			}
+		}
+		if cantBeAdded == true {
+			continue
+		}
+
+		println("2")
+		//Is term reserved by user
+		if term.UserID != primitive.NilObjectID {
+			//Check if cantBeAddedIds contains term.AccommodationID
+			var isAlreadyInSlice = false
+			for _, id := range cantBeAddedIds {
+				if id == term.AccommodationID {
+					isAlreadyInSlice = true
+				}
+			}
+
+			if isAlreadyInSlice == false {
+				cantBeAddedIds = append(cantBeAddedIds, term.AccommodationID)
+			}
+			continue
+		}
+
+		println("3")
 
 		if termDateInPeriod == true {
 			var isAlreadyInSlice = false
 
-			for _, id := range accommodationIds {
-				if id == term.AccommodationID.Hex() {
+			for _, id := range accommodationWithPriceResponse {
+				if id.AccommodationId == term.AccommodationID.Hex() {
 					isAlreadyInSlice = true
 				}
 			}
+
 			if isAlreadyInSlice == false {
-				accommodationIds = append(accommodationIds, term.AccommodationID.Hex())
+
+				var newAccommodationWithPriceResponse = &pb.AccommodationWithPriceResponse{
+					AccommodationId: term.AccommodationID.Hex(),
+					Price:           term.Value,
+				}
+				accommodationWithPriceResponse = append(accommodationWithPriceResponse, newAccommodationWithPriceResponse)
 			}
+
+			if isAlreadyInSlice == true {
+				for _, id := range accommodationWithPriceResponse {
+					if id.AccommodationId == term.AccommodationID.Hex() {
+						id.Price += term.Value
+						break
+					}
+				}
+			}
+
 		}
 	}
 
-	return accommodationIds, nil
+	return accommodationWithPriceResponse, nil
 }

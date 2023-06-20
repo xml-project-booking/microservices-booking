@@ -19,14 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	TermService_Get_FullMethodName                  = "/terms.TermService/Get"
-	TermService_GetAll_FullMethodName               = "/terms.TermService/GetAll"
-	TermService_Create_FullMethodName               = "/terms.TermService/Create"
-	TermService_Update_FullMethodName               = "/terms.TermService/Update"
-	TermService_Delete_FullMethodName               = "/terms.TermService/Delete"
-	TermService_DeleteInPeriod_FullMethodName       = "/terms.TermService/DeleteInPeriod"
-	TermService_UpdateInPeriod_FullMethodName       = "/terms.TermService/UpdateInPeriod"
-	TermService_GetByAccommodationId_FullMethodName = "/terms.TermService/GetByAccommodationId"
+	TermService_Get_FullMethodName                                = "/terms.TermService/Get"
+	TermService_GetAll_FullMethodName                             = "/terms.TermService/GetAll"
+	TermService_Create_FullMethodName                             = "/terms.TermService/Create"
+	TermService_Update_FullMethodName                             = "/terms.TermService/Update"
+	TermService_Delete_FullMethodName                             = "/terms.TermService/Delete"
+	TermService_DeleteInPeriod_FullMethodName                     = "/terms.TermService/DeleteInPeriod"
+	TermService_UpdateInPeriod_FullMethodName                     = "/terms.TermService/UpdateInPeriod"
+	TermService_GetByAccommodationId_FullMethodName               = "/terms.TermService/GetByAccommodationId"
+	TermService_GetAvailableAccommodationsInPeriod_FullMethodName = "/terms.TermService/GetAvailableAccommodationsInPeriod"
 )
 
 // TermServiceClient is the client API for TermService service.
@@ -41,6 +42,7 @@ type TermServiceClient interface {
 	DeleteInPeriod(ctx context.Context, in *DeleteInPeriodRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	UpdateInPeriod(ctx context.Context, in *UpdateInPeriodRequest, opts ...grpc.CallOption) (*UpdateResponse, error)
 	GetByAccommodationId(ctx context.Context, in *GetByAccommodationIdRequest, opts ...grpc.CallOption) (*GetByAccommodationIdResponse, error)
+	GetAvailableAccommodationsInPeriod(ctx context.Context, in *GetAvailableAccommodationsInPeriodRequest, opts ...grpc.CallOption) (*GetAvailableAccommodationsInPeriodResponse, error)
 }
 
 type termServiceClient struct {
@@ -123,6 +125,15 @@ func (c *termServiceClient) GetByAccommodationId(ctx context.Context, in *GetByA
 	return out, nil
 }
 
+func (c *termServiceClient) GetAvailableAccommodationsInPeriod(ctx context.Context, in *GetAvailableAccommodationsInPeriodRequest, opts ...grpc.CallOption) (*GetAvailableAccommodationsInPeriodResponse, error) {
+	out := new(GetAvailableAccommodationsInPeriodResponse)
+	err := c.cc.Invoke(ctx, TermService_GetAvailableAccommodationsInPeriod_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TermServiceServer is the server API for TermService service.
 // All implementations must embed UnimplementedTermServiceServer
 // for forward compatibility
@@ -135,6 +146,7 @@ type TermServiceServer interface {
 	DeleteInPeriod(context.Context, *DeleteInPeriodRequest) (*DeleteResponse, error)
 	UpdateInPeriod(context.Context, *UpdateInPeriodRequest) (*UpdateResponse, error)
 	GetByAccommodationId(context.Context, *GetByAccommodationIdRequest) (*GetByAccommodationIdResponse, error)
+	GetAvailableAccommodationsInPeriod(context.Context, *GetAvailableAccommodationsInPeriodRequest) (*GetAvailableAccommodationsInPeriodResponse, error)
 	mustEmbedUnimplementedTermServiceServer()
 }
 
@@ -165,6 +177,9 @@ func (UnimplementedTermServiceServer) UpdateInPeriod(context.Context, *UpdateInP
 }
 func (UnimplementedTermServiceServer) GetByAccommodationId(context.Context, *GetByAccommodationIdRequest) (*GetByAccommodationIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetByAccommodationId not implemented")
+}
+func (UnimplementedTermServiceServer) GetAvailableAccommodationsInPeriod(context.Context, *GetAvailableAccommodationsInPeriodRequest) (*GetAvailableAccommodationsInPeriodResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAvailableAccommodationsInPeriod not implemented")
 }
 func (UnimplementedTermServiceServer) mustEmbedUnimplementedTermServiceServer() {}
 
@@ -323,6 +338,24 @@ func _TermService_GetByAccommodationId_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TermService_GetAvailableAccommodationsInPeriod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAvailableAccommodationsInPeriodRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TermServiceServer).GetAvailableAccommodationsInPeriod(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TermService_GetAvailableAccommodationsInPeriod_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TermServiceServer).GetAvailableAccommodationsInPeriod(ctx, req.(*GetAvailableAccommodationsInPeriodRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TermService_ServiceDesc is the grpc.ServiceDesc for TermService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -361,6 +394,10 @@ var TermService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetByAccommodationId",
 			Handler:    _TermService_GetByAccommodationId_Handler,
+		},
+		{
+			MethodName: "GetAvailableAccommodationsInPeriod",
+			Handler:    _TermService_GetAvailableAccommodationsInPeriod_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

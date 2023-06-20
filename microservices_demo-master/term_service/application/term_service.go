@@ -109,3 +109,38 @@ func (service *TermService) GetByAccommodationId(id primitive.ObjectID) ([]*doma
 
 	return filteredTerms, nil
 }
+
+func (service *TermService) GetAvailableAccommodationsInPeriod(startDate string, endDate string) ([]string, error) {
+	allTerms, _ := service.store.GetAll()
+	var accommodationIds []string
+	layout := "2006-01-02T15:04:05.000Z"
+	strtDate, _ := time.Parse(layout, startDate)
+	eDate, _ := time.Parse(layout, endDate)
+
+	//set hours, seconds... to 0
+	strtDate = time.Date(strtDate.Year(), strtDate.Month(), strtDate.Day(), 0, 0, 0, 0, strtDate.Location())
+	eDate = time.Date(eDate.Year(), eDate.Month(), eDate.Day(), 0, 0, 0, 0, eDate.Location())
+
+	for _, term := range allTerms {
+		if term.UserID != primitive.NilObjectID {
+			continue
+		}
+		termDateInPeriod := service.CheckIfOverLaps(term.Date, strtDate, eDate)
+		println("Term date in period: ", term.Date.String(), " ", strtDate.String(), " ", eDate.String(), " ", termDateInPeriod, " ", term.AccommodationID.Hex())
+
+		if termDateInPeriod == true {
+			var isAlreadyInSlice = false
+
+			for _, id := range accommodationIds {
+				if id == term.AccommodationID.Hex() {
+					isAlreadyInSlice = true
+				}
+			}
+			if isAlreadyInSlice == false {
+				accommodationIds = append(accommodationIds, term.AccommodationID.Hex())
+			}
+		}
+	}
+
+	return accommodationIds, nil
+}

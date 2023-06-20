@@ -126,7 +126,6 @@ func (service *TermService) GetAvailableAccommodationsInPeriod(startDate string,
 			continue
 		}
 		termDateInPeriod := service.CheckIfOverLaps(term.Date, strtDate, eDate)
-		println("Term date in period: ", term.Date.String(), " ", strtDate.String(), " ", eDate.String(), " ", termDateInPeriod, " ", term.AccommodationID.Hex())
 
 		if termDateInPeriod == true {
 			var isAlreadyInSlice = false

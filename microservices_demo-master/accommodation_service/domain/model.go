@@ -13,7 +13,7 @@ type Accommodation struct {
 	Street                  string             `bson:"street"`
 	StreetNumber            string             `bson:"street_number"`
 	MinGuest                int                `bson:"min_guest"`
-	MaxGuest                int
+	MaxGuest                int                `bson:"max_guest"`
 	HostId                  primitive.ObjectID `bson:"host_id"`
 	Wifi                    bool               `bson:"wifi"`
 	Kitchen                 bool               `bson:"kitchen"`

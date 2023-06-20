@@ -53,16 +53,19 @@ message ChangeReservationTypeResponse{
 }
 
 message CreateAccommodationRequest {
-  string id = 1;
-  string name = 2;
+  string name = 1;
+  string reservationConfirmation = 2;
   string city = 3;
   string country = 4;
   string street = 5;
   string streetNumber = 6;
   string minGuest = 7;
   string maxGuest = 8;
-  repeated string amenities=9;
-  string reservationConfirmation = 10;
+  string hostId = 9;
+  bool wifi = 10;
+  bool kitchen = 11;
+  bool airConditioning = 12;
+  bool freeParking = 13;
 }
 message CreateAccommodationResponse {
   string id = 1;

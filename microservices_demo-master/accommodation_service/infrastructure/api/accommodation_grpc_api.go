@@ -44,18 +44,18 @@ func (handler *AccommodationHandler) ChangeAccommodationReservationType(ctx cont
 	return response, nil
 }
 func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, request *pb.CreateAccommodationRequest) (*pb.CreateAccommodationResponse, error) {
-	var accommodationDTO domain.AccommodationDTO
-	fmt.Print("request: ")
-	fmt.Println(request)
-
-	jsonBytes, err := protojson.Marshal(request)
-
-	err = json.Unmarshal(jsonBytes, &accommodationDTO)
-	if err != nil {
-		// Handle error
-	}
-	fmt.Println("kako se ispisati  resefvationdto")
-	fmt.Println(accommodationDTO)
+	//var accommodationDTO domain.AccommodationDTO
+	//fmt.Print("request: ")
+	//fmt.Println(request)
+	//
+	//jsonBytes, err := protojson.Marshal(request)
+	//
+	//err = json.Unmarshal(jsonBytes, &accommodationDTO)
+	//if err != nil {
+	//	// Handle error
+	//}
+	//fmt.Println("kako se ispisati  resefvationdto")
+	//fmt.Println(accommodationDTO)
 
 	/*if err != nil {
 		handler.LogError.WithFields(logrus.Fields{
@@ -69,8 +69,8 @@ func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, re
 	}*/
 	//layout := "2006-01-02T15:04:05.000Z"
 
-	minGuest, err := strconv.Atoi(accommodationDTO.MinGuest)
-	maxGuest, err := strconv.Atoi(accommodationDTO.MaxGuest)
+	//minGuest, err := strconv.Atoi(accommodationDTO.MinGuest)
+	//maxGuest, err := strconv.Atoi(accommodationDTO.MaxGuest)
 
 	/*address := domain.Address{
 		Street: accommodationDTO.Street,
@@ -78,16 +78,24 @@ func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, re
 		City: accommodationDTO.City,
 		Country: accommodationDTO.Country,
 	}*/
-
+	objectId, err := primitive.ObjectIDFromHex(request.id)
+	if err != nil {
+		return nil, err
+	}
 	createAccommodation := domain.Accommodation{
-		Name:                    accommodationDTO.Name,
-		ReservationConfirmation: accommodationDTO.ReservationConfirmation,
-		Street:                  accommodationDTO.Street,
-		StreetNumber:            accommodationDTO.StreetNumber,
-		City:                    accommodationDTO.City,
-		Country:                 accommodationDTO.Country,
-		MinGuest:                minGuest,
-		MaxGuest:                maxGuest,
+		Name:                    request.Name,
+		ReservationConfirmation: request.ReservationConfirmation,
+		Street:                  request.Street,
+		StreetNumber:            request.StreetNumber,
+		City:                    request.City,
+		Country:                 request.Country,
+		MinGuest:                request.MinGuest,
+		MaxGuest:                request.MaxGuest,
+		HostId:                  objectId,
+		Wifi:                    request.Wifi,
+		Kitchen:                 request.Kitchen,
+		AirConditioning:         request.AirConditioning,
+		FreeParking:             request.FreeParking,
 	}
 
 	err = handler.service.Create(&createAccommodation)

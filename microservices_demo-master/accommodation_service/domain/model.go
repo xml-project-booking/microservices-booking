@@ -15,6 +15,11 @@ type Accommodation struct {
 	MinGuest                int                `bson:"min_guest"`
 	MaxGuest                int
 	HostId                  primitive.ObjectID `bson:"host_id"`
+	Wifi                    bool               `bson:"wifi"`
+	Kitchen                 bool               `bson:"kitchen"`
+	AirConditioning         bool               `bson:"air_conditioning"`
+	FreeParking             bool               `bson:"free_parking"`
+	Photos                  string             `bson:"photos"`
 }
 
 type ConfirmationType int

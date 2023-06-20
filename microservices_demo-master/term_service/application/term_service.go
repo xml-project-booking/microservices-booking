@@ -130,7 +130,7 @@ func (service *TermService) GetAvailableAccommodationsInPeriod(startDate string,
 		if termDateInPeriod == false {
 			continue
 		}
-		println("START:", term.AccommodationID.String(), term.Date.String(), strtDate.String(), eDate.String())
+		
 		//If cantBeAddedIds contains term.AccommodationID
 		var cantBeAdded = false
 		for _, id := range cantBeAddedIds {
@@ -143,7 +143,6 @@ func (service *TermService) GetAvailableAccommodationsInPeriod(startDate string,
 			continue
 		}
 
-		println("2")
 		//Is term reserved by user
 		if term.UserID != primitive.NilObjectID {
 			//Check if cantBeAddedIds contains term.AccommodationID
@@ -159,8 +158,6 @@ func (service *TermService) GetAvailableAccommodationsInPeriod(startDate string,
 			}
 			continue
 		}
-
-		println("3")
 
 		if termDateInPeriod == true {
 			var isAlreadyInSlice = false

@@ -395,3 +395,19 @@ func (handler *TermHandler) DeleteInPeriod(ctx context.Context, request *pb.Dele
 
 	return &res, nil
 }
+
+// GetAvailableAccommodationsInPeriodRequest
+func (handler *TermHandler) GetAvailableAccommodationsInPeriod(ctx context.Context, request *pb.GetAvailableAccommodationsInPeriodRequest) (*pb.GetAvailableAccommodationsInPeriodResponse, error) {
+
+	accommodationIds, err := handler.service.GetAvailableAccommodationsInPeriod(request.StartDate, request.EndDate)
+	if err != nil {
+		return nil, err
+	}
+
+	// Prepare the response
+	res := pb.GetAvailableAccommodationsInPeriodResponse{
+		AccommodationId: accommodationIds,
+	}
+
+	return &res, nil
+}

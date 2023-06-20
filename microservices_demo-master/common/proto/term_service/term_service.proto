@@ -58,8 +58,24 @@ service TermService {
         get: "/terms/term/accommodation/{accommodationId}"
      };
   }
+
+  rpc GetAvailableAccommodationsInPeriod(GetAvailableAccommodationsInPeriodRequest) returns (GetAvailableAccommodationsInPeriodResponse) {
+    option (google.api.http) = {
+      post: "/terms/term/available-accommodations-in-period"
+      body: "*"
+    };
+  }
+
 }
 
+message GetAvailableAccommodationsInPeriodRequest {
+  string StartDate = 1;
+  string EndDate = 2;
+}
+
+message GetAvailableAccommodationsInPeriodResponse {
+  repeated string accommodationId = 1;
+}
 
 message GetByAccommodationIdRequest {
   string accommodationId = 1;

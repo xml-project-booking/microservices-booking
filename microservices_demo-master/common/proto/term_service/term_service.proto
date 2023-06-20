@@ -74,7 +74,13 @@ message GetAvailableAccommodationsInPeriodRequest {
 }
 
 message GetAvailableAccommodationsInPeriodResponse {
-  repeated string accommodationId = 1;
+  repeated AccommodationWithPriceResponse accommodationWithPrice = 1;
+
+}
+
+message AccommodationWithPriceResponse {
+  string accommodationId = 1;
+  int32 price = 2;
 }
 
 message GetByAccommodationIdRequest {

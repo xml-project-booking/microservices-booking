@@ -411,7 +411,7 @@ func (handler *TermHandler) GetAvailableAccommodationsInPeriod(ctx context.Conte
 
 	// Prepare the response
 	res := pb.GetAvailableAccommodationsInPeriodResponse{
-		AccommodationId: accommodationIds,
+		AccommodationWithPrice: accommodationIds,
 	}
 
 	return &res, nil

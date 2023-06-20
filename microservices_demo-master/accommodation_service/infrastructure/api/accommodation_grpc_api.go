@@ -4,12 +4,12 @@ import (
 	"accommodation_service/application"
 	"accommodation_service/domain"
 	"context"
-	"encoding/json"
-	"fmt"
+	//"encoding/json"
+	//"fmt"
 
 	pb "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"google.golang.org/protobuf/encoding/protojson"
+	//"google.golang.org/protobuf/encoding/protojson"
 	"strconv"
 )
 
@@ -44,18 +44,18 @@ func (handler *AccommodationHandler) ChangeAccommodationReservationType(ctx cont
 	return response, nil
 }
 func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, request *pb.CreateAccommodationRequest) (*pb.CreateAccommodationResponse, error) {
-	var accommodationDTO domain.AccommodationDTO
-	fmt.Print("request: ")
-	fmt.Println(request)
-
-	jsonBytes, err := protojson.Marshal(request)
-
-	err = json.Unmarshal(jsonBytes, &accommodationDTO)
-	if err != nil {
-		// Handle error
-	}
-	fmt.Println("kako se ispisati  resefvationdto")
-	fmt.Println(accommodationDTO)
+	//var accommodationDTO domain.AccommodationDTO
+	//fmt.Print("request: ")
+	//fmt.Println(request)
+	//
+	//jsonBytes, err := protojson.Marshal(request)
+	//
+	//err = json.Unmarshal(jsonBytes, &accommodationDTO)
+	//if err != nil {
+	//	// Handle error
+	//}
+	//fmt.Println("kako se ispisati  resefvationdto")
+	//fmt.Println(accommodationDTO)
 
 	/*if err != nil {
 		handler.LogError.WithFields(logrus.Fields{
@@ -69,8 +69,8 @@ func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, re
 	}*/
 	//layout := "2006-01-02T15:04:05.000Z"
 
-	minGuest, err := strconv.Atoi(accommodationDTO.MinGuest)
-	maxGuest, err := strconv.Atoi(accommodationDTO.MaxGuest)
+	minGuest, err := strconv.Atoi(request.MinGuest)
+	maxGuest, err := strconv.Atoi(request.MaxGuest)
 
 	/*address := domain.Address{
 		Street: accommodationDTO.Street,
@@ -78,16 +78,24 @@ func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, re
 		City: accommodationDTO.City,
 		Country: accommodationDTO.Country,
 	}*/
-
+	objectId, err := primitive.ObjectIDFromHex(request.HostId)
+	if err != nil {
+		return nil, err
+	}
 	createAccommodation := domain.Accommodation{
-		Name:                    accommodationDTO.Name,
-		ReservationConfirmation: accommodationDTO.ReservationConfirmation,
-		Street:                  accommodationDTO.Street,
-		StreetNumber:            accommodationDTO.StreetNumber,
-		City:                    accommodationDTO.City,
-		Country:                 accommodationDTO.Country,
+		Name:                    request.Name,
+		ReservationConfirmation: request.ReservationConfirmation,
+		Street:                  request.Street,
+		StreetNumber:            request.StreetNumber,
+		City:                    request.City,
+		Country:                 request.Country,
 		MinGuest:                minGuest,
 		MaxGuest:                maxGuest,
+		HostId:                  objectId,
+		Wifi:                    request.Wifi,
+		Kitchen:                 request.Kitchen,
+		AirConditioning:         request.AirConditioning,
+		FreeParking:             request.FreeParking,
 	}
 
 	err = handler.service.Create(&createAccommodation)
@@ -147,7 +155,7 @@ func (handler *AccommodationHandler) GetAllIdsByHost(ctx context.Context, reques
 
 	accommodationIds := []string{}
 	for _, accommodation := range accommodations {
-		accommodationIds = append(accommodationIds, accommodation.HostId.Hex())
+		accommodationIds = append(accommodationIds, accommodation.Id.Hex())
 	}
 	response := &pb.GetAllIdsByHostResponse{
 		Ids: accommodationIds,

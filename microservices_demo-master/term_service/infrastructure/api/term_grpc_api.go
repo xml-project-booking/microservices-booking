@@ -228,6 +228,7 @@ func (handler *TermHandler) Create(ctx context.Context, request *pb.CreateReques
 
 func (handler *TermHandler) UpdateInPeriod(ctx context.Context, request *pb.UpdateInPeriodRequest) (*pb.UpdateResponse, error) {
 	// Convert request to JSON
+
 	jsonBytes, err := protojson.Marshal(request)
 	if err != nil {
 		handler.LogError.WithFields(logrus.Fields{
@@ -250,6 +251,7 @@ func (handler *TermHandler) UpdateInPeriod(ctx context.Context, request *pb.Upda
 	// Convert string IDs to primitive.ObjectIDs
 	accId, _ := primitive.ObjectIDFromHex(updateRequest.AccommodationId)
 
+	println(updateRequest.PriceType, int32(updateRequest.Value), accId.String())
 	if !requestIsValid(updateRequest.PriceType, int32(updateRequest.Value), accId) {
 		return nil, errors.New("Cannot accomodation, value or type can't be zero")
 	}
@@ -259,8 +261,11 @@ func (handler *TermHandler) UpdateInPeriod(ctx context.Context, request *pb.Upda
 	// Parse start and end date strings to time.Time
 	startDate, _ := time.Parse(layout, updateRequest.StartDate)
 	endDate, _ := time.Parse(layout, updateRequest.EndDate)
+	// Set date hours, secons ... to 0
 	startDate = startDate.Truncate(24 * time.Hour)
 	endDate = endDate.Truncate(24 * time.Hour)
+	endDate = endDate.AddDate(0, 0, 1)
+	startDate = startDate.AddDate(0, 0, 1)
 
 	// Get all terms
 	terms, err := handler.service.GetAll()
@@ -333,7 +338,7 @@ func requestIsValid(priceType string, value int32, accId primitive.ObjectID) boo
 // Helper function to check if any existing term in the specified period has a non-nil or non-zero user ID
 func findTermInPeriodWithUserId(terms []*domain.Term, accId primitive.ObjectID, startDate, endDate time.Time) *domain.Term {
 	for _, term := range terms {
-		if term.AccommodationID == accId && term.Date.After(startDate) && term.Date.Before(endDate) {
+		if term.AccommodationID == accId && term.Date.After(startDate.AddDate(0, 0, -1)) && term.Date.Before(endDate.AddDate(0, 0, 1)) {
 			if !term.UserID.IsZero() {
 				return term
 			}

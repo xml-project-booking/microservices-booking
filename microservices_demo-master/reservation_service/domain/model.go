@@ -16,6 +16,8 @@ type ReservationDTO struct {
 	Confirmation      string             `bson:"confirmation"`
 	GuestId           primitive.ObjectID `bson:"guest_id"`
 	ReservationStatus string             `bson:"reservation_status"`
+	MinGuest          string
+	MaxGuest          string
 }
 
 type Reservation struct {
@@ -40,4 +42,14 @@ func (u *ReservationDTO) ToJSON(w io.Writer) error {
 func (u *ReservationDTO) FromJSON(r io.Reader) error {
 	d := json.NewDecoder(r)
 	return d.Decode(u)
+}
+
+type ReturnForTerm struct {
+	Id string
+}
+
+type TermCheckDTO struct {
+	Id        string
+	StartDate string
+	EndDate   string
 }

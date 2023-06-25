@@ -43,6 +43,62 @@ func (handler *ReservationHandler) CancelReservation(ctx context.Context, reques
 
 }
 
+func (handler *ReservationHandler) TermCheck(ctx context.Context, request *pb.TermCheckRequest) (*pb.TermCheckResponse, error) {
+	var termCheckDTO domain.TermCheckDTO
+	fmt.Print("request: ")
+	fmt.Println(request)
+
+	jsonBytes, err := protojson.Marshal(request)
+	if err != nil {
+		{
+			handler.LogError.WithFields(logrus.Fields{
+				"status":    "failure",
+				"location":  "Reservation Handler",
+				"action":    "CRADA731",
+				"timestamp": time.Now().String(),
+			}).Error("Wrong cast json to ReservationDTO!")
+		}
+	}
+
+	err = json.Unmarshal(jsonBytes, &termCheckDTO)
+	if err != nil {
+		// Handle error
+	}
+
+	layout := "2006-01-02T15:04:05.000Z"
+	startDate, _ := time.Parse(layout, termCheckDTO.StartDate)
+	endDate, _ := time.Parse(layout, termCheckDTO.EndDate)
+	accommodationId, err := primitive.ObjectIDFromHex(termCheckDTO.Id)
+	fmt.Println("ovo se dobije za acc id")
+	fmt.Println(accommodationId)
+	getId := handler.service.CheckForReservationInDateRangeAndGetUserId(accommodationId, startDate, endDate)
+	fmt.Println(getId + "ovooo sam dobilaaaa")
+	res := &pb.TermCheckResponse{
+		HasReservation: getId,
+	}
+	fmt.Println()
+	fmt.Println(res)
+	return res, nil
+}
+
+func (handler *ReservationHandler) DeleteReservationRequestGuest(ctx context.Context, request *pb.DeleteReservationRequest) (*pb.DeleteReservationResponse, error) {
+	id := request.Id
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	boolVar := handler.service.Delete(objectId)
+	if err != nil {
+		return nil, err
+	}
+	isDeleted := strconv.FormatBool(boolVar)
+	//ReservationPb := mapReservation(Reservation)
+	response := &pb.DeleteReservationResponse{
+		Id: isDeleted,
+	}
+	return response, nil
+}
+
 func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context, request *pb.ReservationRequest) (*pb.ReservationRequestResponse, error) {
 
 	var reservationDTO domain.ReservationDTO
@@ -82,21 +138,32 @@ func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context
 	startDate, _ := time.Parse(layout, reservationDTO.StartDate)
 	endDate, _ := time.Parse(layout, reservationDTO.EndDate)
 	num, err := strconv.Atoi(reservationDTO.GuestNumber)
-	b, err := strconv.ParseBool(reservationDTO.Confirmation)
-
+	Minnum, err := strconv.Atoi(reservationDTO.MinGuest)
+	MaxNum, err := strconv.Atoi(reservationDTO.MaxGuest)
+	b, err := strconv.ParseBool("false")
+	fmt.Println(Minnum)
+	fmt.Println(MaxNum)
+	var isValidGuestNum = handler.service.CheckIfNumberOfGuestIsValid(int64(Minnum), int64(MaxNum), int64(num))
+	re := &pb.ReservationRequestResponse{Id: "nedozvoljen broj gostiju"}
+	fmt.Print("ovoooo je vrednost")
+	fmt.Println(isValidGuestNum)
+	if !(isValidGuestNum) {
+		return re, nil
+	}
 	var isTaken = handler.service.CheckForReservationInDateRange(reservationDTO.AccommodationID, startDate, endDate)
-	re := &pb.ReservationRequestResponse{Id: "greska"}
+	re = &pb.ReservationRequestResponse{Id: "greska"}
 	if isTaken == true {
 		return re, nil
 	}
 
 	reservationRequest := domain.Reservation{
-		AccommodationID: reservationDTO.AccommodationID,
-		StartDate:       startDate,
-		EndDate:         endDate,
-		Confirmation:    b,
-		GuestNumber:     int64(num),
-		GuestId:         reservationDTO.GuestId,
+		AccommodationID:   reservationDTO.AccommodationID,
+		StartDate:         startDate,
+		EndDate:           endDate,
+		Confirmation:      b,
+		GuestNumber:       int64(num),
+		GuestId:           reservationDTO.GuestId,
+		ReservationStatus: "PENDING",
 	}
 	fmt.Println(reservationDTO.AccommodationID)
 	fmt.Println("ahhahahahahahahaahahahah")
@@ -218,69 +285,139 @@ func (handler *ReservationHandler) HasActiveReservations(ctx context.Context, re
 	return response, nil
 }
 
-func (handler *ReservationHandler) AutomaticallyMakeReservation(ctx context.Context, request *pb.ReservationRequest) (*pb.ReservationRequestResponse, error) {
+func (handler *ReservationHandler) ConfirmReservationAutomatically(ctx context.Context, request *pb.ReservationRequest) (*pb.ConfirmReservationAutomaticallyMessage, error) {
 	var reservationDTO domain.ReservationDTO
 	fmt.Print("request: ")
 	fmt.Println(request)
+	//id := request.Id
+	//objectId, err := primitive.ObjectIDFromHex(id)
 
 	jsonBytes, err := protojson.Marshal(request)
-	if err != nil {
-		{
-			handler.LogError.WithFields(logrus.Fields{
-				"status":    "failure",
-				"location":  "Reservation Handler",
-				"action":    "CRADA731",
-				"timestamp": time.Now().String(),
-			}).Error("Wrong cast json to ReservationDTO!")
-		}
-	}
 
 	err = json.Unmarshal(jsonBytes, &reservationDTO)
 	if err != nil {
 		// Handle error
 	}
-	fmt.Println("kako se ispisati  resefvationdto")
-	fmt.Println(reservationDTO)
-
-	/*if err != nil {
-		handler.LogError.WithFields(logrus.Fields{
-			"status":    "failure",
-			"location":  "AdvertisementHandler",
-			"action":    "CRADA731",
-			"timestamp": time.Now().String(),
-		}).Error("Wrong cast json to AdvertisementDTO!")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}*/
+	//Reservation, err := handler.service.Get(objectId)
 	layout := "2006-01-02T15:04:05.000Z"
 	startDate, _ := time.Parse(layout, reservationDTO.StartDate)
 	endDate, _ := time.Parse(layout, reservationDTO.EndDate)
 	num, err := strconv.Atoi(reservationDTO.GuestNumber)
-	b, err := strconv.ParseBool(reservationDTO.Confirmation)
-
+	Minnum, err := strconv.Atoi(reservationDTO.MinGuest)
+	MaxNum, err := strconv.Atoi(reservationDTO.MaxGuest)
+	//b, err := strconv.ParseBool("true")
+	var isValidGuestNum = handler.service.CheckIfNumberOfGuestIsValid(int64(Minnum), int64(MaxNum), int64(num))
+	result := &pb.ConfirmReservationAutomaticallyMessage{Id: "nedozvoljen broj gostiju"}
+	fmt.Println("vrednost promenjive isvalidguestnum")
+	fmt.Println(isValidGuestNum)
+	if !(isValidGuestNum) {
+		fmt.Println("uuuuuuuuuuuuuuuuuuuuuuu")
+		return result, nil
+	}
 	var isTaken = handler.service.CheckForReservationInDateRange(reservationDTO.AccommodationID, startDate, endDate)
-	re := &pb.ReservationRequestResponse{Id: "greska"}
+	//re := &pb.ReservationRequestResponse{Id: "greska"}
+	fmt.Println(isTaken)
 	if isTaken == true {
-		return re, nil
-	}
 
+		//err = handler.service.UpdateReservationStatusForCanceled(&reservationRequest)
+		res := &pb.ConfirmReservationAutomaticallyMessage{
+			Id: "greska",
+		}
+		return res, nil
+	}
 	reservationRequest := domain.Reservation{
-		AccommodationID: reservationDTO.AccommodationID,
-		StartDate:       startDate,
-		EndDate:         endDate,
-		Confirmation:    b,
-		GuestNumber:     int64(num),
-		GuestId:         reservationDTO.GuestId,
+		AccommodationID:   reservationDTO.AccommodationID,
+		StartDate:         startDate,
+		EndDate:           endDate,
+		Confirmation:      true,
+		GuestNumber:       int64(num),
+		GuestId:           reservationDTO.GuestId,
+		ReservationStatus: "CONFIRMED",
 	}
-	fmt.Println(reservationDTO.AccommodationID)
-	fmt.Println("ahhahahahahahahaahahahah")
-	fmt.Println(reservationDTO.AccommodationID)
-	fmt.Println(reservationDTO.StartDate)
-	fmt.Println(reservationDTO.EndDate)
 
-	err = handler.service.CreateReservationRequest(&reservationRequest)
+	err = handler.service.Create(&reservationRequest)
+
+	err = handler.service.UpdateReservationStatusForConfirmed(&reservationRequest)
+	//var listOfReservationRequests = handler.service.GetAllReservationRequestWhichOverlapsWithConfirmed(Reservation.StartDate, Reservation.EndDate, Reservation.AccommodationID)
+	//handler.service.CancelAllReservationRequestOverlaping(listOfReservationRequests)
 	ReservationPb := mapReservation(&reservationRequest)
-	response := &pb.ReservationRequestResponse{
+	response := &pb.ConfirmReservationAutomaticallyMessage{
+		Id: ReservationPb.Id,
+	}
+	return response, nil
+}
+func (handler *ReservationHandler) ConfirmReservationManually(ctx context.Context, request *pb.ConfirmReservationManuallyRequest) (*pb.ConfirmReservationManuallyResponse, error) {
+	var reservationDTO domain.ReservationDTO
+	fmt.Print("request: ")
+
+	fmt.Println(request)
+	id := request.Id
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	jsonBytes, err := protojson.Marshal(request)
+
+	err = json.Unmarshal(jsonBytes, &reservationDTO)
+	if err != nil {
+		// Handle error
+	}
+
+	//layout := "2006-01-02T15:04:05.000Z"
+	/*startDate, _ := time.Parse(layout, reservationDTO.StartDate)
+	endDate, _ := time.Parse(layout, reservationDTO.EndDate)
+	num, err := strconv.Atoi(reservationDTO.GuestNumber)
+	b, err := strconv.ParseBool(reservationDTO.Confirmation)*/
+	Reservation, err := handler.service.Get(objectId)
+
+	//err = handler.service.Create(&reservationRequest)
+	err = handler.service.UpdateReservationStatusForConfirmed(Reservation)
+	var listOfReservationRequests = handler.service.GetAllReservationRequestWhichOverlapsWithConfirmed(Reservation.StartDate, Reservation.EndDate, Reservation.AccommodationID)
+	fmt.Println("vo je duzina liste sa prekalpajucim terminima")
+	fmt.Println(listOfReservationRequests)
+	handler.service.CancelAllReservationRequestOverlaping(listOfReservationRequests)
+	ReservationPb := mapReservation(Reservation)
+	response := &pb.ConfirmReservationManuallyResponse{
+		Id: ReservationPb.Id,
+	}
+	return response, nil
+}
+func (handler *ReservationHandler) CancelReservationManually(ctx context.Context, request *pb.CancelReservationManuallyRequest) (*pb.CancelReservationManuallyResponse, error) {
+	var reservationDTO domain.ReservationDTO
+	fmt.Print("request: ")
+	fmt.Println(request)
+	id := request.Id
+	objectId, err := primitive.ObjectIDFromHex(id)
+	jsonBytes, err := protojson.Marshal(request)
+
+	err = json.Unmarshal(jsonBytes, &reservationDTO)
+	if err != nil {
+		// Handle error
+	}
+
+	/*layout := "2006-01-02T15:04:05.000Z"
+	startDate, _ := time.Parse(layout, reservationDTO.StartDate)
+	endDate, _ := time.Parse(layout, reservationDTO.EndDate)
+	num, err := strconv.Atoi(reservationDTO.GuestNumber)
+	b, err := strconv.ParseBool(reservationDTO.Confirmation)*/
+	Reservation, err := handler.service.Get(objectId)
+
+	/*reservationRequest := domain.Reservation{
+		AccommodationID:   reservationDTO.AccommodationID,
+		StartDate:         startDate,
+		EndDate:           endDate,
+		Confirmation:      b,
+		GuestNumber:       int64(num),
+		GuestId:           reservationDTO.GuestId,
+		ReservationStatus: "CONFIRMED",
+	}*/
+	err = handler.service.UpdateReservationStatusForCanceled(Reservation)
+	if err != nil {
+		return nil, err
+	}
+	//err = handler.service.Create(&reservationRequest)
+	//var listOfReservationRequests = handler.service.GetAllReservationRequestWhichOverlapsWithConfirmed(Reservation.StartDate, Reservation.EndDate, Reservation.AccommodationID)
+	//handler.service.CancelAllReservationRequestOverlaping(listOfReservationRequests)
+	ReservationPb := mapReservation(Reservation)
+	response := &pb.CancelReservationManuallyResponse{
 		Id: ReservationPb.Id,
 	}
 	return response, nil

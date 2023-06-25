@@ -7,7 +7,10 @@ import (
 
 func mapAccommodation(order *domain.Accommodation) *pb.Accommodation {
 	orderPb := &pb.Accommodation{
-		Id: order.Id.Hex(),
+		Id:                           order.Id.Hex(),
+		AccommodationReservationType: order.ReservationConfirmation,
+		MinGuest:                     int64(order.MinGuest),
+		MaxGuest:                     int64(order.MaxGuest),
 	}
 	return orderPb
 }

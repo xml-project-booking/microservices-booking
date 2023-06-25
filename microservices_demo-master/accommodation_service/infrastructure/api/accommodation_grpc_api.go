@@ -23,6 +23,7 @@ func NewAccommodationHandler(service *application.AccommodationService) *Accommo
 		service: service,
 	}
 }
+
 func (handler *AccommodationHandler) ChangeAccommodationReservationType(ctx context.Context, request *pb.ChangeReservationTypeRequest) (*pb.ChangeReservationTypeResponse, error) {
 	accommodationId := request.Id
 	objectId, err := primitive.ObjectIDFromHex(accommodationId)
@@ -39,7 +40,7 @@ func (handler *AccommodationHandler) ChangeAccommodationReservationType(ctx cont
 
 	response := &pb.ChangeReservationTypeResponse{
 		Id:  objectId.Hex(),
-		Err: err.Error(),
+		Err: "nema greske",
 	}
 	return response, nil
 }

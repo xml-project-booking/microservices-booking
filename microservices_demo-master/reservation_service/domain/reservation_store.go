@@ -7,7 +7,8 @@ type ReservationStore interface {
 	GetAll() ([]*Reservation, error)
 	Insert(reservation *Reservation) error
 	DeleteAll()
-	UpdateStatus(reservation *Reservation) error
+	UpdateStatusForCanceled(reservation *Reservation) error
+	UpdateStatusForConfirmed(reservation *Reservation) error
 	GetAllReservationRequests() ([]*Reservation, error)
 	GetAllReservation() ([]*Reservation, error)
 	GetAllGuestReservation(guestId primitive.ObjectID) ([]*Reservation, error)

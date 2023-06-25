@@ -7,7 +7,8 @@ import (
 
 var users = []*domain.User{
 	{
-		Id: getObjectId("623b0cc336a1d6fd8c1cf0f6"),
+		Id:                 getObjectId("623b0cc336a1d6fd8c1cf0f6"),
+		CancellationNumber: 0,
 	},
 }
 

@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"resevation/domain"
 	"time"
@@ -40,9 +41,19 @@ func (service *ReservationService) Create(user *domain.Reservation) error {
 func (service *ReservationService) GetAllGuestReservations(guestId primitive.ObjectID) ([]*domain.Reservation, error) {
 	return service.store.GetAllGuestReservation(guestId)
 }
+func (service *ReservationService) UpdateReservationStatusForCanceled(reservation *domain.Reservation) error {
+	return service.store.UpdateStatusForCanceled(reservation)
 
+}
+func (service *ReservationService) UpdateReservationStatusForConfirmed(reservation *domain.Reservation) error {
+	return service.store.UpdateStatusForConfirmed(reservation)
+
+}
 func (service *ReservationService) Cancel(user *domain.Reservation) error {
-	return service.store.UpdateStatus(user)
+	return service.store.UpdateStatusForCanceled(user)
+}
+func (service *ReservationService) Delete(reservationId primitive.ObjectID) bool {
+	return service.store.DeleteReservationById(reservationId)
 }
 func (service *ReservationService) CreateReservationRequest(reservation *domain.Reservation) error {
 	err := service.store.Insert(reservation)
@@ -51,13 +62,46 @@ func (service *ReservationService) CreateReservationRequest(reservation *domain.
 	}
 	return nil
 }
+func (service *ReservationService) CancelAllReservationRequestOverlaping(reservations []*domain.Reservation) {
+	for _, res := range reservations {
+		service.UpdateReservationStatusForCanceled(res)
+	}
+
+}
+func (service *ReservationService) GetAllReservationRequestWhichOverlapsWithConfirmed(startDate time.Time, endDate time.Time, accommodationId primitive.ObjectID) []*domain.Reservation {
+	allReservations, _ := service.store.GetAllReservationRequests()
+	fmt.Println("ovo su svi zahtjevi za rezeervaciju")
+	fmt.Println(allReservations)
+	var filteredReservationsByAccommodation []*domain.Reservation
+	var filteredReservationsOverlaps []*domain.Reservation
+	for _, reservation := range allReservations {
+		if reservation.AccommodationID == accommodationId {
+			fmt.Println("usao je  eem alo dddj")
+			filteredReservationsByAccommodation = append(filteredReservationsByAccommodation, reservation)
+		}
+	}
+	fmt.Println("ovo je duzina filterocane liste akomodacijom")
+	fmt.Println(filteredReservationsByAccommodation)
+	for _, res := range filteredReservationsByAccommodation {
+		fmt.Println(res)
+		var overLaps = service.CheckIfOverLaps(res.StartDate, res.EndDate, startDate, endDate)
+		if overLaps {
+			fmt.Println("usao u fju za prekpalanje")
+			filteredReservationsOverlaps = append(filteredReservationsOverlaps, res)
+		}
+
+	}
+	return filteredReservationsOverlaps
+}
 func (service *ReservationService) CheckForReservationInDateRange(accommodationId primitive.ObjectID, startDate time.Time, endDate time.Time) bool {
 
 	allReservations, _ := service.store.GetAllReservation()
 	var filteredReservations []*domain.Reservation
-
+	fmt.Println(len(allReservations))
+	fmt.Println(accommodationId)
 	for _, reservation := range allReservations {
 		if reservation.AccommodationID == accommodationId {
+
 			filteredReservations = append(filteredReservations, reservation)
 		}
 	}
@@ -70,6 +114,38 @@ func (service *ReservationService) CheckForReservationInDateRange(accommodationI
 
 	}
 	return false
+
+}
+func (service *ReservationService) CheckForReservationInDateRangeAndGetUserId(accommodationId primitive.ObjectID, startDate time.Time, endDate time.Time) string {
+	fmt.Println("usaooooooooooo ovdee")
+	allReservations, _ := service.store.GetAllReservation()
+	var filteredReservations []*domain.Reservation
+	var termCondition string
+	fmt.Println("lista filterovana po acc id")
+	fmt.Println(allReservations)
+	for _, reservation := range allReservations {
+		fmt.Println(reservation.AccommodationID)
+		if reservation.AccommodationID == accommodationId {
+
+			filteredReservations = append(filteredReservations, reservation)
+		}
+	}
+	fmt.Println("lista filterovana po acc id")
+	fmt.Println(filteredReservations)
+	for _, res := range filteredReservations {
+		var isTaken = service.CheckIfOverLaps(res.StartDate, res.EndDate, startDate, endDate)
+		if isTaken {
+			fmt.Println("uslov ispunjen")
+			termCondition = res.Id.Hex()
+			return termCondition
+		}
+
+	}
+
+	termCondition = "greska"
+
+	fmt.Println(termCondition)
+	return termCondition
 
 }
 
@@ -110,4 +186,8 @@ func (service *ReservationService) CheckIfLessThan24Hours(reservationId primitiv
 	}
 	return false
 
+}
+
+func (service *ReservationService) CheckIfNumberOfGuestIsValid(minNumber int64, maxNumber int64, guestNumber int64) bool {
+	return guestNumber >= minNumber && guestNumber <= maxNumber
 }

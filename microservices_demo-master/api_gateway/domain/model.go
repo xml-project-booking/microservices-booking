@@ -50,7 +50,17 @@ type ReservationDTO struct {
 	Confirmation    string
 	GuestId         string
 }
+
 type UserInfo struct {
 	Id   string
 	Role string
+}
+type TermDTO struct {
+	Id              string
+	AccommodationID string // ID smeštaja za koji je termin vezan
+	UserID          string // ID korisnika koji je rezervisao smeštaj
+	PriceType       string
+	Value           string
+	StartDate       string
+	EndDate         string
 }

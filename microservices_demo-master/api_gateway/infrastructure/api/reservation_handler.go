@@ -8,16 +8,19 @@ import (
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/services"
 	accommodations "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
 	reservations "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
+	terms "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	users "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/net/context"
 	"net/http"
+	"strconv"
 )
 
 type ReservationHandler struct {
 	reservationClientAddress string
 	userClientAddress        string
 	accommodationAddress     string
+	termAddress              string
 }
 
 func (handler *ReservationHandler) Init(mux *runtime.ServeMux) {
@@ -29,17 +32,30 @@ func (handler *ReservationHandler) Init(mux *runtime.ServeMux) {
 	if err != nil {
 		panic(err)
 	}
-	err = mux.HandlePath("POST", "/make-reservation", handler.GetReservationForHost)
+	err = mux.HandlePath("POST", "/make-reservation", handler.ConfirmationOfReservation)
+	if err != nil {
+		panic(err)
+	}
+	err = mux.HandlePath("GET", "/confirm-reservation-man/{reservationId}", handler.ManuallyConfirmReservation)
+	if err != nil {
+		panic(err)
+	}
+	err = mux.HandlePath("GET", "/cancel-reservation-man/{reservationId}", handler.ManuallyCancelReservation)
+	if err != nil {
+		panic(err)
+	}
+	err = mux.HandlePath("POST", "/term/reservation", handler.CheckReservationForTerm)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func NewReservationHandler(reservationClientAddress, userClientAddress, accommodationAddress string) Handler {
+func NewReservationHandler(reservationClientAddress, userClientAddress, accommodationAddress, termAddress string) Handler {
 	return &ReservationHandler{
 		reservationClientAddress: reservationClientAddress,
 		userClientAddress:        userClientAddress,
 		accommodationAddress:     accommodationAddress,
+		termAddress:              termAddress,
 	}
 }
 
@@ -135,47 +151,154 @@ func (handler *ReservationHandler) GetReservations(accommodationId primitive.Obj
 	}
 	return reservationSlice
 }
-func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWriter, req *http.Request) {
-	//reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWriter, req *http.Request, params map[string]string) {
+	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
 	accommodationClient := services.NewAccommodationClient(handler.accommodationAddress)
+	//termClient := services.NewTermClient(handler.termAddress)
 
 	decoder := json.NewDecoder(req.Body)
 	var t domain.ReservationDTO
 	err := decoder.Decode(&t)
+	fmt.Println(req.Body)
 	if err != nil {
-		panic(err)
+		return
 
 	}
 	accommodation, err := accommodationClient.Get(context.TODO(), &accommodations.GetRequest{
 		Id: t.AccommodationID,
 	})
+	fmt.Println(accommodation)
+	fmt.Println(accommodation.Accommodation.AccommodationReservationType + "ovo je tip")
 	if accommodation.Accommodation.AccommodationReservationType == "AUTOMATIC" {
-		//response, err:= reservationClient.ConfirmReservationAutomatically(context.TODO(),&reservations.ReservationRequest{})
-	}
-	{
-		//response,err:= reservationClient.MakeRequestForReservation(context.TODO(),&reservations.ReservationRequest{});
+		fmt.Println("usaooooooooo u automatic")
+		res, err := reservationClient.ConfirmReservationAutomatically(context.TODO(), &reservations.ReservationRequest{
+			Id:              t.Id,
+			AccommodationID: t.AccommodationID,
+			StartDate:       t.StartDate,
+			EndDate:         t.EndDate,
+			GuestNumber:     t.GuestNumber,
+			GuestId:         t.GuestId,
+			Confirmation:    t.Confirmation,
+			MinGuest:        strconv.FormatInt(accommodation.Accommodation.MinGuest, 10),
+			MaxGuest:        strconv.FormatInt(accommodation.Accommodation.MaxGuest, 10),
+		})
+		if err != nil {
+
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		id := res.Id
+		response, err := json.Marshal(id)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write((response))
+		return
 	}
 
+	fmt.Println("usaoooooooo u manuall")
+	result, err := reservationClient.MakeRequestForReservation(context.TODO(), &reservations.ReservationRequest{Id: t.Id,
+		AccommodationID: t.AccommodationID,
+		StartDate:       t.StartDate,
+		EndDate:         t.EndDate,
+		GuestNumber:     t.GuestNumber,
+		GuestId:         t.GuestId,
+		Confirmation:    t.Confirmation,
+		MinGuest:        strconv.FormatInt(accommodation.Accommodation.MinGuest, 10),
+		MaxGuest:        strconv.FormatInt(accommodation.Accommodation.MaxGuest, 10)})
+
+	if err != nil {
+		return
+	}
 	fmt.Println(t)
 	fmt.Println("hahahahahahahahahahahahahhaha")
+	id := result.Id
+	response, err := json.Marshal(id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write((response))
+	return
 }
 
-/*func (handler *ReservationHandler) ManuallyConfirmReservation(orderDetails *domain.OrderDetails) error {
-	orderingClient := services.NewOrderingClient(handler.orderingClientAddress)
-	orderInfo, err := orderingClient.Get(context.TODO(), &ordering.GetRequest{Id: orderDetails.Id})
+func (handler *ReservationHandler) ManuallyConfirmReservation(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	id := pathParams["reservationId"]
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	result, err := reservationClient.ConfirmReservationManually(context.TODO(), &reservations.ConfirmReservationManuallyRequest{Id: id})
 	if err != nil {
-		return err
+		return
 	}
-	orderDetails.Id = orderInfo.Order.Id
-	orderDetails.CreatedAt = orderInfo.Order.CreatedAt.AsTime()
-	orderDetails.Status = orderInfo.Order.Status.String()
-	orderDetails.OrderItems = make([]domain.OrderItem, 0)
-	for _, item := range orderInfo.Order.Items {
-		itemDetails := domain.OrderItem{
-			Product:  domain.Product{Id: item.Product.Id, ColorCode: item.Product.Color.Code},
-			Quantity: uint16(item.Quantity),
-		}
-		orderDetails.OrderItems = append(orderDetails.OrderItems, itemDetails)
+	idResult := result.Id
+	response, err := json.Marshal(idResult)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
-	return nil
-}*/
+	w.Write((response))
+
+	return
+}
+func (handler *ReservationHandler) ManuallyCancelReservation(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	id := pathParams["reservationId"]
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	result, err := reservationClient.CancelReservationManually(context.TODO(), &reservations.CancelReservationManuallyRequest{Id: id})
+	if err != nil {
+		return
+	}
+	idResult := result.Id
+	response, err := json.Marshal(idResult)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write((response))
+
+	return
+}
+
+func (handler *ReservationHandler) CheckReservationForTerm(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	termClient := services.NewTermClient(handler.termAddress)
+	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	decoder := json.NewDecoder(r.Body)
+	var t domain.TermDTO
+	err := decoder.Decode(&t)
+	if err != nil {
+		return
+	}
+	fmt.Println(t)
+	res, err := reservationClient.TermCheck(context.TODO(), &reservations.TermCheckRequest{
+		Id:        t.AccommodationID,
+		Startdate: t.StartDate,
+		EndDate:   t.EndDate,
+	})
+
+
+	if res.HasReservation != "greska" {
+		w.WriteHeader(http.StatusForbidden)
+		return
+
+	}
+	num, err := strconv.Atoi(t.Value)
+	termClient.Create(context.TODO(), &terms.CreateRequest{
+		UserId:          t.UserID,
+		StartDate:       t.StartDate,
+		EndDate:         t.EndDate,
+		AccommodationId: t.AccommodationID,
+		PriceType:       t.PriceType,
+		Value:           float64(num),
+	})
+	w.WriteHeader(http.StatusOK)
+	return
+}

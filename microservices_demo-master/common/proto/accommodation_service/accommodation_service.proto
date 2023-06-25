@@ -30,6 +30,7 @@ service AccommodationService{
       body:"*"
     };
   }
+
   rpc GetAllIdsByHost(GetAllIdsByHostRequest) returns(GetAllIdsByHostResponse) {
     option (google.api.http) = {
       get: "/accommodations/accommodationIds/{id}"
@@ -38,6 +39,13 @@ service AccommodationService{
   rpc DeleteAllByHost(DeleteAllByHostRequest) returns (DeleteAllByHostResponse) {
     option (google.api.http) = {
       delete: "/accommodations/delete-host/{id}"
+    };
+  }
+  rpc GetAccommodation(GetRequest) returns (GetAccommodationResponse){
+    option (google.api.http) = {
+      get: "/accommodations/get-accommodation/{id}"
+
+
     };
   }
 
@@ -51,7 +59,12 @@ message ChangeReservationTypeResponse{
   string id = 1;
   string err= 2;
 }
-
+message GetAccommodationResponse{
+  string id =1;
+  string ReservationConfirmationType  =2;
+  string minGuest = 3;
+  string maxGuest = 4;
+}
 message CreateAccommodationRequest {
   string name = 1;
   string reservationConfirmation = 2;
@@ -110,4 +123,8 @@ message DeleteAllByHostResponse {
 message RequestResult {
   int32 code = 1;
   string message = 2;
+
+  int64 MaxGuest  =3;
+  int64 MinGuest = 4;
+
 }

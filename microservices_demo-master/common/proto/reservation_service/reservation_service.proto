@@ -47,12 +47,13 @@ service ReservationService{
       body:"*"
     };
   }
-  rpc ConfirmReservationAutomatically(CancelReservationManuallyRequest) returns (CancelReservationManuallyResponse){
+  rpc ConfirmReservationAutomatically(ReservationRequest) returns (ConfirmReservationAutomaticallyMessage){
     option (google.api.http) = {
       post: "/reservations/automatically-confirm"
       body:"*"
     };
   }
+
   rpc HasActiveReservations(HasActiveReservationsRequest) returns (HasActiveReservationsResponse) {
     option (google.api.http) = {
       get: "/reservations/active-reservations/{id}"
@@ -63,8 +64,31 @@ service ReservationService{
       get: "/reservations/future"
     };
   }
-}
+  rpc DeleteReservationRequestGuest(DeleteReservationRequest) returns (DeleteReservationResponse){
+    option (google.api.http) = {
+      post: "/reservations/delete-reservation-request"
+      body:"*"
+    };
+  }
+  rpc TermCheck(TermCheckRequest) returns (TermCheckResponse){
+    option (google.api.http) = {
+      post: "/reservations/term-check"
+      body:"*"
 
+    };
+  }
+}
+message TermCheckRequest{
+  string id = 1;
+  string startdate = 2;
+  string endDate = 3;
+
+}
+message TermCheckResponse{
+  string hasReservation = 1;
+
+
+}
 
 message GetRequest {
   string id = 1;
@@ -78,6 +102,9 @@ message ReservationRequest {
   string GuestNumber = 5;
   string  Confirmation = 6;
   string GuestId = 7;
+  string minGuest = 8;
+  string maxGuest = 9;
+
 
 }
 
@@ -104,8 +131,8 @@ message CancelReservationResponse {
   bool isDeleted = 2;
 }
 
-message ConfirmReservationAutomatically{
-
+message ConfirmReservationAutomaticallyMessage{
+ string id = 1;
 }
 
 message GetResponse {
@@ -137,6 +164,8 @@ message Reservation {
   int64 guestNumber = 5;
   bool  isConfirmed = 6;
   string guestId = 7;
+  int64 minGuest = 8;
+  int64 maxGuest = 9;
 }
 
 message ReservationDTO {
@@ -146,15 +175,20 @@ message ReservationDTO {
    string endDate = 4;
   int64 guestNumber = 5;
   bool  isConfirmed = 6;
+  int64 minGuest = 8;
+  int64 maxGuest = 9;
 
 }
-
+message DeleteReservationRequest{
+  string id =1;
+}
 message GetAllByAccommodationRequest{
   string id = 1;
 }
  message GetAllByAccommodationResponse {
    repeated Reservation reservations = 1;
  }
+
 message HasActiveReservationsRequest {
   string id = 1;
 }
@@ -162,3 +196,9 @@ message HasActiveReservationsRequest {
 message HasActiveReservationsResponse {
   bool hasReservations=1;
 }
+
+
+message DeleteReservationResponse{
+  string id = 1;
+}
+

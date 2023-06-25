@@ -2,6 +2,7 @@ package persistence
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,6 +18,24 @@ const (
 
 type ReservationMongoDBStore struct {
 	reservations *mongo.Collection
+}
+
+func (store *ReservationMongoDBStore) UpdateStatusForConfirmed(reservation *domain.Reservation) error {
+
+	result, err := store.reservations.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": reservation.Id},
+		bson.D{
+			{"$set", bson.D{{"reservation_status", "CONFIRMED"}, {"confirmation", true}}},
+		},
+	)
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount != 1 {
+		return errors.New("one document should've been updated")
+	}
+	return nil
 }
 
 func (store *ReservationMongoDBStore) DeleteReservationById(reservationId primitive.ObjectID) bool {
@@ -38,9 +57,23 @@ func (store *ReservationMongoDBStore) GetAllGuestReservation(guestId primitive.O
 
 }
 
-func (store *ReservationMongoDBStore) UpdateStatus(user *domain.Reservation) error {
-	//TODO implement me
-	panic("implement me")
+func (store *ReservationMongoDBStore) UpdateStatusForCanceled(reservation *domain.Reservation) error {
+
+	result, err := store.reservations.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": reservation.Id},
+		bson.D{
+			{"$set", bson.D{{"reservation_status", "CANCELED"}, {"confirmation", false}}},
+		},
+	)
+	if err != nil {
+		fmt.Println("ovoo mozdaa")
+		return err
+	}
+	if result.MatchedCount != 1 {
+		return errors.New("one document should've been updated")
+	}
+	return nil
 }
 
 func NewReservationMongoDBStore(client *mongo.Client) domain.ReservationStore {

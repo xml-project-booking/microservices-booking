@@ -6,6 +6,7 @@ import (
 	ordering "github.com/tamararankovic/microservices_demo/common/proto/ordering_service"
 	reservation "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	shipping "github.com/tamararankovic/microservices_demo/common/proto/shipping_service"
+	terms "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	user "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -55,6 +56,14 @@ func NewAccommodationClient(address string) accommodation.AccommodationServiceCl
 		log.Fatalf("Failed to start gRPC connection to Accommodation service: %v", err)
 	}
 	return accommodation.NewAccommodationServiceClient(conn)
+}
+func NewTermClient(address string) terms.TermServiceClient {
+	conn, err := getConnection(address)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC connection to Shipping service: %v", err)
+	}
+	return terms.NewTermServiceClient(conn)
+
 }
 
 func getConnection(address string) (*grpc.ClientConn, error) {

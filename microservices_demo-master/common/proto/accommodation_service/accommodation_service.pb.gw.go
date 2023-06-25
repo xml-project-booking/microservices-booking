@@ -169,13 +169,8 @@ func local_request_AccommodationService_CreateAccommodation_0(ctx context.Contex
 
 }
 
-<<<<<<< HEAD
 func request_AccommodationService_GetAllIdsByHost_0(ctx context.Context, marshaler runtime.Marshaler, client AccommodationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetAllIdsByHostRequest
-=======
-func request_AccommodationService_GetAccommodation_0(ctx context.Context, marshaler runtime.Marshaler, client AccommodationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetRequest
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -195,22 +190,13 @@ func request_AccommodationService_GetAccommodation_0(ctx context.Context, marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-<<<<<<< HEAD
 	msg, err := client.GetAllIdsByHost(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-=======
-	msg, err := client.GetAccommodation(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	return msg, metadata, err
 
 }
 
-<<<<<<< HEAD
 func local_request_AccommodationService_GetAllIdsByHost_0(ctx context.Context, marshaler runtime.Marshaler, server AccommodationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetAllIdsByHostRequest
-=======
-func local_request_AccommodationService_GetAccommodation_0(ctx context.Context, marshaler runtime.Marshaler, server AccommodationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetRequest
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -230,7 +216,6 @@ func local_request_AccommodationService_GetAccommodation_0(ctx context.Context, 
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
-<<<<<<< HEAD
 	msg, err := server.GetAllIdsByHost(ctx, &protoReq)
 	return msg, metadata, err
 
@@ -284,9 +269,58 @@ func local_request_AccommodationService_DeleteAllByHost_0(ctx context.Context, m
 	}
 
 	msg, err := server.DeleteAllByHost(ctx, &protoReq)
-=======
+	return msg, metadata, err
+
+}
+
+func request_AccommodationService_GetAccommodation_0(ctx context.Context, marshaler runtime.Marshaler, client AccommodationServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	msg, err := client.GetAccommodation(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_AccommodationService_GetAccommodation_0(ctx context.Context, marshaler runtime.Marshaler, server AccommodationServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
 	msg, err := server.GetAccommodation(ctx, &protoReq)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	return msg, metadata, err
 
 }
@@ -397,11 +431,7 @@ func RegisterAccommodationServiceHandlerServer(ctx context.Context, mux *runtime
 
 	})
 
-<<<<<<< HEAD
 	mux.Handle("GET", pattern_AccommodationService_GetAllIdsByHost_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-=======
-	mux.Handle("GET", pattern_AccommodationService_GetAccommodation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
@@ -409,20 +439,12 @@ func RegisterAccommodationServiceHandlerServer(ctx context.Context, mux *runtime
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-<<<<<<< HEAD
 		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accommodations.AccommodationService/GetAllIdsByHost", runtime.WithHTTPPathPattern("/accommodations/accommodationIds/{id}"))
-=======
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accommodations.AccommodationService/GetAccommodation", runtime.WithHTTPPathPattern("/accommodations/get-accommodation/{id}"))
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-<<<<<<< HEAD
 		resp, md, err := local_request_AccommodationService_GetAllIdsByHost_0(annotatedContext, inboundMarshaler, server, req, pathParams)
-=======
-		resp, md, err := local_request_AccommodationService_GetAccommodation_0(annotatedContext, inboundMarshaler, server, req, pathParams)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
@@ -430,7 +452,6 @@ func RegisterAccommodationServiceHandlerServer(ctx context.Context, mux *runtime
 			return
 		}
 
-<<<<<<< HEAD
 		forward_AccommodationService_GetAllIdsByHost_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
@@ -457,9 +478,31 @@ func RegisterAccommodationServiceHandlerServer(ctx context.Context, mux *runtime
 		}
 
 		forward_AccommodationService_DeleteAllByHost_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-=======
+
+	})
+
+	mux.Handle("GET", pattern_AccommodationService_GetAccommodation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/accommodations.AccommodationService/GetAccommodation", runtime.WithHTTPPathPattern("/accommodations/get-accommodation/{id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_AccommodationService_GetAccommodation_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
 		forward_AccommodationService_GetAccommodation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 
 	})
 
@@ -592,37 +635,24 @@ func RegisterAccommodationServiceHandlerClient(ctx context.Context, mux *runtime
 
 	})
 
-<<<<<<< HEAD
 	mux.Handle("GET", pattern_AccommodationService_GetAllIdsByHost_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-=======
-	mux.Handle("GET", pattern_AccommodationService_GetAccommodation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-<<<<<<< HEAD
 		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accommodations.AccommodationService/GetAllIdsByHost", runtime.WithHTTPPathPattern("/accommodations/accommodationIds/{id}"))
-=======
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accommodations.AccommodationService/GetAccommodation", runtime.WithHTTPPathPattern("/accommodations/get-accommodation/{id}"))
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-<<<<<<< HEAD
 		resp, md, err := request_AccommodationService_GetAllIdsByHost_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-=======
-		resp, md, err := request_AccommodationService_GetAccommodation_0(annotatedContext, inboundMarshaler, client, req, pathParams)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
 		if err != nil {
 			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-<<<<<<< HEAD
 		forward_AccommodationService_GetAllIdsByHost_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
@@ -646,9 +676,28 @@ func RegisterAccommodationServiceHandlerClient(ctx context.Context, mux *runtime
 		}
 
 		forward_AccommodationService_DeleteAllByHost_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-=======
+
+	})
+
+	mux.Handle("GET", pattern_AccommodationService_GetAccommodation_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/accommodations.AccommodationService/GetAccommodation", runtime.WithHTTPPathPattern("/accommodations/get-accommodation/{id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_AccommodationService_GetAccommodation_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
 		forward_AccommodationService_GetAccommodation_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 
 	})
 
@@ -664,13 +713,11 @@ var (
 
 	pattern_AccommodationService_CreateAccommodation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"accommodations", "create-accommodation"}, ""))
 
-<<<<<<< HEAD
 	pattern_AccommodationService_GetAllIdsByHost_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"accommodations", "accommodationIds", "id"}, ""))
 
 	pattern_AccommodationService_DeleteAllByHost_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"accommodations", "delete-host", "id"}, ""))
-=======
+
 	pattern_AccommodationService_GetAccommodation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"accommodations", "get-accommodation", "id"}, ""))
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 )
 
 var (
@@ -682,11 +729,9 @@ var (
 
 	forward_AccommodationService_CreateAccommodation_0 = runtime.ForwardResponseMessage
 
-<<<<<<< HEAD
 	forward_AccommodationService_GetAllIdsByHost_0 = runtime.ForwardResponseMessage
 
 	forward_AccommodationService_DeleteAllByHost_0 = runtime.ForwardResponseMessage
-=======
+
 	forward_AccommodationService_GetAccommodation_0 = runtime.ForwardResponseMessage
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 )

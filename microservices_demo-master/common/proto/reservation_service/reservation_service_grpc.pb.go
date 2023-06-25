@@ -27,13 +27,10 @@ const (
 	ReservationService_ConfirmReservationManually_FullMethodName      = "/reservations.ReservationService/ConfirmReservationManually"
 	ReservationService_CancelReservationManually_FullMethodName       = "/reservations.ReservationService/CancelReservationManually"
 	ReservationService_ConfirmReservationAutomatically_FullMethodName = "/reservations.ReservationService/ConfirmReservationAutomatically"
-<<<<<<< HEAD
 	ReservationService_HasActiveReservations_FullMethodName           = "/reservations.ReservationService/HasActiveReservations"
 	ReservationService_GetAllFuture_FullMethodName                    = "/reservations.ReservationService/GetAllFuture"
-=======
 	ReservationService_DeleteReservationRequestGuest_FullMethodName   = "/reservations.ReservationService/DeleteReservationRequestGuest"
 	ReservationService_TermCheck_FullMethodName                       = "/reservations.ReservationService/TermCheck"
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 )
 
 // ReservationServiceClient is the client API for ReservationService service.
@@ -47,15 +44,11 @@ type ReservationServiceClient interface {
 	CancelReservation(ctx context.Context, in *CancelReservationRequest, opts ...grpc.CallOption) (*CancelReservationResponse, error)
 	ConfirmReservationManually(ctx context.Context, in *ConfirmReservationManuallyRequest, opts ...grpc.CallOption) (*ConfirmReservationManuallyResponse, error)
 	CancelReservationManually(ctx context.Context, in *CancelReservationManuallyRequest, opts ...grpc.CallOption) (*CancelReservationManuallyResponse, error)
-<<<<<<< HEAD
-	ConfirmReservationAutomatically(ctx context.Context, in *CancelReservationManuallyRequest, opts ...grpc.CallOption) (*CancelReservationManuallyResponse, error)
+	ConfirmReservationAutomatically(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*ConfirmReservationAutomaticallyMessage, error)
 	HasActiveReservations(ctx context.Context, in *HasActiveReservationsRequest, opts ...grpc.CallOption) (*HasActiveReservationsResponse, error)
 	GetAllFuture(ctx context.Context, in *GetAllFutureRequest, opts ...grpc.CallOption) (*GetAllFutureResponse, error)
-=======
-	ConfirmReservationAutomatically(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*ConfirmReservationAutomaticallyMessage, error)
 	DeleteReservationRequestGuest(ctx context.Context, in *DeleteReservationRequest, opts ...grpc.CallOption) (*DeleteReservationResponse, error)
 	TermCheck(ctx context.Context, in *TermCheckRequest, opts ...grpc.CallOption) (*TermCheckResponse, error)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 }
 
 type reservationServiceClient struct {
@@ -138,30 +131,36 @@ func (c *reservationServiceClient) ConfirmReservationAutomatically(ctx context.C
 	return out, nil
 }
 
-<<<<<<< HEAD
 func (c *reservationServiceClient) HasActiveReservations(ctx context.Context, in *HasActiveReservationsRequest, opts ...grpc.CallOption) (*HasActiveReservationsResponse, error) {
 	out := new(HasActiveReservationsResponse)
 	err := c.cc.Invoke(ctx, ReservationService_HasActiveReservations_FullMethodName, in, out, opts...)
-=======
-func (c *reservationServiceClient) DeleteReservationRequestGuest(ctx context.Context, in *DeleteReservationRequest, opts ...grpc.CallOption) (*DeleteReservationResponse, error) {
-	out := new(DeleteReservationResponse)
-	err := c.cc.Invoke(ctx, ReservationService_DeleteReservationRequestGuest_FullMethodName, in, out, opts...)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-<<<<<<< HEAD
 func (c *reservationServiceClient) GetAllFuture(ctx context.Context, in *GetAllFutureRequest, opts ...grpc.CallOption) (*GetAllFutureResponse, error) {
 	out := new(GetAllFutureResponse)
 	err := c.cc.Invoke(ctx, ReservationService_GetAllFuture_FullMethodName, in, out, opts...)
-=======
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reservationServiceClient) DeleteReservationRequestGuest(ctx context.Context, in *DeleteReservationRequest, opts ...grpc.CallOption) (*DeleteReservationResponse, error) {
+	out := new(DeleteReservationResponse)
+	err := c.cc.Invoke(ctx, ReservationService_DeleteReservationRequestGuest_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *reservationServiceClient) TermCheck(ctx context.Context, in *TermCheckRequest, opts ...grpc.CallOption) (*TermCheckResponse, error) {
 	out := new(TermCheckResponse)
 	err := c.cc.Invoke(ctx, ReservationService_TermCheck_FullMethodName, in, out, opts...)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	if err != nil {
 		return nil, err
 	}
@@ -179,15 +178,11 @@ type ReservationServiceServer interface {
 	CancelReservation(context.Context, *CancelReservationRequest) (*CancelReservationResponse, error)
 	ConfirmReservationManually(context.Context, *ConfirmReservationManuallyRequest) (*ConfirmReservationManuallyResponse, error)
 	CancelReservationManually(context.Context, *CancelReservationManuallyRequest) (*CancelReservationManuallyResponse, error)
-<<<<<<< HEAD
-	ConfirmReservationAutomatically(context.Context, *CancelReservationManuallyRequest) (*CancelReservationManuallyResponse, error)
+	ConfirmReservationAutomatically(context.Context, *ReservationRequest) (*ConfirmReservationAutomaticallyMessage, error)
 	HasActiveReservations(context.Context, *HasActiveReservationsRequest) (*HasActiveReservationsResponse, error)
 	GetAllFuture(context.Context, *GetAllFutureRequest) (*GetAllFutureResponse, error)
-=======
-	ConfirmReservationAutomatically(context.Context, *ReservationRequest) (*ConfirmReservationAutomaticallyMessage, error)
 	DeleteReservationRequestGuest(context.Context, *DeleteReservationRequest) (*DeleteReservationResponse, error)
 	TermCheck(context.Context, *TermCheckRequest) (*TermCheckResponse, error)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	mustEmbedUnimplementedReservationServiceServer()
 }
 
@@ -219,19 +214,17 @@ func (UnimplementedReservationServiceServer) CancelReservationManually(context.C
 func (UnimplementedReservationServiceServer) ConfirmReservationAutomatically(context.Context, *ReservationRequest) (*ConfirmReservationAutomaticallyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ConfirmReservationAutomatically not implemented")
 }
-<<<<<<< HEAD
 func (UnimplementedReservationServiceServer) HasActiveReservations(context.Context, *HasActiveReservationsRequest) (*HasActiveReservationsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasActiveReservations not implemented")
 }
 func (UnimplementedReservationServiceServer) GetAllFuture(context.Context, *GetAllFutureRequest) (*GetAllFutureResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllFuture not implemented")
-=======
+}
 func (UnimplementedReservationServiceServer) DeleteReservationRequestGuest(context.Context, *DeleteReservationRequest) (*DeleteReservationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteReservationRequestGuest not implemented")
 }
 func (UnimplementedReservationServiceServer) TermCheck(context.Context, *TermCheckRequest) (*TermCheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TermCheck not implemented")
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 }
 func (UnimplementedReservationServiceServer) mustEmbedUnimplementedReservationServiceServer() {}
 
@@ -390,42 +383,6 @@ func _ReservationService_ConfirmReservationAutomatically_Handler(srv interface{}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ReservationService_DeleteReservationRequestGuest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteReservationRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ReservationServiceServer).DeleteReservationRequestGuest(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ReservationService_DeleteReservationRequestGuest_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReservationServiceServer).DeleteReservationRequestGuest(ctx, req.(*DeleteReservationRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ReservationService_TermCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TermCheckRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ReservationServiceServer).TermCheck(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ReservationService_TermCheck_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReservationServiceServer).TermCheck(ctx, req.(*TermCheckRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ReservationService_HasActiveReservations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HasActiveReservationsRequest)
 	if err := dec(in); err != nil {
@@ -458,6 +415,42 @@ func _ReservationService_GetAllFuture_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ReservationServiceServer).GetAllFuture(ctx, req.(*GetAllFutureRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReservationService_DeleteReservationRequestGuest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteReservationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).DeleteReservationRequestGuest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_DeleteReservationRequestGuest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).DeleteReservationRequestGuest(ctx, req.(*DeleteReservationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReservationService_TermCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TermCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).TermCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_TermCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).TermCheck(ctx, req.(*TermCheckRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -502,21 +495,20 @@ var ReservationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ReservationService_ConfirmReservationAutomatically_Handler,
 		},
 		{
-<<<<<<< HEAD
 			MethodName: "HasActiveReservations",
 			Handler:    _ReservationService_HasActiveReservations_Handler,
 		},
 		{
 			MethodName: "GetAllFuture",
 			Handler:    _ReservationService_GetAllFuture_Handler,
-=======
+		},
+		{
 			MethodName: "DeleteReservationRequestGuest",
 			Handler:    _ReservationService_DeleteReservationRequestGuest_Handler,
 		},
 		{
 			MethodName: "TermCheck",
 			Handler:    _ReservationService_TermCheck_Handler,
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

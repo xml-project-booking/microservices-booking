@@ -105,6 +105,8 @@ message Accommodation {
   string AccommodationReservationType=2;
   string name = 3;
   string hostId = 4;
+  int64 MaxGuest  =5;
+  int64 MinGuest = 6;
 }
 message GetAllIdsByHostRequest {
   string id = 1;

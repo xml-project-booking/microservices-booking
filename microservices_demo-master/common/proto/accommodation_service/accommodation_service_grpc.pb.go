@@ -23,12 +23,9 @@ const (
 	AccommodationService_GetAll_FullMethodName                             = "/accommodations.AccommodationService/GetAll"
 	AccommodationService_ChangeAccommodationReservationType_FullMethodName = "/accommodations.AccommodationService/ChangeAccommodationReservationType"
 	AccommodationService_CreateAccommodation_FullMethodName                = "/accommodations.AccommodationService/CreateAccommodation"
-<<<<<<< HEAD
 	AccommodationService_GetAllIdsByHost_FullMethodName                    = "/accommodations.AccommodationService/GetAllIdsByHost"
 	AccommodationService_DeleteAllByHost_FullMethodName                    = "/accommodations.AccommodationService/DeleteAllByHost"
-=======
 	AccommodationService_GetAccommodation_FullMethodName                   = "/accommodations.AccommodationService/GetAccommodation"
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 )
 
 // AccommodationServiceClient is the client API for AccommodationService service.
@@ -39,12 +36,9 @@ type AccommodationServiceClient interface {
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	ChangeAccommodationReservationType(ctx context.Context, in *ChangeReservationTypeRequest, opts ...grpc.CallOption) (*ChangeReservationTypeResponse, error)
 	CreateAccommodation(ctx context.Context, in *CreateAccommodationRequest, opts ...grpc.CallOption) (*CreateAccommodationResponse, error)
-<<<<<<< HEAD
 	GetAllIdsByHost(ctx context.Context, in *GetAllIdsByHostRequest, opts ...grpc.CallOption) (*GetAllIdsByHostResponse, error)
 	DeleteAllByHost(ctx context.Context, in *DeleteAllByHostRequest, opts ...grpc.CallOption) (*DeleteAllByHostResponse, error)
-=======
 	GetAccommodation(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetAccommodationResponse, error)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 }
 
 type accommodationServiceClient struct {
@@ -91,7 +85,6 @@ func (c *accommodationServiceClient) CreateAccommodation(ctx context.Context, in
 	return out, nil
 }
 
-<<<<<<< HEAD
 func (c *accommodationServiceClient) GetAllIdsByHost(ctx context.Context, in *GetAllIdsByHostRequest, opts ...grpc.CallOption) (*GetAllIdsByHostResponse, error) {
 	out := new(GetAllIdsByHostResponse)
 	err := c.cc.Invoke(ctx, AccommodationService_GetAllIdsByHost_FullMethodName, in, out, opts...)
@@ -104,11 +97,15 @@ func (c *accommodationServiceClient) GetAllIdsByHost(ctx context.Context, in *Ge
 func (c *accommodationServiceClient) DeleteAllByHost(ctx context.Context, in *DeleteAllByHostRequest, opts ...grpc.CallOption) (*DeleteAllByHostResponse, error) {
 	out := new(DeleteAllByHostResponse)
 	err := c.cc.Invoke(ctx, AccommodationService_DeleteAllByHost_FullMethodName, in, out, opts...)
-=======
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *accommodationServiceClient) GetAccommodation(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetAccommodationResponse, error) {
 	out := new(GetAccommodationResponse)
 	err := c.cc.Invoke(ctx, AccommodationService_GetAccommodation_FullMethodName, in, out, opts...)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	if err != nil {
 		return nil, err
 	}
@@ -123,12 +120,9 @@ type AccommodationServiceServer interface {
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
 	ChangeAccommodationReservationType(context.Context, *ChangeReservationTypeRequest) (*ChangeReservationTypeResponse, error)
 	CreateAccommodation(context.Context, *CreateAccommodationRequest) (*CreateAccommodationResponse, error)
-<<<<<<< HEAD
 	GetAllIdsByHost(context.Context, *GetAllIdsByHostRequest) (*GetAllIdsByHostResponse, error)
 	DeleteAllByHost(context.Context, *DeleteAllByHostRequest) (*DeleteAllByHostResponse, error)
-=======
 	GetAccommodation(context.Context, *GetRequest) (*GetAccommodationResponse, error)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	mustEmbedUnimplementedAccommodationServiceServer()
 }
 
@@ -148,16 +142,14 @@ func (UnimplementedAccommodationServiceServer) ChangeAccommodationReservationTyp
 func (UnimplementedAccommodationServiceServer) CreateAccommodation(context.Context, *CreateAccommodationRequest) (*CreateAccommodationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAccommodation not implemented")
 }
-<<<<<<< HEAD
 func (UnimplementedAccommodationServiceServer) GetAllIdsByHost(context.Context, *GetAllIdsByHostRequest) (*GetAllIdsByHostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllIdsByHost not implemented")
 }
 func (UnimplementedAccommodationServiceServer) DeleteAllByHost(context.Context, *DeleteAllByHostRequest) (*DeleteAllByHostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteAllByHost not implemented")
-=======
+}
 func (UnimplementedAccommodationServiceServer) GetAccommodation(context.Context, *GetRequest) (*GetAccommodationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccommodation not implemented")
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 }
 func (UnimplementedAccommodationServiceServer) mustEmbedUnimplementedAccommodationServiceServer() {}
 
@@ -244,18 +236,12 @@ func _AccommodationService_CreateAccommodation_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
-<<<<<<< HEAD
 func _AccommodationService_GetAllIdsByHost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetAllIdsByHostRequest)
-=======
-func _AccommodationService_GetAccommodation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRequest)
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-<<<<<<< HEAD
 		return srv.(AccommodationServiceServer).GetAllIdsByHost(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
@@ -282,7 +268,16 @@ func _AccommodationService_DeleteAllByHost_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccommodationServiceServer).DeleteAllByHost(ctx, req.(*DeleteAllByHostRequest))
-=======
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccommodationService_GetAccommodation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
 		return srv.(AccommodationServiceServer).GetAccommodation(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
@@ -291,7 +286,6 @@ func _AccommodationService_DeleteAllByHost_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccommodationServiceServer).GetAccommodation(ctx, req.(*GetRequest))
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -320,17 +314,16 @@ var AccommodationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AccommodationService_CreateAccommodation_Handler,
 		},
 		{
-<<<<<<< HEAD
 			MethodName: "GetAllIdsByHost",
 			Handler:    _AccommodationService_GetAllIdsByHost_Handler,
 		},
 		{
 			MethodName: "DeleteAllByHost",
 			Handler:    _AccommodationService_DeleteAllByHost_Handler,
-=======
+		},
+		{
 			MethodName: "GetAccommodation",
 			Handler:    _AccommodationService_GetAccommodation_Handler,
->>>>>>> bf2cdc8 (fixed mistakes made in implmentation of resrvation service)
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

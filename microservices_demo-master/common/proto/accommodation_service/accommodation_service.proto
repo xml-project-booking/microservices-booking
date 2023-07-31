@@ -18,13 +18,18 @@ service AccommodationService{
       get: "/accommodations/accommodation"
     };
   }
+  rpc GetAllByHostId(GetByHostIdRequest) returns(GetAllResponse) {
+    option (google.api.http) = {
+      get: "/accommodations/accommodation-host/{hostId}"
+    };
+  }
   rpc ChangeAccommodationReservationType (ChangeReservationTypeRequest) returns (ChangeReservationTypeResponse){
     option (google.api.http) = {
       post: "/accommodations/update-reservation-type"
       body:"*"
     };
   }
-  rpc CreateAccommodation (CreateAccommodationRequest) returns (CreateAccommodationResponse){
+  rpc CreateAccommodation(CreateAccommodationRequest) returns (CreateAccommodationResponse){
     option (google.api.http) = {
       post: "/accommodations/create-accommodation"
       body:"*"
@@ -79,16 +84,23 @@ message CreateAccommodationRequest {
   bool kitchen = 11;
   bool airConditioning = 12;
   bool freeParking = 13;
+  repeated FileToUpload files = 14;
 }
 message CreateAccommodationResponse {
   string id = 1;
+}
+message FileToUpload {
+  string filename = 1;
+  bytes content = 2;
 }
 
 
 message GetRequest {
   string id = 1;
 }
-
+message GetByHostIdRequest {
+  string hostId = 1;
+}
 message GetResponse {
   Accommodation accommodation = 1;
 }
@@ -107,6 +119,13 @@ message Accommodation {
   string hostId = 4;
   int64 MaxGuest  =5;
   int64 MinGuest = 6;
+  string city = 7;
+  string country = 8;
+  string street = 9;
+  bool wifi = 10;
+  bool kitchen = 11;
+  bool airConditioning = 12;
+  bool freeParking = 13;
 }
 message GetAllIdsByHostRequest {
   string id = 1;

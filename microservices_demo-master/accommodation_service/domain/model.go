@@ -19,7 +19,7 @@ type Accommodation struct {
 	Kitchen                 bool               `bson:"kitchen"`
 	AirConditioning         bool               `bson:"air_conditioning"`
 	FreeParking             bool               `bson:"free_parking"`
-	Photos                  string             `bson:"photos"`
+	Photos                  []string           `bson:"photos"`
 }
 
 type ConfirmationType int

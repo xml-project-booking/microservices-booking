@@ -80,9 +80,34 @@ func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, re
 		Country: accommodationDTO.Country,
 	}*/
 	objectId, err := primitive.ObjectIDFromHex(request.HostId)
+	//accommodationId := uuid.New()
+	var array []string
 	if err != nil {
 		return nil, err
 	}
+	//files := request.Files
+
+	//fmt.Println(files)
+
+	/*for _, file := range files {
+		fmt.Println(os.Getwd())
+		fileCreated, err := os.Create("example.txt")
+		if err != nil {
+			panic(err)
+
+		}
+		fmt.Println(fileCreated.Name() + "hahahahha")
+		fmt.Println(fileCreated.Readdirnames(2))
+		fmt.Println("dosao dovdee")
+
+		defer fileCreated.Close()
+		filePath := "C://Users/Cvetana/Desktop/cvetaVerzijamikrosevisi/cvetaVerzijamikrosevisi/microservices_demo-master/microservices_demo-master/uploads" + accommodationId.String() + file.Filename + ".jpg" // Change the extension based on the file type
+		err = os.WriteFile(filePath, file.Content, 0644)
+		if err != nil {
+			panic(err)
+		}
+		array = append(array, file.Filename)
+	}*/
 	createAccommodation := domain.Accommodation{
 		Name:                    request.Name,
 		ReservationConfirmation: request.ReservationConfirmation,
@@ -97,6 +122,7 @@ func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, re
 		Kitchen:                 request.Kitchen,
 		AirConditioning:         request.AirConditioning,
 		FreeParking:             request.FreeParking,
+		Photos:                  array,
 	}
 
 	err = handler.service.Create(&createAccommodation)
@@ -134,6 +160,27 @@ func (handler *AccommodationHandler) GetAll(ctx context.Context, request *pb.Get
 	for _, Accommodation := range Accommodations {
 		current := mapAccommodation(Accommodation)
 		response.Accommodations = append(response.Accommodations, current)
+	}
+	return response, nil
+}
+func (handler *AccommodationHandler) GetAllByHostId(ctx context.Context, request *pb.GetByHostIdRequest) (*pb.GetAllResponse, error) {
+	hostId := request.HostId
+	objectId, err := primitive.ObjectIDFromHex(hostId)
+	if err != nil {
+		return nil, err
+	}
+	Accommodations, err := handler.service.GetAll()
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllResponse{
+		Accommodations: []*pb.Accommodation{},
+	}
+	for _, Accommodation := range Accommodations {
+		if Accommodation.HostId == objectId {
+			current := mapAccommodation(Accommodation)
+			response.Accommodations = append(response.Accommodations, current)
+		}
 	}
 	return response, nil
 }

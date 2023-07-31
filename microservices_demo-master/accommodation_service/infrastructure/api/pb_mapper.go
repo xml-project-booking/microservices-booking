@@ -11,6 +11,14 @@ func mapAccommodation(order *domain.Accommodation) *pb.Accommodation {
 		AccommodationReservationType: order.ReservationConfirmation,
 		MinGuest:                     int64(order.MinGuest),
 		MaxGuest:                     int64(order.MaxGuest),
+		Name:                         order.Name,
+		Country:                      order.Country,
+		City:                         order.City,
+		Street:                       order.Street,
+		Wifi:                         order.Wifi,
+		Kitchen:                      order.Kitchen,
+		FreeParking:                  order.FreeParking,
+		AirConditioning:              order.AirConditioning,
 	}
 	return orderPb
 }

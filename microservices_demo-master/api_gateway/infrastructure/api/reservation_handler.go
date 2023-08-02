@@ -24,11 +24,15 @@ type ReservationHandler struct {
 }
 
 func (handler *ReservationHandler) Init(mux *runtime.ServeMux) {
-	err := mux.HandlePath("GET", "/reservations/{reservationId}/{userId}", handler.CancelReservation)
+	err := mux.HandlePath("GET", "/reservations-cancel/{reservationId}/{userId}", handler.CancelReservation)
 	if err != nil {
 		panic(err)
 	}
 	err = mux.HandlePath("GET", "/reservations-host/{accommodationId}", handler.GetReservationForHost)
+	if err != nil {
+		panic(err)
+	}
+	err = mux.HandlePath("GET", "/reservations-host-confirmed/{accommodationId}", handler.GetReservationForHostConfirmed)
 	if err != nil {
 		panic(err)
 	}
@@ -62,6 +66,9 @@ func NewReservationHandler(reservationClientAddress, userClientAddress, accommod
 func (handler *ReservationHandler) CancelReservation(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
 	userIdString := pathParams["userId"]
 	reservationIdString := pathParams["reservationId"]
+	fmt.Println(userIdString + "fhfhhfhf")
+	fmt.Println(reservationIdString + "ovo je id")
+	fmt.Println("usaoo u pogresnu funkciju")
 	userId, err := primitive.ObjectIDFromHex(userIdString)
 	reservationId, err := primitive.ObjectIDFromHex(reservationIdString)
 	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
@@ -71,6 +78,7 @@ func (handler *ReservationHandler) CancelReservation(w http.ResponseWriter, r *h
 		return
 	}
 	if reservationIdString == "" {
+		fmt.Println("jebi se")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -123,21 +131,50 @@ func (handler *ReservationHandler) GetReservationForHost(w http.ResponseWriter, 
 	w.WriteHeader(http.StatusOK)
 	w.Write(response)
 }
-func (handler *ReservationHandler) GetReservations(accommodationId primitive.ObjectID) []*domain.ReservationForHost {
+
+func (handler *ReservationHandler) GetReservationForHostConfirmed(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	accommodationId := pathParams["accommodationId"]
+	objectId, err := primitive.ObjectIDFromHex(accommodationId)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if accommodationId == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	reservationList := handler.GetReservationsConfirmed(objectId)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	response, err := json.Marshal(reservationList)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
+}
+func (handler *ReservationHandler) GetReservationsConfirmed(accommodationId primitive.ObjectID) []*domain.ReservationForHost {
 	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
 	userClient := services.NewUserClient(handler.userClientAddress)
-	reservationsAccommodation, err := reservationClient.GetAllByAccommodation(context.TODO(), &reservations.GetAllByAccommodationRequest{Id: accommodationId.Hex()})
+	reservationsAccommodation, err := reservationClient.GetAllByAccommodationConfirmed(context.TODO(), &reservations.GetAllByAccommodationRequest{Id: accommodationId.Hex()})
 	if err != nil {
 
-		return nil
+		panic(err)
 	}
 	var reservationSlice []*domain.ReservationForHost
 	for _, reservation := range reservationsAccommodation.Reservations {
 		user, err := userClient.Get(context.TODO(), &users.GetRequest{
 			Id: reservation.GuestId,
-		})
+		},
+		)
 		if err != nil {
-			return nil
+			panic(err)
 		}
 
 		reservationDetails := &domain.ReservationForHost{
@@ -146,9 +183,48 @@ func (handler *ReservationHandler) GetReservations(accommodationId primitive.Obj
 			EndDate:            reservation.EndDate,
 			GuestNumber:        reservation.GuestNumber,
 			CancellationNumber: user.User.CancellationNumber,
+			GuestName:          user.User.Name,
+			GuestSurname:       user.User.Surname,
+			GuestId:            user.User.Id,
 		}
 		reservationSlice = append(reservationSlice, reservationDetails)
 	}
+	fmt.Println(len(reservationSlice))
+	fmt.Println("ovo je duzina")
+	return reservationSlice
+}
+func (handler *ReservationHandler) GetReservations(accommodationId primitive.ObjectID) []*domain.ReservationForHost {
+	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	userClient := services.NewUserClient(handler.userClientAddress)
+	reservationsAccommodation, err := reservationClient.GetAllByAccommodation(context.TODO(), &reservations.GetAllByAccommodationRequest{Id: accommodationId.Hex()})
+	if err != nil {
+
+		panic(err)
+	}
+	var reservationSlice []*domain.ReservationForHost
+	for _, reservation := range reservationsAccommodation.Reservations {
+		user, err := userClient.Get(context.TODO(), &users.GetRequest{
+			Id: reservation.GuestId,
+		},
+		)
+		if err != nil {
+			panic(err)
+		}
+
+		reservationDetails := &domain.ReservationForHost{
+			Id:                 reservation.Id,
+			StartDate:          reservation.StartDate,
+			EndDate:            reservation.EndDate,
+			GuestNumber:        reservation.GuestNumber,
+			CancellationNumber: user.User.CancellationNumber,
+			GuestName:          user.User.Name,
+			GuestSurname:       user.User.Surname,
+			GuestId:            user.User.Id,
+		}
+		reservationSlice = append(reservationSlice, reservationDetails)
+	}
+	fmt.Println(len(reservationSlice))
+	fmt.Println("ovo je duzina")
 	return reservationSlice
 }
 func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWriter, req *http.Request, params map[string]string) {
@@ -283,7 +359,6 @@ func (handler *ReservationHandler) CheckReservationForTerm(w http.ResponseWriter
 		Startdate: t.StartDate,
 		EndDate:   t.EndDate,
 	})
-
 
 	if res.HasReservation != "greska" {
 		w.WriteHeader(http.StatusForbidden)

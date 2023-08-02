@@ -22,6 +22,9 @@ const (
 	ReservationService_Get_FullMethodName                             = "/reservations.ReservationService/Get"
 	ReservationService_GetAll_FullMethodName                          = "/reservations.ReservationService/GetAll"
 	ReservationService_GetAllByAccommodation_FullMethodName           = "/reservations.ReservationService/GetAllByAccommodation"
+	ReservationService_GetAllByAccommodationConfirmed_FullMethodName  = "/reservations.ReservationService/GetAllByAccommodationConfirmed"
+	ReservationService_GetAllByGuest_FullMethodName                   = "/reservations.ReservationService/GetAllByGuest"
+	ReservationService_GetAllByGuestPending_FullMethodName            = "/reservations.ReservationService/GetAllByGuestPending"
 	ReservationService_MakeRequestForReservation_FullMethodName       = "/reservations.ReservationService/MakeRequestForReservation"
 	ReservationService_CancelReservation_FullMethodName               = "/reservations.ReservationService/CancelReservation"
 	ReservationService_ConfirmReservationManually_FullMethodName      = "/reservations.ReservationService/ConfirmReservationManually"
@@ -40,6 +43,9 @@ type ReservationServiceClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	GetAllByAccommodation(ctx context.Context, in *GetAllByAccommodationRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error)
+	GetAllByAccommodationConfirmed(ctx context.Context, in *GetAllByAccommodationRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error)
+	GetAllByGuest(ctx context.Context, in *GetAllByGuestRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error)
+	GetAllByGuestPending(ctx context.Context, in *GetAllByGuestRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error)
 	MakeRequestForReservation(ctx context.Context, in *ReservationRequest, opts ...grpc.CallOption) (*ReservationRequestResponse, error)
 	CancelReservation(ctx context.Context, in *CancelReservationRequest, opts ...grpc.CallOption) (*CancelReservationResponse, error)
 	ConfirmReservationManually(ctx context.Context, in *ConfirmReservationManuallyRequest, opts ...grpc.CallOption) (*ConfirmReservationManuallyResponse, error)
@@ -80,6 +86,33 @@ func (c *reservationServiceClient) GetAll(ctx context.Context, in *GetAllRequest
 func (c *reservationServiceClient) GetAllByAccommodation(ctx context.Context, in *GetAllByAccommodationRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error) {
 	out := new(GetAllByAccommodationResponse)
 	err := c.cc.Invoke(ctx, ReservationService_GetAllByAccommodation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reservationServiceClient) GetAllByAccommodationConfirmed(ctx context.Context, in *GetAllByAccommodationRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error) {
+	out := new(GetAllByAccommodationResponse)
+	err := c.cc.Invoke(ctx, ReservationService_GetAllByAccommodationConfirmed_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reservationServiceClient) GetAllByGuest(ctx context.Context, in *GetAllByGuestRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error) {
+	out := new(GetAllByAccommodationResponse)
+	err := c.cc.Invoke(ctx, ReservationService_GetAllByGuest_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *reservationServiceClient) GetAllByGuestPending(ctx context.Context, in *GetAllByGuestRequest, opts ...grpc.CallOption) (*GetAllByAccommodationResponse, error) {
+	out := new(GetAllByAccommodationResponse)
+	err := c.cc.Invoke(ctx, ReservationService_GetAllByGuestPending_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -174,6 +207,9 @@ type ReservationServiceServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
 	GetAllByAccommodation(context.Context, *GetAllByAccommodationRequest) (*GetAllByAccommodationResponse, error)
+	GetAllByAccommodationConfirmed(context.Context, *GetAllByAccommodationRequest) (*GetAllByAccommodationResponse, error)
+	GetAllByGuest(context.Context, *GetAllByGuestRequest) (*GetAllByAccommodationResponse, error)
+	GetAllByGuestPending(context.Context, *GetAllByGuestRequest) (*GetAllByAccommodationResponse, error)
 	MakeRequestForReservation(context.Context, *ReservationRequest) (*ReservationRequestResponse, error)
 	CancelReservation(context.Context, *CancelReservationRequest) (*CancelReservationResponse, error)
 	ConfirmReservationManually(context.Context, *ConfirmReservationManuallyRequest) (*ConfirmReservationManuallyResponse, error)
@@ -198,6 +234,15 @@ func (UnimplementedReservationServiceServer) GetAll(context.Context, *GetAllRequ
 }
 func (UnimplementedReservationServiceServer) GetAllByAccommodation(context.Context, *GetAllByAccommodationRequest) (*GetAllByAccommodationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllByAccommodation not implemented")
+}
+func (UnimplementedReservationServiceServer) GetAllByAccommodationConfirmed(context.Context, *GetAllByAccommodationRequest) (*GetAllByAccommodationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllByAccommodationConfirmed not implemented")
+}
+func (UnimplementedReservationServiceServer) GetAllByGuest(context.Context, *GetAllByGuestRequest) (*GetAllByAccommodationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllByGuest not implemented")
+}
+func (UnimplementedReservationServiceServer) GetAllByGuestPending(context.Context, *GetAllByGuestRequest) (*GetAllByAccommodationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllByGuestPending not implemented")
 }
 func (UnimplementedReservationServiceServer) MakeRequestForReservation(context.Context, *ReservationRequest) (*ReservationRequestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakeRequestForReservation not implemented")
@@ -289,6 +334,60 @@ func _ReservationService_GetAllByAccommodation_Handler(srv interface{}, ctx cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ReservationServiceServer).GetAllByAccommodation(ctx, req.(*GetAllByAccommodationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReservationService_GetAllByAccommodationConfirmed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllByAccommodationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).GetAllByAccommodationConfirmed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_GetAllByAccommodationConfirmed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).GetAllByAccommodationConfirmed(ctx, req.(*GetAllByAccommodationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReservationService_GetAllByGuest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllByGuestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).GetAllByGuest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_GetAllByGuest_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).GetAllByGuest(ctx, req.(*GetAllByGuestRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ReservationService_GetAllByGuestPending_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAllByGuestRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).GetAllByGuestPending(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_GetAllByGuestPending_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).GetAllByGuestPending(ctx, req.(*GetAllByGuestRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -473,6 +572,18 @@ var ReservationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllByAccommodation",
 			Handler:    _ReservationService_GetAllByAccommodation_Handler,
+		},
+		{
+			MethodName: "GetAllByAccommodationConfirmed",
+			Handler:    _ReservationService_GetAllByAccommodationConfirmed_Handler,
+		},
+		{
+			MethodName: "GetAllByGuest",
+			Handler:    _ReservationService_GetAllByGuest_Handler,
+		},
+		{
+			MethodName: "GetAllByGuestPending",
+			Handler:    _ReservationService_GetAllByGuestPending_Handler,
 		},
 		{
 			MethodName: "MakeRequestForReservation",

@@ -44,6 +44,7 @@ func (server *Server) initHandlers() {
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
 
 	if err != nil {
+		fmt.Println("ahahahaah")
 		panic(err)
 	}
 	reservationEndpoint := fmt.Sprintf("%s:%s", server.config.ReservationHost, server.config.ReservationPort)

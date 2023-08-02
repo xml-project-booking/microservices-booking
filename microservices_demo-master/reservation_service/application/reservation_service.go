@@ -27,6 +27,15 @@ func (service *ReservationService) GetAllReservationRequests() ([]*domain.Reserv
 func (service *ReservationService) GetAllReservationsByAccommodation(accommodationId primitive.ObjectID) ([]*domain.Reservation, error) {
 	return service.store.GetAllReservationByAccommodation(accommodationId)
 }
+func (service *ReservationService) GetAllConfirmedReservationsByAccommodation(accommodationId primitive.ObjectID) ([]*domain.Reservation, error) {
+	return service.store.GetAllConfirmedReservationByAccommodation(accommodationId)
+}
+func (service *ReservationService) GetAllReservationsByGuestId(guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	return service.store.GetAllReservationByGuest(guestId)
+}
+func (service *ReservationService) GetAllReservationsByGuestIdPending(guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	return service.store.GetAllReservationByGuestPending(guestId)
+}
 func (service *ReservationService) GetAllReservation() ([]*domain.Reservation, error) {
 	return service.store.GetAllReservation()
 }
@@ -179,6 +188,9 @@ func (service *ReservationService) CheckIfOverLaps(start1 time.Time, end1 time.T
 func (service *ReservationService) CheckIfLessThan24Hours(reservationId primitive.ObjectID) bool {
 	reservation, _ := service.store.Get(reservationId)
 	startTime := time.Now()
+	fmt.Println("ovo je rez")
+	fmt.Println(reservation)
+
 	startReservationTime := reservation.StartDate
 	difference := (startReservationTime).Sub(startTime).Hours()
 	if difference < 24 {

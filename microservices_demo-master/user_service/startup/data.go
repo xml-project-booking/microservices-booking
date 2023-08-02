@@ -8,7 +8,17 @@ import (
 var users = []*domain.User{
 	{
 		Id:                 getObjectId("623b0cc336a1d6fd8c1cf0f6"),
-		CancellationNumber: 0,
+		CancellationNumber: 1,
+		Name:               "Marko",
+		Surname:            "Markovic",
+		Role:               1,
+	},
+	{
+		Id:                 getObjectId("623b0cc336a1d6fd8c1cf0f5"),
+		CancellationNumber: 1,
+		Name:               "Ivan",
+		Surname:            "Ivanovic",
+		Role:               1,
 	},
 }
 

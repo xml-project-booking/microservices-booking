@@ -12,13 +12,14 @@ func mapUser(order *domain.User) *pb.User {
 	}
 
 	orderPb := &pb.User{
-		Id:       order.Id.Hex(),
-		Name:     order.Name,
-		Surname:  order.Surname,
-		Email:    order.Email,
-		Address:  order.Address,
-		Username: order.Username,
-		IsHost:   boolRole,
+		Id:                 order.Id.Hex(),
+		Name:               order.Name,
+		Surname:            order.Surname,
+		Email:              order.Email,
+		Address:            order.Address,
+		Username:           order.Username,
+		IsHost:             boolRole,
+		CancellationNumber: int64(order.CancellationNumber),
 	}
 	return orderPb
 }

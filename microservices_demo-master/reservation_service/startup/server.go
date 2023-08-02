@@ -52,7 +52,7 @@ func (server *Server) initMongoClient() *mongo.Client {
 
 func (server *Server) initReservationStore(client *mongo.Client) domain.ReservationStore {
 	store := persistence.NewReservationMongoDBStore(client)
-	store.DeleteAll()
+	//store.DeleteAll()
 
 	return store
 }

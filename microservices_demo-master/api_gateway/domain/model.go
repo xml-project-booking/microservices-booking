@@ -40,6 +40,7 @@ type ReservationForHost struct {
 	CancellationNumber int64
 	GuestName          string
 	GuestSurname       string
+	GuestId            string
 }
 type ReservationDTO struct {
 	Id              string

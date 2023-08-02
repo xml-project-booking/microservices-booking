@@ -24,6 +24,21 @@ service ReservationService{
       get: "/reservations/accommodation/{id}"
     };
   }
+  rpc GetAllByAccommodationConfirmed(GetAllByAccommodationRequest) returns(GetAllByAccommodationResponse) {
+    option (google.api.http) = {
+      get: "/reservations/accommodation-confirmed/{id}"
+    };
+  }
+  rpc GetAllByGuest(GetAllByGuestRequest) returns(GetAllByAccommodationResponse) {
+    option (google.api.http) = {
+      get: "/reservations/guest/{id}"
+    };
+  }
+  rpc GetAllByGuestPending(GetAllByGuestRequest) returns(GetAllByAccommodationResponse) {
+    option (google.api.http) = {
+      get: "/reservations/guest-pending/{id}"
+    };
+  }
   rpc MakeRequestForReservation(ReservationRequest) returns (ReservationRequestResponse){
     option (google.api.http) = {
       post: "/reservations/reservation-request"
@@ -166,6 +181,7 @@ message Reservation {
   string guestId = 7;
   int64 minGuest = 8;
   int64 maxGuest = 9;
+  string reservationStatus =10;
 }
 
 message ReservationDTO {
@@ -188,6 +204,11 @@ message GetAllByAccommodationRequest{
  message GetAllByAccommodationResponse {
    repeated Reservation reservations = 1;
  }
+
+message GetAllByGuestRequest{
+  string id =1 ;
+}
+
 
 message HasActiveReservationsRequest {
   string id = 1;

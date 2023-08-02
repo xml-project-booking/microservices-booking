@@ -203,8 +203,66 @@ func (handler *ReservationHandler) Get(ctx context.Context, request *pb.GetReque
 }
 func (handler *ReservationHandler) GetAllByAccommodation(ctx context.Context, request *pb.GetAllByAccommodationRequest) (*pb.GetAllByAccommodationResponse, error) {
 	accommodationId := request.Id
+	fmt.Println("ov je id od accommodationa")
+	fmt.Println(accommodationId)
 	objectId, err := primitive.ObjectIDFromHex(accommodationId)
 	Reservations, err := handler.service.GetAllReservationsByAccommodation(objectId)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllByAccommodationResponse{
+		Reservations: []*pb.Reservation{},
+	}
+	fmt.Println("ovo su rezevracije")
+
+	for _, Reservation := range Reservations {
+		fmt.Println(Reservation)
+		current := mapReservation(Reservation)
+		response.Reservations = append(response.Reservations, current)
+	}
+	return response, nil
+}
+func (handler *ReservationHandler) GetAllByAccommodationConfirmed(ctx context.Context, request *pb.GetAllByAccommodationRequest) (*pb.GetAllByAccommodationResponse, error) {
+	accommodationId := request.Id
+
+	objectId, err := primitive.ObjectIDFromHex(accommodationId)
+	Reservations, err := handler.service.GetAllConfirmedReservationsByAccommodation(objectId)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllByAccommodationResponse{
+		Reservations: []*pb.Reservation{},
+	}
+	for _, Reservation := range Reservations {
+		current := mapReservation(Reservation)
+		response.Reservations = append(response.Reservations, current)
+	}
+	return response, nil
+}
+func (handler *ReservationHandler) GetAllByGuest(ctx context.Context, request *pb.GetAllByGuestRequest) (*pb.GetAllByAccommodationResponse, error) {
+	guestId := request.Id
+	fmt.Println(guestId)
+	objectId, err := primitive.ObjectIDFromHex(guestId)
+	fmt.Println("ajdeee")
+	Reservations, err := handler.service.GetAllReservationsByGuestId(objectId)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetAllByAccommodationResponse{
+		Reservations: []*pb.Reservation{},
+	}
+	for _, Reservation := range Reservations {
+		current := mapReservation(Reservation)
+		response.Reservations = append(response.Reservations, current)
+	}
+	return response, nil
+}
+func (handler *ReservationHandler) GetAllByGuestPending(ctx context.Context, request *pb.GetAllByGuestRequest) (*pb.GetAllByAccommodationResponse, error) {
+	guestId := request.Id
+	fmt.Println(guestId)
+	objectId, err := primitive.ObjectIDFromHex(guestId)
+	fmt.Println("ajdeee")
+	Reservations, err := handler.service.GetAllReservationsByGuestIdPending(objectId)
 	if err != nil {
 		return nil, err
 	}

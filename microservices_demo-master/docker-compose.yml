@@ -133,7 +133,7 @@ services:
     container_name: user_db
     restart: on-failure
     ports:
-      - "27017:27017"
+      - "27018:27017"
     networks:
       - network
 

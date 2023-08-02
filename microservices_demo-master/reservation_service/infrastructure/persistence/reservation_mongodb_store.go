@@ -20,6 +20,21 @@ type ReservationMongoDBStore struct {
 	reservations *mongo.Collection
 }
 
+func (store *ReservationMongoDBStore) GetAllReservationByGuestPending(guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"guest_id": guestId, "reservation_status": "PENDING"}
+	return store.filter(filter)
+}
+
+func (store *ReservationMongoDBStore) GetAllConfirmedReservationByAccommodation(accommodationId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"accommodation_id": accommodationId, "reservation_status": "CONFIRMED"}
+	return store.filter(filter)
+}
+
+func (store *ReservationMongoDBStore) GetAllReservationByGuest(guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"guest_id": guestId, "reservation_status": "CONFIRMED"}
+	return store.filter(filter)
+}
+
 func (store *ReservationMongoDBStore) UpdateStatusForConfirmed(reservation *domain.Reservation) error {
 
 	result, err := store.reservations.UpdateOne(
@@ -98,7 +113,7 @@ func (store *ReservationMongoDBStore) GetAllReservation() ([]*domain.Reservation
 }
 
 func (store *ReservationMongoDBStore) GetAllReservationByAccommodation(accommodationId primitive.ObjectID) ([]*domain.Reservation, error) {
-	filter := bson.M{"accommodation_id": accommodationId}
+	filter := bson.M{"accommodation_id": accommodationId, "reservation_status": "PENDING"}
 	return store.filter(filter)
 }
 

@@ -13,5 +13,8 @@ type ReservationStore interface {
 	GetAllReservation() ([]*Reservation, error)
 	GetAllGuestReservation(guestId primitive.ObjectID) ([]*Reservation, error)
 	GetAllReservationByAccommodation(accommodationId primitive.ObjectID) ([]*Reservation, error)
+	GetAllConfirmedReservationByAccommodation(accommodationId primitive.ObjectID) ([]*Reservation, error)
+	GetAllReservationByGuest(guestId primitive.ObjectID) ([]*Reservation, error)
+	GetAllReservationByGuestPending(guestId primitive.ObjectID) ([]*Reservation, error)
 	DeleteReservationById(reservationId primitive.ObjectID) bool
 }

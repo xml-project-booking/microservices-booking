@@ -7,13 +7,14 @@ import (
 
 func mapReservation(reservation *domain.Reservation) *pb.Reservation {
 	orderPb := &pb.Reservation{
-		Id:              reservation.Id.Hex(),
-		AccommodationID: reservation.AccommodationID.Hex(),
-		StartDate:       reservation.StartDate.Format("2006-01-02"),
-		EndDate:         reservation.EndDate.Format("2006-01-02"),
-		GuestNumber:     reservation.GuestNumber,
-		GuestId:         reservation.GuestId.Hex(),
-		IsConfirmed:     reservation.Confirmation,
+		Id:                reservation.Id.Hex(),
+		AccommodationID:   reservation.AccommodationID.Hex(),
+		StartDate:         reservation.StartDate.Format("2006-01-02"),
+		EndDate:           reservation.EndDate.Format("2006-01-02"),
+		GuestNumber:       reservation.GuestNumber,
+		GuestId:           reservation.GuestId.Hex(),
+		IsConfirmed:       reservation.Confirmation,
+		ReservationStatus: reservation.ReservationStatus,
 	}
 	return orderPb
 }

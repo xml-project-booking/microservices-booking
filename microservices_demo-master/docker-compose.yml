@@ -66,6 +66,22 @@ services:
     networks:
       - network
 
+  rating_service:
+    image: rating_service
+    container_name: rating_service
+    build:
+      context: .
+      dockerfile: ./rating_service/Dockerfile
+    restart: on-failure
+    environment:
+      RATING_DB_HOST: ${RATING_DB_HOST}
+      RATING_DB_PORT: ${RATING_DB_PORT}
+      RATING_SERVICE_PORT: ${RATING_SERVICE_PORT}
+    depends_on:
+      - rating_db
+    networks:
+      - network
+
 
 
 
@@ -95,6 +111,8 @@ services:
       USER_SERVICE_PORT: ${USER_SERVICE_PORT}
       ACCOMMODATION_SERVICE_HOST: ${ACCOMMODATION_SERVICE_HOST}
       ACCOMMODATION_SERVICE_PORT: ${ACCOMMODATION_SERVICE_PORT}
+      RATING_SERVICE_HOST: ${RATING_SERVICE_HOST}
+      RATING_SERVICE_PORT: ${RATING_SERVICE_PORT}
     networks:
       - network
 
@@ -125,6 +143,15 @@ services:
     restart: on-failure
     ports:
       - "27033:27017"
+    networks:
+      - network
+
+  rating_db:
+    image: mongo
+    container_name: rating_db
+    restart: on-failure
+    ports:
+      - "27025:27017"
     networks:
       - network
 

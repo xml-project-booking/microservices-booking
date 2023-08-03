@@ -4,12 +4,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type TermStore interface {
-	Get(id primitive.ObjectID) (*Term, error)
-	GetAll() ([]*Term, error)
-	Insert(term *Term) error
-	Delete(term *Term) error
+type RatingStore interface {
+	Get(id primitive.ObjectID) (*Rating, error)
+	GetAll() ([]*Rating, error)
+	Insert(term *Rating) error
+	Delete(term *Rating) error
 	DeleteAll()
-	Update(term *Term) error
-	GetByAccommodationId(id primitive.ObjectID) ([]*Term, error)
+	Update(term *Rating) error
+	GetByAccommodationId(id primitive.ObjectID) ([]*Rating, error)
 }

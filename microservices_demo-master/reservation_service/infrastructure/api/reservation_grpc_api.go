@@ -28,10 +28,11 @@ type ReservationHandler struct {
 func (handler *ReservationHandler) CancelReservation(ctx context.Context, request *pb.CancelReservationRequest) (*pb.CancelReservationResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)
+	Reservation, err := handler.service.Get(objectId)
 	if err != nil {
 		return nil, err
 	}
-	isDeletedRes := handler.service.CancelReservation(objectId)
+	isDeletedRes := handler.service.CancelReservation(Reservation)
 	if err != nil {
 		return nil, err
 	}

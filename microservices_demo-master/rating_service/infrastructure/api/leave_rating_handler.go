@@ -3,21 +3,20 @@ package api
 import (
 	events "github.com/tamararankovic/microservices_demo/common/saga/leave_rating"
 	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
-	"user_service/application"
-	"user_service/domain"
-
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"rating_service/application"
+	"rating_service/domain"
 )
 
-type CreateUserCommandHandler struct {
-	userService       *application.UserService
+type LeaveRatingCommandHandler struct {
+	ratingService     *application.RatingService
 	replyPublisher    saga.Publisher
 	commandSubscriber saga.Subscriber
 }
 
-func NewCreateUserCommandHandler(userService *application.UserService, publisher saga.Publisher, subscriber saga.Subscriber) (*CreateUserCommandHandler, error) {
-	o := &CreateUserCommandHandler{
-		userService:       userService,
+func NewLeaveRatingCommandHandler(ratingService *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) (*CreateRatingCommandHandler, error) {
+	o := &LeaveRatingCommandHandler{
+		ratingService:     ratingService,
 		replyPublisher:    publisher,
 		commandSubscriber: subscriber,
 	}
@@ -28,18 +27,18 @@ func NewCreateUserCommandHandler(userService *application.UserService, publisher
 	return o, nil
 }
 
-func (handler *CreateUserCommandHandler) handle(command *events.CreateOrderCommand) {
+func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingCommand) {
 	id, err := primitive.ObjectIDFromHex(command.Order.Id)
 	if err != nil {
 		return
 	}
-	order := &domain.User{Id: id}
+	order := &domain.Rating{Id: id}
 
 	reply := events.CreateOrderReply{Order: command.Order}
 
 	switch command.Type {
 	case events.ShipOrder:
-		err := handler.userService.Create(order)
+		err := handler.ratingService.Create(order)
 		if err != nil {
 			reply.Type = events.OrderShippingNotScheduled
 			break

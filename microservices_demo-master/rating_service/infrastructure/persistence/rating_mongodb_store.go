@@ -2,7 +2,7 @@ package persistence
 
 import (
 	"context"
-	"term_service/domain"
+	"rating_service/domain"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,27 +14,27 @@ const (
 	COLLECTION = "ratings"
 )
 
-type TermMongoDBStore struct {
-	terms *mongo.Collection
+type RatingMongoDBStore struct {
+	ratings *mongo.Collection
 }
 
-func (store *TermMongoDBStore) GetByAccommodationId(id primitive.ObjectID) ([]*domain.Term, error) {
+func (store *RatingMongoDBStore) GetByAccommodationId(id primitive.ObjectID) ([]*domain.Rating, error) {
 	filter := bson.M{"accommodationId": id}
 	return store.filter(filter)
 }
 
-func (store *TermMongoDBStore) Delete(term *domain.Term) error {
+func (store *RatingMongoDBStore) Delete(rating *domain.Rating) error {
 
-	_, err := store.terms.DeleteOne(context.TODO(), bson.D{{}})
+	_, err := store.ratings.DeleteOne(context.TODO(), bson.D{{}})
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (store *TermMongoDBStore) Update(term *domain.Term) error {
+func (store *RatingMongoDBStore) Update(rating *domain.Rating) error {
 
-	_, err := store.terms.ReplaceOne(context.TODO(), bson.M{"_id": term.Id}, term)
+	_, err := store.ratings.ReplaceOne(context.TODO(), bson.M{"_id": rating.Id}, rating)
 
 	if err != nil {
 		return err
@@ -43,38 +43,38 @@ func (store *TermMongoDBStore) Update(term *domain.Term) error {
 	return nil
 }
 
-func NewTermMongoDBStore(client *mongo.Client) domain.TermStore {
-	users := client.Database(DATABASE).Collection(COLLECTION)
-	return &TermMongoDBStore{
-		terms: users,
+func NewRatingMongoDBStore(client *mongo.Client) domain.RatingStore {
+	ratings := client.Database(DATABASE).Collection(COLLECTION)
+	return &RatingMongoDBStore{
+		ratings: ratings,
 	}
 }
 
-func (store *TermMongoDBStore) Get(id primitive.ObjectID) (*domain.Term, error) {
+func (store *RatingMongoDBStore) Get(id primitive.ObjectID) (*domain.Rating, error) {
 	filter := bson.M{"_id": id}
 	return store.filterOne(filter)
 }
 
-func (store *TermMongoDBStore) GetAll() ([]*domain.Term, error) {
+func (store *RatingMongoDBStore) GetAll() ([]*domain.Rating, error) {
 	filter := bson.D{{}}
 	return store.filter(filter)
 }
 
-func (store *TermMongoDBStore) Insert(User *domain.Term) error {
-	result, err := store.terms.InsertOne(context.TODO(), User)
+func (store *RatingMongoDBStore) Insert(Rating *domain.Rating) error {
+	result, err := store.ratings.InsertOne(context.TODO(), Rating)
 	if err != nil {
 		return err
 	}
-	User.Id = result.InsertedID.(primitive.ObjectID)
+	Rating.Id = result.InsertedID.(primitive.ObjectID)
 	return nil
 }
 
-func (store *TermMongoDBStore) DeleteAll() {
-	store.terms.DeleteMany(context.TODO(), bson.D{{}})
+func (store *RatingMongoDBStore) DeleteAll() {
+	store.ratings.DeleteMany(context.TODO(), bson.D{{}})
 }
 
-func (store *TermMongoDBStore) filter(filter interface{}) ([]*domain.Term, error) {
-	cursor, err := store.terms.Find(context.TODO(), filter)
+func (store *RatingMongoDBStore) filter(filter interface{}) ([]*domain.Rating, error) {
+	cursor, err := store.ratings.Find(context.TODO(), filter)
 	defer cursor.Close(context.TODO())
 
 	if err != nil {
@@ -83,20 +83,20 @@ func (store *TermMongoDBStore) filter(filter interface{}) ([]*domain.Term, error
 	return decode(cursor)
 }
 
-func (store *TermMongoDBStore) filterOne(filter interface{}) (User *domain.Term, err error) {
-	result := store.terms.FindOne(context.TODO(), filter)
-	err = result.Decode(&User)
+func (store *RatingMongoDBStore) filterOne(filter interface{}) (Rating *domain.Rating, err error) {
+	result := store.ratings.FindOne(context.TODO(), filter)
+	err = result.Decode(&Rating)
 	return
 }
 
-func decode(cursor *mongo.Cursor) (terms []*domain.Term, err error) {
+func decode(cursor *mongo.Cursor) (ratings []*domain.Rating, err error) {
 	for cursor.Next(context.TODO()) {
-		var Term domain.Term
-		err = cursor.Decode(&Term)
+		var Rating domain.Rating
+		err = cursor.Decode(&Rating)
 		if err != nil {
 			return
 		}
-		terms = append(terms, &Term)
+		ratings = append(ratings, &Rating)
 	}
 	err = cursor.Err()
 	return

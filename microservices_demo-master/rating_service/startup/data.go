@@ -2,10 +2,10 @@ package startup
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"term_service/domain"
+	"rating_service/domain"
 )
 
-var terms = []*domain.Term{
+var ratings = []*domain.Rating{
 	{
 		Id: getObjectId("623b0cc336a1d6fd8c1cf0f6"),
 	},

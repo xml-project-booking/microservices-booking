@@ -1,8 +1,8 @@
 package main
 
 import (
-	"term_service/startup"
-	cfg "term_service/startup/config"
+	"rating_service/startup"
+	cfg "rating_service/startup/config"
 )
 
 func main() {

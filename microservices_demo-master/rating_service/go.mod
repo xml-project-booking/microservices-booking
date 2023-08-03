@@ -1,4 +1,4 @@
-module term_service
+module rating_service
 
 go 1.20
 

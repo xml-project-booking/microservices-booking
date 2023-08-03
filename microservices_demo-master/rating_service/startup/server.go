@@ -2,16 +2,16 @@ package startup
 
 import (
 	"fmt"
-	term "github.com/tamararankovic/microservices_demo/common/proto/term_service"
+	rating "github.com/tamararankovic/microservices_demo/common/proto/rating_service"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	"term_service/application"
-	"term_service/domain"
-	"term_service/infrastructure/api"
-	"term_service/infrastructure/persistence"
-	"term_service/startup/config"
+	"rating_service/application"
+	"rating_service/domain"
+	"rating_service/infrastructure/api"
+	"rating_service/infrastructure/persistence"
+	"rating_service/startup/config"
 )
 
 type Server struct {
@@ -25,31 +25,38 @@ func NewServer(config *config.Config) *Server {
 }
 
 const (
-	QueueGroup = "term_service"
+	QueueGroup = "rating_service"
 )
 
 func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
-	termStore := server.initTermStore(mongoClient)
+	ratingStore := server.initRatingStore(mongoClient)
 
-	termService := server.initTermService(termStore)
+	ratingService := server.initRatingService(ratingStore)
 
-	termHandler := server.initTermHandler(termService)
+	ratingHandler := server.initRatingHandler(ratingService)
 
-	server.startGrpcServer(termHandler)
+	server.startGrpcServer(ratingHandler)
 }
 
 func (server *Server) initMongoClient() *mongo.Client {
-	fmt.Print(server.config.TermDBHost, server.config.TermDBPort)
-	client, err := persistence.GetClient(server.config.TermDBHost, server.config.TermDBPort)
+	fmt.Print(server.config.RatingDBHost, server.config.RatingDBPort)
+	client, err := persistence.GetClient(server.config.RatingDBHost, server.config.RatingDBPort)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return client
 }
 
-func (server *Server) initTermStore(client *mongo.Client) domain.TermStore {
-	store := persistence.NewTermMongoDBStore(client)
+func (server *Server) initRatingStore(client *mongo.Client) domain.RatingStore {
+	store := persistence.NewRatingMongoDBStore(client)
+	store.DeleteAll()
+	for _, Rating := range ratings {
+		err := store.Insert(Rating)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 	return store
 }
 
@@ -73,28 +80,28 @@ func (server *Server) initTermStore(client *mongo.Client) domain.TermStore {
 //	return subscriber
 //}
 
-func (server *Server) initTermService(store domain.TermStore) *application.TermService {
-	return application.NewTermService(store)
+func (server *Server) initRatingService(store domain.RatingStore) *application.RatingService {
+	return application.NewRatingService(store)
 }
 
-//func (server *Server) initCreateOrderHandler(service *application.TermService, publisher saga.Publisher, subscriber saga.Subscriber) {
-//	_, err := api.NewCreateTermCommandHandler(service, publisher, subscriber)
+//func (server *Server) initCreateOrderHandler(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) {
+//	_, err := api.NewCreateRatingCommandHandler(service, publisher, subscriber)
 //	if err != nil {
 //		log.Fatal(err)
 //	}
 //}
 
-func (server *Server) initTermHandler(service *application.TermService) *api.TermHandler {
+func (server *Server) initRatingHandler(service *application.RatingService) *api.RatingHandler {
 	return api.NewUserHandler(service)
 }
 
-func (server *Server) startGrpcServer(termHandler *api.TermHandler) {
+func (server *Server) startGrpcServer(ratingHandler *api.RatingHandler) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", server.config.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	term.RegisterTermServiceServer(grpcServer, termHandler)
+	rating.RegisterRatingServiceServer(grpcServer, ratingHandler)
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %s", err)
 	}

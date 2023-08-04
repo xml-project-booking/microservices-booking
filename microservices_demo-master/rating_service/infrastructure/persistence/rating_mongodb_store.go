@@ -18,6 +18,16 @@ type RatingMongoDBStore struct {
 	ratings *mongo.Collection
 }
 
+func (store *RatingMongoDBStore) GetTargetRatings(targetId primitive.ObjectID, targetType int32) ([]*domain.Rating, error) {
+	filter := bson.M{"targetId": targetId, "target_type": targetType}
+	return store.filter(filter)
+}
+
+func (store *RatingMongoDBStore) GetByUserAndTargetID(userId, targetId primitive.ObjectID, targetType int) (*domain.Rating, error) {
+	filter := bson.M{"targetId": targetId, "target_type": targetType, "userId": userId}
+	return store.filterOne(filter)
+}
+
 func (store *RatingMongoDBStore) GetByAccommodationId(id primitive.ObjectID) ([]*domain.Rating, error) {
 	filter := bson.M{"accommodationId": id}
 	return store.filter(filter)

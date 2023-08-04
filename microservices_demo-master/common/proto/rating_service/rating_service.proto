@@ -17,6 +17,30 @@ service RatingService{
       get: "/rating/order"
     };
   }
+  rpc CreateAccommodationRating(CreateAccommodationRatingRequest) returns(CreateAccommodationRatingResponse) {
+    option (google.api.http) = {
+      post: "/create/accommodation-rating"
+      body: "*"
+    };
+  }
+  rpc CreateHostRating(CreateHostRatingRequest) returns(CreateHostRatingResponse) {
+    option (google.api.http) = {
+      post: "/create/host-rating"
+      body: "*"
+    };
+  }
+  rpc GetRatingsByType(GetRatingsByTypeRequest) returns(GetRatingsByTypeResponse) {
+    option (google.api.http) = {
+      post: "/get-ratings"
+      body:"*"
+    };
+  }
+  rpc DeleteRating(DeleteRatingRequest) returns(DeleteRatingResponse) {
+    option (google.api.http) = {
+      get: "/delete-rating/{id}"
+
+    };
+  }
 }
 
 message GetRequest {
@@ -24,24 +48,49 @@ message GetRequest {
 }
 
 message GetResponse {
-  Order order = 1;
+  Rating rating = 1;
 }
 
 message GetAllRequest {
 }
+message CreateHostRatingRequest{
+  Rating rating =1;
+}
+message CreateHostRatingResponse{
+    string id =1;
+}
+message CreateAccommodationRatingRequest{
+ Rating rating = 1;
 
-message GetAllResponse {
-  repeated Order orders = 1;
+
+}
+message CreateAccommodationRatingResponse{
+  string id = 1;
 }
 
-message Order {
+message GetRatingsByTypeRequest{
+  int32 type = 1;
+  string id =2 ;
+}
+
+message GetRatingsByTypeResponse{
+  repeated Rating ratings = 1;
+}
+message GetAllResponse {
+  repeated Rating ratings = 1;
+}
+message DeleteRatingRequest{
   string id = 1;
-  enum OrderStatus {
-    Scheduled = 0;
-    InTransport = 1;
-    Delivered = 2;
-    Cancelled = 3;
-  }
-  OrderStatus status = 2;
-  string shippingAddress = 3;
+}
+message DeleteRatingResponse{
+  string id =1;
+}
+message Rating {
+
+ string  UserID = 1;
+  int32 RatingValue =2;
+  int32   TargetType = 3;
+  string TargetId = 4;
+  string LastModified = 5;
+
 }

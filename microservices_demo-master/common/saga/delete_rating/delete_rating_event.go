@@ -1,21 +1,18 @@
 package delete_rating
 
-type Color struct {
-	Code string
-}
-
-type Product struct {
-	Id    string
-	Color Color
-}
-
-type OrderItem struct {
-	Product  Product
-	Quantity uint16
-}
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
+)
 
 type RatingDetails struct {
-	Id string
+	ID           primitive.ObjectID
+	TargetID     primitive.ObjectID
+	TargetType   uint32
+	UserID       primitive.ObjectID
+	Value        uint32
+	LastModified time.Time
+	OldValue     *RatingDetails
 }
 
 type DeleteRatingCommandType int8
@@ -23,7 +20,9 @@ type DeleteRatingCommandType int8
 const (
 	StartedDeletionRating DeleteRatingCommandType = iota
 	UpdateAccommodation
+	UpdateHost
 	RollbackRating
+	CancelDeletionRating
 	FinishDeletionRating
 	UnknownCommand
 )
@@ -40,6 +39,8 @@ const (
 	DeletionFailed
 	AccommodationUpdate
 	AccommodationNotUpdate
+	HostUpdate
+	HostNotUpdate
 	RatingRollBack
 	RatingDeletionDone
 	UnknownReply

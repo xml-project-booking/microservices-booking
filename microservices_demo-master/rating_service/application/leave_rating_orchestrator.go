@@ -23,14 +23,10 @@ func NewLeaveRatingOrchestrator(publisher saga.Publisher, subscriber saga.Subscr
 	return o, nil
 }
 
-func (o *LeaveRatingOrchestrator) Start(rating *domain.Rating, address string) error {
+func (o *LeaveRatingOrchestrator) Start(rating *domain.Rating, oldRating *domain.Rating) error {
 	event := &events.LeaveRatingCommand{
-		Type: events.StartedCreatingRating,
-		Rating: events.RatingDetails{
-			Id:              rating.Id.Hex(),
-			AccommodationId: rating.AccommodationID.Hex(),
-			GuestId:         rating.UserID.Hex(),
-		},
+		Type:   events.StartedCreatingRating,
+		Rating: events.RatingDetails{},
 	}
 
 	return o.commandPublisher.Publish(event)

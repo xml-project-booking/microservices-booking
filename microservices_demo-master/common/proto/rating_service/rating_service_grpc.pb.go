@@ -19,8 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RatingService_Get_FullMethodName    = "/ratings.RatingService/Get"
-	RatingService_GetAll_FullMethodName = "/ratings.RatingService/GetAll"
+	RatingService_Get_FullMethodName                       = "/ratings.RatingService/Get"
+	RatingService_GetAll_FullMethodName                    = "/ratings.RatingService/GetAll"
+	RatingService_CreateAccommodationRating_FullMethodName = "/ratings.RatingService/CreateAccommodationRating"
+	RatingService_CreateHostRating_FullMethodName          = "/ratings.RatingService/CreateHostRating"
+	RatingService_GetRatingsByType_FullMethodName          = "/ratings.RatingService/GetRatingsByType"
+	RatingService_DeleteRating_FullMethodName              = "/ratings.RatingService/DeleteRating"
 )
 
 // RatingServiceClient is the client API for RatingService service.
@@ -29,6 +33,10 @@ const (
 type RatingServiceClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	CreateAccommodationRating(ctx context.Context, in *CreateAccommodationRatingRequest, opts ...grpc.CallOption) (*CreateAccommodationRatingResponse, error)
+	CreateHostRating(ctx context.Context, in *CreateHostRatingRequest, opts ...grpc.CallOption) (*CreateHostRatingResponse, error)
+	GetRatingsByType(ctx context.Context, in *GetRatingsByTypeRequest, opts ...grpc.CallOption) (*GetRatingsByTypeResponse, error)
+	DeleteRating(ctx context.Context, in *DeleteRatingRequest, opts ...grpc.CallOption) (*DeleteRatingResponse, error)
 }
 
 type ratingServiceClient struct {
@@ -57,12 +65,52 @@ func (c *ratingServiceClient) GetAll(ctx context.Context, in *GetAllRequest, opt
 	return out, nil
 }
 
+func (c *ratingServiceClient) CreateAccommodationRating(ctx context.Context, in *CreateAccommodationRatingRequest, opts ...grpc.CallOption) (*CreateAccommodationRatingResponse, error) {
+	out := new(CreateAccommodationRatingResponse)
+	err := c.cc.Invoke(ctx, RatingService_CreateAccommodationRating_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ratingServiceClient) CreateHostRating(ctx context.Context, in *CreateHostRatingRequest, opts ...grpc.CallOption) (*CreateHostRatingResponse, error) {
+	out := new(CreateHostRatingResponse)
+	err := c.cc.Invoke(ctx, RatingService_CreateHostRating_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ratingServiceClient) GetRatingsByType(ctx context.Context, in *GetRatingsByTypeRequest, opts ...grpc.CallOption) (*GetRatingsByTypeResponse, error) {
+	out := new(GetRatingsByTypeResponse)
+	err := c.cc.Invoke(ctx, RatingService_GetRatingsByType_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ratingServiceClient) DeleteRating(ctx context.Context, in *DeleteRatingRequest, opts ...grpc.CallOption) (*DeleteRatingResponse, error) {
+	out := new(DeleteRatingResponse)
+	err := c.cc.Invoke(ctx, RatingService_DeleteRating_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // RatingServiceServer is the server API for RatingService service.
 // All implementations must embed UnimplementedRatingServiceServer
 // for forward compatibility
 type RatingServiceServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+	CreateAccommodationRating(context.Context, *CreateAccommodationRatingRequest) (*CreateAccommodationRatingResponse, error)
+	CreateHostRating(context.Context, *CreateHostRatingRequest) (*CreateHostRatingResponse, error)
+	GetRatingsByType(context.Context, *GetRatingsByTypeRequest) (*GetRatingsByTypeResponse, error)
+	DeleteRating(context.Context, *DeleteRatingRequest) (*DeleteRatingResponse, error)
 	mustEmbedUnimplementedRatingServiceServer()
 }
 
@@ -75,6 +123,18 @@ func (UnimplementedRatingServiceServer) Get(context.Context, *GetRequest) (*GetR
 }
 func (UnimplementedRatingServiceServer) GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
+}
+func (UnimplementedRatingServiceServer) CreateAccommodationRating(context.Context, *CreateAccommodationRatingRequest) (*CreateAccommodationRatingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAccommodationRating not implemented")
+}
+func (UnimplementedRatingServiceServer) CreateHostRating(context.Context, *CreateHostRatingRequest) (*CreateHostRatingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateHostRating not implemented")
+}
+func (UnimplementedRatingServiceServer) GetRatingsByType(context.Context, *GetRatingsByTypeRequest) (*GetRatingsByTypeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRatingsByType not implemented")
+}
+func (UnimplementedRatingServiceServer) DeleteRating(context.Context, *DeleteRatingRequest) (*DeleteRatingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteRating not implemented")
 }
 func (UnimplementedRatingServiceServer) mustEmbedUnimplementedRatingServiceServer() {}
 
@@ -125,6 +185,78 @@ func _RatingService_GetAll_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _RatingService_CreateAccommodationRating_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAccommodationRatingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RatingServiceServer).CreateAccommodationRating(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RatingService_CreateAccommodationRating_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RatingServiceServer).CreateAccommodationRating(ctx, req.(*CreateAccommodationRatingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RatingService_CreateHostRating_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateHostRatingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RatingServiceServer).CreateHostRating(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RatingService_CreateHostRating_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RatingServiceServer).CreateHostRating(ctx, req.(*CreateHostRatingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RatingService_GetRatingsByType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetRatingsByTypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RatingServiceServer).GetRatingsByType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RatingService_GetRatingsByType_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RatingServiceServer).GetRatingsByType(ctx, req.(*GetRatingsByTypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _RatingService_DeleteRating_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRatingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(RatingServiceServer).DeleteRating(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: RatingService_DeleteRating_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(RatingServiceServer).DeleteRating(ctx, req.(*DeleteRatingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // RatingService_ServiceDesc is the grpc.ServiceDesc for RatingService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -139,6 +271,22 @@ var RatingService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAll",
 			Handler:    _RatingService_GetAll_Handler,
+		},
+		{
+			MethodName: "CreateAccommodationRating",
+			Handler:    _RatingService_CreateAccommodationRating_Handler,
+		},
+		{
+			MethodName: "CreateHostRating",
+			Handler:    _RatingService_CreateHostRating_Handler,
+		},
+		{
+			MethodName: "GetRatingsByType",
+			Handler:    _RatingService_GetRatingsByType_Handler,
+		},
+		{
+			MethodName: "DeleteRating",
+			Handler:    _RatingService_DeleteRating_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -3,6 +3,8 @@ package startup
 import (
 	"fmt"
 	rating "github.com/tamararankovic/microservices_demo/common/proto/rating_service"
+	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
+	"github.com/tamararankovic/microservices_demo/common/saga/messaging/nats"
 	"go.mongodb.org/mongo-driver/mongo"
 	"google.golang.org/grpc"
 	"log"
@@ -60,36 +62,36 @@ func (server *Server) initRatingStore(client *mongo.Client) domain.RatingStore {
 	return store
 }
 
-//func (server *Server) initPublisher(subject string) saga.Publisher {
-//	publisher, err := nats.NewNATSPublisher(
-//		server.config.NatsHost, server.config.NatsPort,
-//		server.config.NatsUser, server.config.NatsPass, subject)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	return publisher
-//}
-//
-//func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber {
-//	subscriber, err := nats.NewNATSSubscriber(
-//		server.config.NatsHost, server.config.NatsPort,
-//		server.config.NatsUser, server.config.NatsPass, subject, queueGroup)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//	return subscriber
-//}
+func (server *Server) initPublisher(subject string) saga.Publisher {
+	publisher, err := nats.NewNATSPublisher(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return publisher
+}
+
+func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber {
+	subscriber, err := nats.NewNATSSubscriber(
+		server.config.NatsHost, server.config.NatsPort,
+		server.config.NatsUser, server.config.NatsPass, subject, queueGroup)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return subscriber
+}
 
 func (server *Server) initRatingService(store domain.RatingStore) *application.RatingService {
 	return application.NewRatingService(store)
 }
 
-//func (server *Server) initCreateOrderHandler(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) {
-//	_, err := api.NewCreateRatingCommandHandler(service, publisher, subscriber)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//}
+func (server *Server) initLeaveRatingHandler(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewLeaveRatingCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func (server *Server) initRatingHandler(service *application.RatingService) *api.RatingHandler {
 	return api.NewUserHandler(service)

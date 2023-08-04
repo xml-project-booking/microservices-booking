@@ -33,10 +33,16 @@ const (
 func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
 	ratingStore := server.initRatingStore(mongoClient)
-
-	ratingService := server.initRatingService(ratingStore)
-
+	commandPublisher := server.initPublisher(server.config.LeaveRatingCommandSubject)
+	replySubscriber := server.initSubscriber(server.config.LeaveRatingReplySubject, QueueGroup)
+	commandSubscriber := server.initSubscriber(server.config.LeaveRatingCommandSubject, QueueGroup)
+	replyPublisher := server.initPublisher(server.config.LeaveRatingReplySubject)
+	leaveRatingOrchestrator := server.initLeaveRatingOrchestrator(commandPublisher, replySubscriber)
+	deleteRatingOrchestrator := server.initDeleteRatingOrchestrator(commandPublisher, replySubscriber)
+	ratingService := server.initRatingService(ratingStore, leaveRatingOrchestrator, deleteRatingOrchestrator)
 	ratingHandler := server.initRatingHandler(ratingService)
+
+	server.initLeaveRatingService(ratingService, replyPublisher, commandSubscriber)
 
 	server.startGrpcServer(ratingHandler)
 }
@@ -81,9 +87,15 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 	}
 	return subscriber
 }
+func (server *Server) initLeaveRatingService(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewLeaveRatingCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
-func (server *Server) initRatingService(store domain.RatingStore) *application.RatingService {
-	return application.NewRatingService(store)
+func (server *Server) initRatingService(store domain.RatingStore, leaveRatingOrchestrator *application.LeaveRatingOrchestrator, deleteRatingOrchestrator *application.DeleteRatingOrchestrator) *application.RatingService {
+	return application.NewRatingService(store, leaveRatingOrchestrator, deleteRatingOrchestrator)
 }
 
 func (server *Server) initLeaveRatingHandler(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) {
@@ -91,6 +103,21 @@ func (server *Server) initLeaveRatingHandler(service *application.RatingService,
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (server *Server) initLeaveRatingOrchestrator(publisher saga.Publisher, subscriber saga.Subscriber) *application.LeaveRatingOrchestrator {
+	orchestrator, err := application.NewLeaveRatingOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
+}
+func (server *Server) initDeleteRatingOrchestrator(publisher saga.Publisher, subscriber saga.Subscriber) *application.DeleteRatingOrchestrator {
+	orchestrator, err := application.NewDeleteRatingOrchestrator(publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return orchestrator
 }
 
 func (server *Server) initRatingHandler(service *application.RatingService) *api.RatingHandler {

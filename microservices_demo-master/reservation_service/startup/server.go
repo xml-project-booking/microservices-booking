@@ -28,16 +28,17 @@ func NewServer(config *config.Config) *Server {
 }
 
 const (
-	QueueGroup = "user_service"
+	QueueGroup = "reservation_service"
 )
 
 func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
 	reservationStore := server.initReservationStore(mongoClient)
-
 	reservationService := server.initReservationService(reservationStore)
-
 	reservationHandler := server.initReservationHandler(reservationService)
+	commandSubscriber := server.initSubscriber(server.config.LeaveRatingCommandSubject, QueueGroup)
+	replyPublisher := server.initPublisher(server.config.LeaveRatingReplySubject)
+	server.initLeaveRatingService(reservationService, replyPublisher, commandSubscriber)
 
 	server.startGrpcServer(reservationHandler)
 }
@@ -75,6 +76,13 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 		log.Fatal(err)
 	}
 	return subscriber
+}
+
+func (server *Server) initLeaveRatingService(service *application.ReservationService, publisher saga.Publisher, subscriber saga.Subscriber) {
+	_, err := api.NewLeaveRatingCommandHandler(service, publisher, subscriber)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (server *Server) initReservationService(store domain.ReservationStore) *application.ReservationService {

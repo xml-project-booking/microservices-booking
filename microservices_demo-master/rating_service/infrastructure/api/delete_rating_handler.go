@@ -14,7 +14,7 @@ type DeleteRatingCommandHandler struct {
 	commandSubscriber saga.Subscriber
 }
 
-func NewDeleteRatingCommandHandler(ratingService *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) (*CreateRatingCommandHandler, error) {
+func NewDeleteRatingCommandHandler(ratingService *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) (*DeleteRatingCommandHandler, error) {
 	o := &DeleteRatingCommandHandler{
 		ratingService:     ratingService,
 		replyPublisher:    publisher,
@@ -28,7 +28,7 @@ func NewDeleteRatingCommandHandler(ratingService *application.RatingService, pub
 }
 
 func (handler *DeleteRatingCommandHandler) handle(command *events.DeleteRatingCommand) {
-	id, err := primitive.ObjectIDFromHex(command.Rating.Id)
+	id, err := primitive.ObjectIDFromHex(command.Rating.ID.Hex())
 	if err != nil {
 		return
 	}
@@ -37,13 +37,13 @@ func (handler *DeleteRatingCommandHandler) handle(command *events.DeleteRatingCo
 	reply := events.DeleteRatingReply{Rating: command.Rating}
 
 	switch command.Type {
-	case events.ShipOrder:
+	case events.StartedDeletionRating:
 		err := handler.ratingService.Create(order)
 		if err != nil {
-			reply.Type = events.OrderShippingNotScheduled
+			reply.Type = events.DeletionStarted
 			break
 		}
-		reply.Type = events.OrderShippingScheduled
+		reply.Type = events.DeletionFailed
 	default:
 		reply.Type = events.UnknownReply
 	}

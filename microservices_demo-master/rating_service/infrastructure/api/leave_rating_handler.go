@@ -14,7 +14,7 @@ type LeaveRatingCommandHandler struct {
 	commandSubscriber saga.Subscriber
 }
 
-func NewLeaveRatingCommandHandler(ratingService *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) (*CreateRatingCommandHandler, error) {
+func NewLeaveRatingCommandHandler(ratingService *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) (*LeaveRatingCommandHandler, error) {
 	o := &LeaveRatingCommandHandler{
 		ratingService:     ratingService,
 		replyPublisher:    publisher,
@@ -28,22 +28,22 @@ func NewLeaveRatingCommandHandler(ratingService *application.RatingService, publ
 }
 
 func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingCommand) {
-	id, err := primitive.ObjectIDFromHex(command.Order.Id)
+	id, err := primitive.ObjectIDFromHex(command.Rating.ID.Hex())
 	if err != nil {
 		return
 	}
 	order := &domain.Rating{Id: id}
 
-	reply := events.CreateOrderReply{Order: command.Order}
+	reply := events.LeaveRatingReply{Rating: command.Rating}
 
 	switch command.Type {
-	case events.ShipOrder:
+	case events.StartedCreatingRating:
 		err := handler.ratingService.Create(order)
 		if err != nil {
-			reply.Type = events.OrderShippingNotScheduled
+			reply.Type = events.CreationStarted
 			break
 		}
-		reply.Type = events.OrderShippingScheduled
+		reply.Type = events.CreationFailed
 	default:
 		reply.Type = events.UnknownReply
 	}

@@ -29,8 +29,8 @@ func NewLeaveRatingCommandHandler(reservationService *application.ReservationSer
 }
 
 func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingCommand) {
-	accommodationId, err := primitive.ObjectIDFromHex(command.Rating.AccommodationId)
-	guestId, err := primitive.ObjectIDFromHex(command.Rating.GuestId)
+	accommodationId, err := primitive.ObjectIDFromHex(command.Rating.TargetID.Hex())
+	guestId, err := primitive.ObjectIDFromHex(command.Rating.UserID.Hex())
 	if err != nil {
 		return
 	}

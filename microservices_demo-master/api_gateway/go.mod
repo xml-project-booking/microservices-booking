@@ -7,7 +7,7 @@ replace github.com/tamararankovic/microservices_demo/common => ../common
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
 	github.com/tamararankovic/microservices_demo/common v1.0.0
-	go.mongodb.org/mongo-driver v1.11.7
+	go.mongodb.org/mongo-driver v1.12.1
 	golang.org/x/net v0.10.0
 	google.golang.org/grpc v1.55.0
 )

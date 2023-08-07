@@ -33,6 +33,7 @@ const (
 func (server *Server) Start() {
 	mongoClient := server.initMongoClient()
 	ratingStore := server.initRatingStore(mongoClient)
+	notificationPublisher := server.initPublisher(server.config.NoificationSubject)
 	commandPublisher := server.initPublisher(server.config.LeaveRatingCommandSubject)
 	replySubscriber := server.initSubscriber(server.config.LeaveRatingReplySubject, QueueGroup)
 	commandSubscriber := server.initSubscriber(server.config.LeaveRatingCommandSubject, QueueGroup)
@@ -42,7 +43,7 @@ func (server *Server) Start() {
 	ratingService := server.initRatingService(ratingStore, leaveRatingOrchestrator, deleteRatingOrchestrator)
 	ratingHandler := server.initRatingHandler(ratingService)
 
-	server.initLeaveRatingService(ratingService, replyPublisher, commandSubscriber)
+	server.initLeaveRatingService(ratingService, replyPublisher, commandSubscriber, notificationPublisher)
 
 	server.startGrpcServer(ratingHandler)
 }
@@ -87,8 +88,8 @@ func (server *Server) initSubscriber(subject, queueGroup string) saga.Subscriber
 	}
 	return subscriber
 }
-func (server *Server) initLeaveRatingService(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) {
-	_, err := api.NewLeaveRatingCommandHandler(service, publisher, subscriber)
+func (server *Server) initLeaveRatingService(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber, notificationPublisher saga.Publisher) {
+	_, err := api.NewLeaveRatingCommandHandler(service, publisher, subscriber, notificationPublisher)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,8 +99,8 @@ func (server *Server) initRatingService(store domain.RatingStore, leaveRatingOrc
 	return application.NewRatingService(store, leaveRatingOrchestrator, deleteRatingOrchestrator)
 }
 
-func (server *Server) initLeaveRatingHandler(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) {
-	_, err := api.NewLeaveRatingCommandHandler(service, publisher, subscriber)
+func (server *Server) initLeaveRatingHandler(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber, notificationPublisher saga.Publisher) {
+	_, err := api.NewLeaveRatingCommandHandler(service, publisher, subscriber, notificationPublisher)
 	if err != nil {
 		log.Fatal(err)
 	}

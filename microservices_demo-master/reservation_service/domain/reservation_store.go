@@ -13,6 +13,7 @@ type ReservationStore interface {
 	GetAllReservationRequests() ([]*Reservation, error)
 	GetAllReservation() ([]*Reservation, error)
 	GetGuestAccommodationReservation(accommodationId, guestId primitive.ObjectID) ([]*Reservation, error)
+	GetGuestAccommodationHostReservation(hostId, guestId primitive.ObjectID) ([]*Reservation, error)
 	GetAllGuestReservation(guestId primitive.ObjectID) ([]*Reservation, error)
 	GetAllReservationByAccommodation(accommodationId primitive.ObjectID) ([]*Reservation, error)
 	GetAllConfirmedReservationByAccommodation(accommodationId primitive.ObjectID) ([]*Reservation, error)

@@ -1,24 +1,27 @@
 package api
 
 import (
+	"github.com/tamararankovic/microservices_demo/common/notification"
 	events "github.com/tamararankovic/microservices_demo/common/saga/leave_rating"
 	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"log"
 	"rating_service/application"
 	"rating_service/domain"
 )
 
 type LeaveRatingCommandHandler struct {
-	ratingService     *application.RatingService
-	replyPublisher    saga.Publisher
-	commandSubscriber saga.Subscriber
+	ratingService         *application.RatingService
+	replyPublisher        saga.Publisher
+	commandSubscriber     saga.Subscriber
+	notificationPublisher saga.Publisher
 }
 
-func NewLeaveRatingCommandHandler(ratingService *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber) (*LeaveRatingCommandHandler, error) {
+func NewLeaveRatingCommandHandler(ratingService *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber, notificationPublisher saga.Publisher) (*LeaveRatingCommandHandler, error) {
 	o := &LeaveRatingCommandHandler{
-		ratingService:     ratingService,
-		replyPublisher:    publisher,
-		commandSubscriber: subscriber,
+		ratingService:         ratingService,
+		replyPublisher:        publisher,
+		commandSubscriber:     subscriber,
+		notificationPublisher: notificationPublisher,
 	}
 	err := o.commandSubscriber.Subscribe(o.handle)
 	if err != nil {
@@ -28,22 +31,62 @@ func NewLeaveRatingCommandHandler(ratingService *application.RatingService, publ
 }
 
 func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingCommand) {
-	id, err := primitive.ObjectIDFromHex(command.Rating.ID.Hex())
-	if err != nil {
-		return
-	}
-	order := &domain.Rating{Id: id}
 
 	reply := events.LeaveRatingReply{Rating: command.Rating}
 
 	switch command.Type {
-	case events.StartedCreatingRating:
-		err := handler.ratingService.Create(order)
-		if err != nil {
-			reply.Type = events.CreationStarted
-			break
+	case events.CreateRating:
+		oldValue := command.Rating.OldValue
+		var err error
+		r := domain.Rating{
+			Id:           command.Rating.ID,
+			UserID:       command.Rating.UserID,
+			TargetId:     command.Rating.TargetID,
+			RatingValue:  int32(command.Rating.Value),
+			TargetType:   int(command.Rating.TargetType),
+			LastModified: command.Rating.LastModified,
 		}
-		reply.Type = events.CreationFailed
+		if oldValue == nil {
+
+			reply.Rating.ID = r.Id
+			err = handler.ratingService.Create(&r)
+		} else {
+			r.Id = oldValue.ID
+			reply.Rating.ID = r.Id
+			err = (*handler.ratingService).Update(&r)
+		}
+		if err != nil {
+			log.Println(err)
+			reply.Type = events.CreationFailed
+		} else {
+			reply.Type = events.CreationStarted
+		}
+	case events.RollBackRating:
+		oldValue := command.Rating.OldValue
+		if oldValue == nil {
+			handler.ratingService.Delete(&domain.Rating{Id: command.Rating.ID})
+		} else {
+			handler.ratingService.Update(&domain.Rating{
+				Id:           oldValue.ID,
+				TargetId:     oldValue.TargetID,
+				UserID:       oldValue.UserID,
+				TargetType:   int(oldValue.TargetType),
+				RatingValue:  int32(oldValue.Value),
+				LastModified: command.Rating.LastModified,
+			})
+		}
+		log.Println("RATING ROLLED BACK")
+		reply.Type = events.RatingRollBack
+	case events.SendNotification:
+
+		log.Println("notification sent")
+		handler.notificationPublisher.Publish(&notification.Message{
+			Title:      "Rating Created Successfully",
+			Content:    "Rating Created Successfully",
+			Type:       notification.AccommodationRated,
+			NotifierId: (*command).Rating.UserID,
+		})
+		reply.Type = events.NotificationSent
 	default:
 		reply.Type = events.UnknownReply
 	}

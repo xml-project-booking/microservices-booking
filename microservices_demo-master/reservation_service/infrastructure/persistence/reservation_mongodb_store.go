@@ -25,6 +25,11 @@ func (store *ReservationMongoDBStore) GetGuestAccommodationReservation(accommoda
 	return store.filter(filter)
 }
 
+func (store *ReservationMongoDBStore) GetGuestAccommodationHostReservation(accommodationId, guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"host_id": accommodationId, "reservation_status": "CONFIRMED", "guest_id": guestId}
+	return store.filter(filter)
+}
+
 func (store *ReservationMongoDBStore) UpdateStatusForCanceledUser(reservation *domain.Reservation) error {
 	result, err := store.reservations.UpdateOne(
 		context.TODO(),
@@ -34,7 +39,6 @@ func (store *ReservationMongoDBStore) UpdateStatusForCanceledUser(reservation *d
 		},
 	)
 	if err != nil {
-		fmt.Println("ovoo mozdaa")
 		return err
 	}
 	if result.MatchedCount != 1 {

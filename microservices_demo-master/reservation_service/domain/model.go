@@ -18,6 +18,7 @@ type ReservationDTO struct {
 	ReservationStatus string             `bson:"reservation_status"`
 	MinGuest          string
 	MaxGuest          string
+	HostId            primitive.ObjectID
 }
 
 type Reservation struct {
@@ -29,6 +30,7 @@ type Reservation struct {
 	Confirmation      bool               `bson:"confirmation"`
 	GuestId           primitive.ObjectID `bson:"guest_id"`
 	ReservationStatus string             `bson:"reservation_status"`
+	HostId            primitive.ObjectID `bson:"host_id"`
 }
 
 type AccommodationRequest struct {

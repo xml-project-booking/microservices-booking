@@ -23,7 +23,8 @@ const (
 	UpdateAccommodation
 	ApproveRating
 	RollBackRating
-	GetOldValue
+	SendNotification
+
 	CancelRating
 	UnknownCommand
 )
@@ -42,8 +43,7 @@ const (
 	AccommodationUpdate
 	AccommodationNotUpdate
 	RatingRollBack
-	OldValueReturned
-	RatingDone
+	NotificationSent
 	UnknownReply
 )
 

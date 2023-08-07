@@ -25,8 +25,25 @@ func NewLeaveRatingOrchestrator(publisher saga.Publisher, subscriber saga.Subscr
 
 func (o *LeaveRatingOrchestrator) Start(rating *domain.Rating, oldRating *domain.Rating) error {
 	event := &events.LeaveRatingCommand{
-		Type:   events.StartedCreatingRating,
-		Rating: events.RatingDetails{},
+		Type: events.StartedCreatingRating,
+		Rating: events.RatingDetails{
+			ID:           rating.Id,
+			TargetID:     rating.TargetId,
+			TargetType:   uint32(rating.TargetType),
+			UserID:       rating.UserID,
+			Value:        uint32(rating.RatingValue),
+			LastModified: rating.LastModified,
+		},
+	}
+	if oldRating != nil {
+		event.Rating.OldValue = &events.RatingDetails{
+			ID:           oldRating.Id,
+			TargetID:     oldRating.TargetId,
+			TargetType:   uint32(oldRating.TargetType),
+			UserID:       oldRating.UserID,
+			Value:        uint32(oldRating.RatingValue),
+			LastModified: oldRating.LastModified,
+		}
 	}
 
 	return o.commandPublisher.Publish(event)
@@ -46,14 +63,12 @@ func (o *LeaveRatingOrchestrator) nextCommandType(reply events.LeaveRatingReplyT
 		return events.CreateRating
 	case events.RatingCreated:
 		return events.UpdateAccommodation
-	case events.AccommodationUpdate:
-		return events.ApproveRating
 	case events.AccommodationNotUpdate:
-		return events.GetOldValue
-	case events.OldValueReturned:
 		return events.RollBackRating
 	case events.RatingRollBack:
 		return events.CancelRating
+	case events.AccommodationUpdate:
+		return events.SendNotification
 	default:
 		return events.UnknownCommand
 	}

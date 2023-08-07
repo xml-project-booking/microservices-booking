@@ -12,6 +12,7 @@ type Config struct {
 	NatsPass                  string
 	LeaveRatingCommandSubject string
 	LeaveRatingReplySubject   string
+	NoificationSubject        string
 }
 
 func NewConfig() *Config {
@@ -25,5 +26,6 @@ func NewConfig() *Config {
 		NatsPass:                  os.Getenv("NATS_PASS"),
 		LeaveRatingCommandSubject: os.Getenv("CREATE_ORDER_COMMAND_SUBJECT"),
 		LeaveRatingReplySubject:   os.Getenv("CREATE_ORDER_REPLY_SUBJECT"),
+		NoificationSubject:        os.Getenv("NOTIFICATION_SUBJECT"),
 	}
 }

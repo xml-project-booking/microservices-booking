@@ -11,7 +11,8 @@ type Rating struct {
 	RatingValue  int32
 	TargetType   int `bson:"target_type"`
 	LastModified time.Time
-	TargetId     primitive.ObjectID `bson:"targetId"` // ID korisnika koji je rezervisao smeštaj
+	TargetId     primitive.ObjectID `bson:"targetId"`
+	RatingStatus string             // ID korisnika koji je rezervisao smeštaj
 
 }
 type RatingDTO struct {

@@ -1,54 +1,19 @@
 package application
 
 import (
+	"accommodation_service/domain"
 	"errors"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"rating_service/domain"
 )
 
 type RatingService struct {
-	store                    domain.RatingStore
-	leaveRatingOrchestrator  *LeaveRatingOrchestrator
-	deleteRatingOrchestrator *DeleteRatingOrchestrator
+	store domain.RatingStore
 }
 
-func NewRatingService(store domain.RatingStore, leaveRatingOrchestrator *LeaveRatingOrchestrator, deleteRatingOrchestrator *DeleteRatingOrchestrator) *RatingService {
+func NewRatingService(store domain.RatingStore) *RatingService {
 	return &RatingService{
-		store:                    store,
-		leaveRatingOrchestrator:  leaveRatingOrchestrator,
-		deleteRatingOrchestrator: deleteRatingOrchestrator,
+		store: store,
 	}
-}
-
-func (service *RatingService) CreateRating(rating *domain.Rating) error {
-	var oldRating *domain.Rating = nil
-	oldRating, err := service.store.GetByUserAndTargetID(rating.UserID, rating.TargetId, rating.TargetType)
-	if err != nil {
-		return err
-	}
-
-	err = service.leaveRatingOrchestrator.Start(rating, oldRating)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (service *RatingService) DeleteRating(id primitive.ObjectID, userId primitive.ObjectID) error {
-	var oldRating *domain.Rating = nil
-	oldRating, err := service.store.Get(id)
-	if err != nil {
-		return err
-	}
-	if oldRating == nil {
-		return errors.New("rating not found")
-	}
-
-	err = service.deleteRatingOrchestrator.Start(id, oldRating)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (service *RatingService) GetAccommodationAverage(accommodationId primitive.ObjectID) (float64, error) {
@@ -82,10 +47,6 @@ func (service *RatingService) GetHostAverage(hostId primitive.ObjectID) (float64
 	}
 
 	return float64(sum / int32(len(hostRatings))), nil
-}
-
-func (service *RatingService) GetTargetRatings(targetId primitive.ObjectID, targetType int32) ([]*domain.Rating, error) {
-	return service.store.GetTargetRatings(targetId, targetType)
 }
 
 func (service *RatingService) Get(id primitive.ObjectID) (*domain.Rating, error) {

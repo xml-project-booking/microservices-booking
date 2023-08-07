@@ -207,7 +207,27 @@ func (service *ReservationService) CheckIfNumberOfGuestIsValid(minNumber int64, 
 
 func (service *ReservationService) CheckGuestCanLeaveRating(accommodationId, guestId primitive.ObjectID) bool {
 	var reservations, _ = service.store.GetGuestAccommodationReservation(accommodationId, guestId)
-	var num = len(reservations)
+	var pastReservations []*domain.Reservation
+	for _, Reservation := range reservations {
+		if Reservation.EndDate.Before(time.Now()) {
+			pastReservations = append(pastReservations, Reservation)
+		}
+	}
+	var num = len(pastReservations)
+	if num > 0 {
+		return true
+	}
+	return false
+}
+func (service *ReservationService) CheckGuestCanLeaveRatingForHost(hostId, guestId primitive.ObjectID) bool {
+	var reservations, _ = service.store.GetGuestAccommodationHostReservation(hostId, guestId)
+	var pastReservations []*domain.Reservation
+	for _, Reservation := range reservations {
+		if Reservation.EndDate.Before(time.Now()) {
+			pastReservations = append(pastReservations, Reservation)
+		}
+	}
+	var num = len(pastReservations)
 	if num > 0 {
 		return true
 	}

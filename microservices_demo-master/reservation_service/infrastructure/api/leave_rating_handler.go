@@ -5,8 +5,6 @@ import (
 	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
 
 	"resevation/application"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type LeaveRatingCommandHandler struct {
@@ -29,18 +27,10 @@ func NewLeaveRatingCommandHandler(reservationService *application.ReservationSer
 }
 
 func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingCommand) {
-	accommodationId, err := primitive.ObjectIDFromHex(command.Rating.TargetID.Hex())
-	guestId, err := primitive.ObjectIDFromHex(command.Rating.UserID.Hex())
-	if err != nil {
-		return
-	}
-	//rating := &domain.{Id: id, ShippingAddress: command.Order.Address}
-
 	reply := events.LeaveRatingReply{Rating: command.Rating}
-
 	switch command.Type {
 	case events.StartedCreatingRating:
-		canLeaveRating := handler.reservationService.CheckGuestCanLeaveRating(accommodationId, guestId)
+		canLeaveRating := handler.reservationService.CheckGuestCanLeaveRating(command.Rating.TargetID, command.Rating.UserID)
 		if canLeaveRating {
 			reply.Type = events.CreationStarted
 			break

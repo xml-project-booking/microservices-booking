@@ -165,6 +165,7 @@ func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context
 		GuestNumber:       int64(num),
 		GuestId:           reservationDTO.GuestId,
 		ReservationStatus: "PENDING",
+		HostId:            reservationDTO.HostId,
 	}
 	fmt.Println(reservationDTO.AccommodationID)
 	fmt.Println("ahhahahahahahahaahahahah")
@@ -392,6 +393,7 @@ func (handler *ReservationHandler) ConfirmReservationAutomatically(ctx context.C
 		GuestNumber:       int64(num),
 		GuestId:           reservationDTO.GuestId,
 		ReservationStatus: "CONFIRMED",
+		HostId:            reservationDTO.HostId,
 	}
 
 	err = handler.service.Create(&reservationRequest)

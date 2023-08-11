@@ -25,8 +25,8 @@ func (store *ReservationMongoDBStore) GetGuestAccommodationReservation(accommoda
 	return store.filter(filter)
 }
 
-func (store *ReservationMongoDBStore) GetGuestAccommodationHostReservation(accommodationId, guestId primitive.ObjectID) ([]*domain.Reservation, error) {
-	filter := bson.M{"host_id": accommodationId, "reservation_status": "CONFIRMED", "guest_id": guestId}
+func (store *ReservationMongoDBStore) GetGuestAccommodationHostReservation(hostId, guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"host_id": hostId, "reservation_status": "CONFIRMED", "guest_id": guestId}
 	return store.filter(filter)
 }
 

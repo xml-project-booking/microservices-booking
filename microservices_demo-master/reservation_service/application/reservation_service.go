@@ -214,6 +214,8 @@ func (service *ReservationService) CheckGuestCanLeaveRating(accommodationId, gue
 		}
 	}
 	var num = len(pastReservations)
+	fmt.Println("broj rezevracija je")
+	fmt.Println(num)
 	if num > 0 {
 		return true
 	}
@@ -228,6 +230,7 @@ func (service *ReservationService) CheckGuestCanLeaveRatingForHost(hostId, guest
 		}
 	}
 	var num = len(pastReservations)
+	fmt.Println("broj")
 	if num > 0 {
 		return true
 	}

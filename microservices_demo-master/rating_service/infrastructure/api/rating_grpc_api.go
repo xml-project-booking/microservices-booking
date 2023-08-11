@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	pb "github.com/tamararankovic/microservices_demo/common/proto/rating_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -21,6 +22,8 @@ func NewUserHandler(service *application.RatingService) *RatingHandler {
 	}
 }
 func (handler *RatingHandler) CreateAccommodationRating(ctx context.Context, request *pb.CreateAccommodationRatingRequest) (*pb.CreateAccommodationRatingResponse, error) {
+	fmt.Println(request)
+	fmt.Println(request.Rating)
 	rating := mapNewRating(request.Rating)
 	err := handler.service.CreateRating(rating)
 	if err != nil {
@@ -37,10 +40,7 @@ func (handler *RatingHandler) CreateHostRating(ctx context.Context, request *pb.
 	if err != nil {
 		return nil, err
 	}
-	err = handler.service.CreateRating(rating)
-	if err != nil {
-		return nil, err
-	}
+
 	return &pb.CreateHostRatingResponse{
 		Id: "kreirano",
 	}, nil

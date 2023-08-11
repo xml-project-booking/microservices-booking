@@ -119,6 +119,7 @@ message ReservationRequest {
   string GuestId = 7;
   string minGuest = 8;
   string maxGuest = 9;
+  string HostId = 10;
 
 
 }

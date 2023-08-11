@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"github.com/tamararankovic/microservices_demo/common/notification"
 	events "github.com/tamararankovic/microservices_demo/common/saga/leave_rating"
 	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
@@ -59,7 +60,7 @@ func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingComm
 			log.Println(err)
 			reply.Type = events.CreationFailed
 		} else {
-			reply.Type = events.CreationStarted
+			reply.Type = events.RatingCreated
 		}
 	case events.RollBackRating:
 		oldValue := command.Rating.OldValue
@@ -78,15 +79,17 @@ func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingComm
 		log.Println("RATING ROLLED BACK")
 		reply.Type = events.RatingRollBack
 	case events.SendNotification:
-
+		fmt.Println("send notifcation")
 		log.Println("notification sent")
 		handler.notificationPublisher.Publish(&notification.Message{
 			Title:      "Rating Created Successfully",
 			Content:    "Rating Created Successfully",
 			Type:       notification.AccommodationRated,
-			NotifierId: (*command).Rating.UserID,
+			NotifierId: command.Rating.UserID,
 		})
+		fmt.Println("mmmmm")
 		reply.Type = events.NotificationSent
+		return
 	default:
 		reply.Type = events.UnknownReply
 	}

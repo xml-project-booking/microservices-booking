@@ -42,7 +42,6 @@ func (server *Server) Start() {
 	deleteRatingOrchestrator := server.initDeleteRatingOrchestrator(commandPublisher, replySubscriber)
 	ratingService := server.initRatingService(ratingStore, leaveRatingOrchestrator, deleteRatingOrchestrator)
 	ratingHandler := server.initRatingHandler(ratingService)
-
 	server.initLeaveRatingService(ratingService, replyPublisher, commandSubscriber, notificationPublisher)
 
 	server.startGrpcServer(ratingHandler)
@@ -111,6 +110,7 @@ func (server *Server) initLeaveRatingOrchestrator(publisher saga.Publisher, subs
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	return orchestrator
 }
 func (server *Server) initDeleteRatingOrchestrator(publisher saga.Publisher, subscriber saga.Subscriber) *application.DeleteRatingOrchestrator {

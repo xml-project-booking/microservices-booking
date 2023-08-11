@@ -50,6 +50,7 @@ type ReservationDTO struct {
 	GuestNumber     string
 	Confirmation    string
 	GuestId         string
+	HostId          string
 }
 
 type UserInfo struct {

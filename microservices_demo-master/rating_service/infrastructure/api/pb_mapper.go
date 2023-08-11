@@ -1,16 +1,26 @@
 package api
 
 import (
+	"fmt"
 	pb "github.com/tamararankovic/microservices_demo/common/proto/rating_service"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"rating_service/domain"
+	"time"
 )
 
 func mapNewRating(ratingPb *pb.Rating) *domain.Rating {
+	layout := "2006-01-02T15:04:05.000Z"
+	parsedTime, err := time.Parse(layout, ratingPb.LastModified)
+	if err != nil {
+		fmt.Println("Error:", err)
+
+	}
 	rating := &domain.Rating{
-		UserID:      getObjectId(ratingPb.UserID),
-		TargetId:    getObjectId(ratingPb.TargetId),
-		RatingValue: ratingPb.RatingValue,
+		UserID:       getObjectId(ratingPb.UserID),
+		TargetId:     getObjectId(ratingPb.TargetId),
+		RatingValue:  ratingPb.RatingValue,
+		LastModified: parsedTime,
+		TargetType:   int(ratingPb.TargetType),
 	}
 	return rating
 }

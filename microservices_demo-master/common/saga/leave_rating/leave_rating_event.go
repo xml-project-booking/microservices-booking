@@ -40,6 +40,7 @@ const (
 	CreationStarted LeaveRatingReplyType = iota
 	RatingCreated
 	CreationFailed
+	CantGiveRating
 	AccommodationUpdate
 	AccommodationNotUpdate
 	RatingRollBack

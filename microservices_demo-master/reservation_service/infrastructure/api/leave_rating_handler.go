@@ -1,9 +1,9 @@
 package api
 
 import (
+	"fmt"
 	events "github.com/tamararankovic/microservices_demo/common/saga/leave_rating"
 	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
-
 	"resevation/application"
 )
 
@@ -19,23 +19,32 @@ func NewLeaveRatingCommandHandler(reservationService *application.ReservationSer
 		replyPublisher:     publisher,
 		commandSubscriber:  subscriber,
 	}
+
 	err := o.commandSubscriber.Subscribe(o.handle)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(o.commandSubscriber)
 	return o, nil
 }
 
 func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingCommand) {
+	var canLeaveRating = false
 	reply := events.LeaveRatingReply{Rating: command.Rating}
 	switch command.Type {
 	case events.StartedCreatingRating:
-		canLeaveRating := handler.reservationService.CheckGuestCanLeaveRating(command.Rating.TargetID, command.Rating.UserID)
+		//var canLeaveRating = false
+		if command.Rating.TargetType == 0 {
+			canLeaveRating = handler.reservationService.CheckGuestCanLeaveRating(command.Rating.TargetID, command.Rating.UserID)
+		} else {
+			canLeaveRating = handler.reservationService.CheckGuestCanLeaveRatingForHost(command.Rating.TargetID, command.Rating.UserID)
+		}
+		fmt.Println(canLeaveRating)
 		if canLeaveRating {
 			reply.Type = events.CreationStarted
 			break
 		}
-		reply.Type = events.CreationFailed
+		reply.Type = events.CantGiveRating
 	default:
 		reply.Type = events.UnknownReply
 	}

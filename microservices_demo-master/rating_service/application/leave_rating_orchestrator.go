@@ -1,6 +1,7 @@
 package application
 
 import (
+	"fmt"
 	events "github.com/tamararankovic/microservices_demo/common/saga/leave_rating"
 	saga "github.com/tamararankovic/microservices_demo/common/saga/messaging"
 	"rating_service/domain"
@@ -20,10 +21,12 @@ func NewLeaveRatingOrchestrator(publisher saga.Publisher, subscriber saga.Subscr
 	if err != nil {
 		return nil, err
 	}
+
 	return o, nil
 }
 
 func (o *LeaveRatingOrchestrator) Start(rating *domain.Rating, oldRating *domain.Rating) error {
+
 	event := &events.LeaveRatingCommand{
 		Type: events.StartedCreatingRating,
 		Rating: events.RatingDetails{
@@ -45,7 +48,7 @@ func (o *LeaveRatingOrchestrator) Start(rating *domain.Rating, oldRating *domain
 			LastModified: oldRating.LastModified,
 		}
 	}
-
+	fmt.Println(event.Type)
 	return o.commandPublisher.Publish(event)
 }
 
@@ -62,13 +65,11 @@ func (o *LeaveRatingOrchestrator) nextCommandType(reply events.LeaveRatingReplyT
 	case events.CreationStarted:
 		return events.CreateRating
 	case events.RatingCreated:
-		return events.UpdateAccommodation
-	case events.AccommodationNotUpdate:
+		return events.SendNotification
+	case events.CreationFailed:
 		return events.RollBackRating
 	case events.RatingRollBack:
 		return events.CancelRating
-	case events.AccommodationUpdate:
-		return events.SendNotification
 	default:
 		return events.UnknownCommand
 	}

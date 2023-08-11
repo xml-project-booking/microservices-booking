@@ -2,7 +2,6 @@ package application
 
 import (
 	"errors"
-	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"rating_service/domain"
 )
@@ -24,9 +23,6 @@ func NewRatingService(store domain.RatingStore, leaveRatingOrchestrator *LeaveRa
 func (service *RatingService) CreateRating(rating *domain.Rating) error {
 	var oldRating *domain.Rating = nil
 	oldRating, err := service.store.GetByUserAndTargetID(rating.UserID, rating.TargetId, rating.TargetType)
-	fmt.Println("ovo je old rating")
-	fmt.Println(oldRating)
-
 	err = service.leaveRatingOrchestrator.Start(rating, oldRating)
 	if err != nil {
 		return err
@@ -34,7 +30,7 @@ func (service *RatingService) CreateRating(rating *domain.Rating) error {
 	return nil
 }
 
-func (service *RatingService) DeleteRating(id primitive.ObjectID, userId primitive.ObjectID) error {
+func (service *RatingService) DeleteRating(id primitive.ObjectID) error {
 	var oldRating *domain.Rating = nil
 	oldRating, err := service.store.Get(id)
 	if err != nil {

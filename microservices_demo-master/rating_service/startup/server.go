@@ -43,6 +43,7 @@ func (server *Server) Start() {
 	ratingService := server.initRatingService(ratingStore, leaveRatingOrchestrator, deleteRatingOrchestrator)
 	ratingHandler := server.initRatingHandler(ratingService)
 	server.initLeaveRatingService(ratingService, replyPublisher, commandSubscriber, notificationPublisher)
+	server.initDeleteRatingHandler(ratingService, replyPublisher, commandSubscriber, notificationPublisher)
 
 	server.startGrpcServer(ratingHandler)
 }
@@ -100,6 +101,12 @@ func (server *Server) initRatingService(store domain.RatingStore, leaveRatingOrc
 
 func (server *Server) initLeaveRatingHandler(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber, notificationPublisher saga.Publisher) {
 	_, err := api.NewLeaveRatingCommandHandler(service, publisher, subscriber, notificationPublisher)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+func (server *Server) initDeleteRatingHandler(service *application.RatingService, publisher saga.Publisher, subscriber saga.Subscriber, notificationPublisher saga.Publisher) {
+	_, err := api.NewDeleteRatingCommandHandler(service, publisher, subscriber, notificationPublisher)
 	if err != nil {
 		log.Fatal(err)
 	}

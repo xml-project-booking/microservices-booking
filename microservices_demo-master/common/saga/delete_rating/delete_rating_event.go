@@ -19,11 +19,11 @@ type DeleteRatingCommandType int8
 
 const (
 	StartedDeletionRating DeleteRatingCommandType = iota
-	UpdateAccommodation
+	DeleteRating
 	UpdateHost
 	RollbackRating
-	CancelDeletionRating
-	FinishDeletionRating
+	SendNotification
+
 	UnknownCommand
 )
 
@@ -36,13 +36,11 @@ type DeleteRatingReplyType int8
 
 const (
 	DeletionStarted DeleteRatingReplyType = iota
-	DeletionFailed
-	AccommodationUpdate
-	AccommodationNotUpdate
-	HostUpdate
-	HostNotUpdate
+	CantFindRating
+	RatingDelete
 	RatingRollBack
 	RatingDeletionDone
+
 	UnknownReply
 )
 

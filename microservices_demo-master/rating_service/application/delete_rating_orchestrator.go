@@ -26,8 +26,18 @@ func NewDeleteRatingOrchestrator(publisher saga.Publisher, subscriber saga.Subsc
 
 func (o *DeleteRatingOrchestrator) Start(id primitive.ObjectID, oldValue *domain.Rating) error {
 	event := &delete_rating.DeleteRatingCommand{
-		Type:   delete_rating.StartedDeletionRating,
-		Rating: delete_rating.RatingDetails{},
+		Type: delete_rating.StartedDeletionRating,
+		Rating: delete_rating.RatingDetails{
+			ID: id,
+			OldValue: &delete_rating.RatingDetails{
+				ID:           oldValue.Id,
+				TargetID:     oldValue.TargetId,
+				TargetType:   uint32(oldValue.TargetType),
+				UserID:       oldValue.UserID,
+				Value:        uint32(oldValue.RatingValue),
+				LastModified: oldValue.LastModified,
+			},
+		},
 	}
 	return o.commandPublisher.Publish(event)
 }
@@ -43,20 +53,10 @@ func (o *DeleteRatingOrchestrator) handle(reply *delete_rating.DeleteRatingReply
 func (o *DeleteRatingOrchestrator) nextCommandType(reply *delete_rating.DeleteRatingReply) delete_rating.DeleteRatingCommandType {
 	switch reply.Type {
 	case delete_rating.DeletionStarted:
-		if reply.Rating.TargetType == 1 {
-			return delete_rating.UpdateHost
-		}
-		return delete_rating.UpdateAccommodation
-	case delete_rating.DeletionFailed:
-		return delete_rating.CancelDeletionRating
-	case delete_rating.AccommodationUpdate:
-		return delete_rating.FinishDeletionRating
-	case delete_rating.AccommodationNotUpdate:
-		return delete_rating.RollbackRating
-	case delete_rating.HostUpdate:
-		return delete_rating.FinishDeletionRating
-	case delete_rating.HostNotUpdate:
-		return delete_rating.RollbackRating
+		return delete_rating.DeleteRating
+	case delete_rating.RatingDelete:
+		return delete_rating.SendNotification
+
 	default:
 		return delete_rating.UnknownCommand
 	}

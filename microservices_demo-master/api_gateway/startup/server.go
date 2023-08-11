@@ -8,6 +8,7 @@ import (
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/api"
 	cfg "github.com/tamararankovic/microservices_demo/api_gateway/startup/config"
 	accommodationGw "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
+	ratingGw "github.com/tamararankovic/microservices_demo/common/proto/rating_service"
 	reservationGw "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	termGw "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	userGw "github.com/tamararankovic/microservices_demo/common/proto/user_service"
@@ -44,13 +45,11 @@ func (server *Server) initHandlers() {
 	err := userGw.RegisterUserServiceHandlerFromEndpoint(context.TODO(), server.mux, userEndpoint, opts)
 
 	if err != nil {
-		fmt.Println("ahahahaah")
 		panic(err)
 	}
 	reservationEndpoint := fmt.Sprintf("%s:%s", server.config.ReservationHost, server.config.ReservationPort)
 	err1 := reservationGw.RegisterReservationServiceHandlerFromEndpoint(context.TODO(), server.mux, reservationEndpoint, opts)
 	if err1 != nil {
-		fmt.Printf("dhhdhdhdhdhddhdhdhdhdhdhdhdhdhdhdhdhdh")
 		panic(err)
 	}
 
@@ -64,6 +63,11 @@ func (server *Server) initHandlers() {
 	accommodationPoint := fmt.Sprintf("%s:%s", server.config.AccommodationHost, server.config.AccommodationPort)
 	err3 := accommodationGw.RegisterAccommodationServiceHandlerFromEndpoint(context.TODO(), server.mux, accommodationPoint, opts)
 	if err3 != nil {
+		panic(err)
+	}
+	ratingPoint := fmt.Sprintf("%s:%s", server.config.RatingHost, server.config.RatingPort)
+	err4 := ratingGw.RegisterRatingServiceHandlerFromEndpoint(context.TODO(), server.mux, ratingPoint, opts)
+	if err4 != nil {
 		fmt.Printf("dhhdhdhdhdhddhdhdhdhdhdhdhdhdhdhdhdhdh")
 		panic(err)
 	}

@@ -2,6 +2,7 @@ package domain
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"time"
 )
 
 type Accommodation struct {
@@ -20,6 +21,7 @@ type Accommodation struct {
 	AirConditioning         bool               `bson:"air_conditioning"`
 	FreeParking             bool               `bson:"free_parking"`
 	Photos                  []string           `bson:"photos"`
+	AverageRating           float64            `bson:"average_rating"`
 }
 
 type ConfirmationType int
@@ -58,4 +60,13 @@ type Address struct {
 	StreetNumber string
 	City         string
 	Country      string
+}
+
+type Rating struct {
+	Id           primitive.ObjectID `bson:"_id"` // ID smeštaja za koji je termin vezan
+	UserID       primitive.ObjectID `bson:"userId"`
+	RatingValue  int32
+	TargetType   int `bson:"target_type"`
+	LastModified time.Time
+	TargetId     primitive.ObjectID
 }

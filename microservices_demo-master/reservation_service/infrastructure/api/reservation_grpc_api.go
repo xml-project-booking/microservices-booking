@@ -28,10 +28,11 @@ type ReservationHandler struct {
 func (handler *ReservationHandler) CancelReservation(ctx context.Context, request *pb.CancelReservationRequest) (*pb.CancelReservationResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)
+	Reservation, err := handler.service.Get(objectId)
 	if err != nil {
 		return nil, err
 	}
-	isDeletedRes := handler.service.CancelReservation(objectId)
+	isDeletedRes := handler.service.CancelReservation(Reservation)
 	if err != nil {
 		return nil, err
 	}
@@ -164,6 +165,7 @@ func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context
 		GuestNumber:       int64(num),
 		GuestId:           reservationDTO.GuestId,
 		ReservationStatus: "PENDING",
+		HostId:            reservationDTO.HostId,
 	}
 	fmt.Println(reservationDTO.AccommodationID)
 	fmt.Println("ahhahahahahahahaahahahah")
@@ -391,6 +393,7 @@ func (handler *ReservationHandler) ConfirmReservationAutomatically(ctx context.C
 		GuestNumber:       int64(num),
 		GuestId:           reservationDTO.GuestId,
 		ReservationStatus: "CONFIRMED",
+		HostId:            reservationDTO.HostId,
 	}
 
 	err = handler.service.Create(&reservationRequest)

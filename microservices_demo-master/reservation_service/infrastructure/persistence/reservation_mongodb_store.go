@@ -20,6 +20,33 @@ type ReservationMongoDBStore struct {
 	reservations *mongo.Collection
 }
 
+func (store *ReservationMongoDBStore) GetGuestAccommodationReservation(accommodationId, guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"accommodation_id": accommodationId, "reservation_status": "CONFIRMED", "guest_id": guestId}
+	return store.filter(filter)
+}
+
+func (store *ReservationMongoDBStore) GetGuestAccommodationHostReservation(hostId, guestId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"host_id": hostId, "reservation_status": "CONFIRMED", "guest_id": guestId}
+	return store.filter(filter)
+}
+
+func (store *ReservationMongoDBStore) UpdateStatusForCanceledUser(reservation *domain.Reservation) error {
+	result, err := store.reservations.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": reservation.Id},
+		bson.D{
+			{"$set", bson.D{{"reservation_status", "CANCELED"}, {"confirmation", true}}},
+		},
+	)
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount != 1 {
+		return errors.New("one document should've been updated")
+	}
+	return nil
+}
+
 func (store *ReservationMongoDBStore) GetAllReservationByGuestPending(guestId primitive.ObjectID) ([]*domain.Reservation, error) {
 	filter := bson.M{"guest_id": guestId, "reservation_status": "PENDING"}
 	return store.filter(filter)

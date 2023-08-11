@@ -1,6 +1,7 @@
 package application
 
 import (
+	"errors"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"resevation/domain"
@@ -158,14 +159,14 @@ func (service *ReservationService) CheckForReservationInDateRangeAndGetUserId(ac
 
 }
 
-func (service *ReservationService) CancelReservation(reservationId primitive.ObjectID) bool {
+func (service *ReservationService) CancelReservation(reservation *domain.Reservation) string {
 
-	if service.CheckIfLessThan24Hours(reservationId) {
-		return false
+	if service.CheckIfLessThan24Hours(reservation.Id) {
+		return errors.New("manje od 24h").Error()
 	}
 
-	var isDeleted = service.store.DeleteReservationById(reservationId)
-	return isDeleted
+	var isDeleted = service.store.UpdateStatusForCanceledUser(reservation)
+	return isDeleted.Error()
 
 }
 
@@ -202,4 +203,36 @@ func (service *ReservationService) CheckIfLessThan24Hours(reservationId primitiv
 
 func (service *ReservationService) CheckIfNumberOfGuestIsValid(minNumber int64, maxNumber int64, guestNumber int64) bool {
 	return guestNumber >= minNumber && guestNumber <= maxNumber
+}
+
+func (service *ReservationService) CheckGuestCanLeaveRating(accommodationId, guestId primitive.ObjectID) bool {
+	var reservations, _ = service.store.GetGuestAccommodationReservation(accommodationId, guestId)
+	var pastReservations []*domain.Reservation
+	for _, Reservation := range reservations {
+		if Reservation.EndDate.Before(time.Now()) {
+			pastReservations = append(pastReservations, Reservation)
+		}
+	}
+	var num = len(pastReservations)
+	fmt.Println("broj rezevracija je")
+	fmt.Println(num)
+	if num > 0 {
+		return true
+	}
+	return false
+}
+func (service *ReservationService) CheckGuestCanLeaveRatingForHost(hostId, guestId primitive.ObjectID) bool {
+	var reservations, _ = service.store.GetGuestAccommodationHostReservation(hostId, guestId)
+	var pastReservations []*domain.Reservation
+	for _, Reservation := range reservations {
+		if Reservation.EndDate.Before(time.Now()) {
+			pastReservations = append(pastReservations, Reservation)
+		}
+	}
+	var num = len(pastReservations)
+	fmt.Println("broj")
+	if num > 0 {
+		return true
+	}
+	return false
 }

@@ -119,6 +119,7 @@ message ReservationRequest {
   string GuestId = 7;
   string minGuest = 8;
   string maxGuest = 9;
+  string HostId = 10;
 
 
 }
@@ -143,7 +144,7 @@ message ConfirmReservationManuallyResponse{
 }
 message CancelReservationResponse {
   string id = 1;
-  bool isDeleted = 2;
+  string isDeleted = 2;
 }
 
 message ConfirmReservationAutomaticallyMessage{

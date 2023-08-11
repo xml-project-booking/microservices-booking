@@ -78,7 +78,6 @@ func (handler *ReservationHandler) CancelReservation(w http.ResponseWriter, r *h
 		return
 	}
 	if reservationIdString == "" {
-		fmt.Println("jebi se")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -257,6 +256,7 @@ func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWrit
 			Confirmation:    t.Confirmation,
 			MinGuest:        strconv.FormatInt(accommodation.Accommodation.MinGuest, 10),
 			MaxGuest:        strconv.FormatInt(accommodation.Accommodation.MaxGuest, 10),
+			HostId:          t.HostId,
 		})
 		if err != nil {
 
@@ -282,7 +282,9 @@ func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWrit
 		GuestId:         t.GuestId,
 		Confirmation:    t.Confirmation,
 		MinGuest:        strconv.FormatInt(accommodation.Accommodation.MinGuest, 10),
-		MaxGuest:        strconv.FormatInt(accommodation.Accommodation.MaxGuest, 10)})
+		MaxGuest:        strconv.FormatInt(accommodation.Accommodation.MaxGuest, 10),
+		HostId:          t.HostId},
+	)
 
 	if err != nil {
 		return

@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+option go_package = "github.com/tamararankovic/microservices_demo/common/ratings";
+
+package ratings;
+
+import "google/api/annotations.proto";
+
+service RatingService{
+  rpc Get(GetRequest) returns(GetResponse) {
+    option (google.api.http) = {
+      get: "/rating/order/{id}"
+    };
+  }
+  rpc GetAll(GetAllRequest) returns(GetAllResponse) {
+    option (google.api.http) = {
+      get: "/rating/order"
+    };
+  }
+  rpc CreateAccommodationRating(CreateAccommodationRatingRequest) returns(CreateAccommodationRatingResponse) {
+    option (google.api.http) = {
+      post: "/create/accommodation-rating"
+      body: "*"
+    };
+  }
+  rpc CreateHostRating(CreateHostRatingRequest) returns(CreateHostRatingResponse) {
+    option (google.api.http) = {
+      post: "/create/host-rating"
+      body: "*"
+    };
+  }
+  rpc GetRatingsByType(GetRatingsByTypeRequest) returns(GetRatingsByTypeResponse) {
+    option (google.api.http) = {
+      post: "/get-ratings"
+      body:"*"
+    };
+  }
+  rpc DeleteRating(DeleteRatingRequest) returns(DeleteRatingResponse) {
+    option (google.api.http) = {
+      get: "/delete-rating/{id}"
+
+    };
+  }
+}
+
+message GetRequest {
+  string id = 1;
+}
+
+message GetResponse {
+  Rating rating = 1;
+}
+
+message GetAllRequest {
+}
+message CreateHostRatingRequest{
+  Rating rating =1;
+}
+message CreateHostRatingResponse{
+    string id =1;
+}
+message CreateAccommodationRatingRequest{
+ Rating rating = 1;
+
+
+}
+message CreateAccommodationRatingResponse{
+  string id = 1;
+}
+
+message GetRatingsByTypeRequest{
+  int32 type = 1;
+  string id =2 ;
+}
+
+message GetRatingsByTypeResponse{
+  repeated Rating ratings = 1;
+}
+message GetAllResponse {
+  repeated Rating ratings = 1;
+}
+message DeleteRatingRequest{
+  string id = 1;
+}
+message DeleteRatingResponse{
+  string id =1;
+}
+message Rating {
+
+ string  UserID = 1;
+  int32 RatingValue =2;
+  int32   TargetType = 3;
+  string TargetId = 4;
+  string LastModified = 5;
+
+}

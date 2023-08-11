@@ -4,6 +4,7 @@ import (
 	accommodation "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
 	catalogue "github.com/tamararankovic/microservices_demo/common/proto/catalogue_service"
 	ordering "github.com/tamararankovic/microservices_demo/common/proto/ordering_service"
+	ratings "github.com/tamararankovic/microservices_demo/common/proto/rating_service"
 	reservation "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	shipping "github.com/tamararankovic/microservices_demo/common/proto/shipping_service"
 	terms "github.com/tamararankovic/microservices_demo/common/proto/term_service"
@@ -63,6 +64,14 @@ func NewTermClient(address string) terms.TermServiceClient {
 		log.Fatalf("Failed to start gRPC connection to Shipping service: %v", err)
 	}
 	return terms.NewTermServiceClient(conn)
+
+}
+func NewRatingClient(address string) ratings.RatingServiceClient {
+	conn, err := getConnection(address)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC connection to Shipping service: %v", err)
+	}
+	return ratings.NewRatingServiceClient(conn)
 
 }
 

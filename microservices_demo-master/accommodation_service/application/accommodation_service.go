@@ -14,7 +14,10 @@ func NewAccommodationService(store domain.AccommodationStore) *AccommodationServ
 		store: store,
 	}
 }
+func (service *AccommodationService) CheckAccommodationForAmenities(amenities []bool) ([]*domain.Accommodation, error) {
+	return service.store.FilterAccommodationsByAmenities(amenities)
 
+}
 func (service *AccommodationService) UpdateReservationConfirmationType(accommodation *domain.Accommodation) error {
 	return service.store.UpdateReservationConfirmationType(accommodation)
 }
@@ -59,4 +62,3 @@ func (service *AccommodationService) DeleteAllAccommodationsByHost(id string) er
 	}
 	return nil
 }
-

@@ -53,7 +53,20 @@ service AccommodationService{
 
     };
   }
+  rpc FilterAccommodation(FilterAccommodationRequest) returns (FilterAccommodationResponse){
+    option (google.api.http) = {
+      get: "/accommodations/filter"
 
+
+    };
+  }
+
+}
+message FilterAccommodationRequest{
+  repeated bool amenities = 1;
+}
+message FilterAccommodationResponse{
+  repeated Accommodation accommodations = 1;
 }
 message ChangeReservationTypeRequest{
   string id = 1;

@@ -20,6 +20,11 @@ type AccommodationMongoDBStore struct {
 	accommodations *mongo.Collection
 }
 
+func (store *AccommodationMongoDBStore) FilterAccommodationsByAmenities(amenities []bool) ([]*domain.Accommodation, error) {
+	filter := bson.M{"wifi": amenities[0], "kitchen": amenities[1], "air_conditioning": amenities[2], "free_parking": amenities[3]}
+	return store.filter(filter)
+}
+
 func (store *AccommodationMongoDBStore) UpdateStatus(user *domain.Accommodation) error {
 	//TODO implement me
 	panic("implement me")

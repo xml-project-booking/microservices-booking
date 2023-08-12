@@ -23,7 +23,20 @@ func NewAccommodationHandler(service *application.AccommodationService) *Accommo
 		service: service,
 	}
 }
+func (handler *AccommodationHandler) FilterAccommodation(ctx context.Context, request *pb.FilterAccommodationRequest) (*pb.FilterAccommodationResponse, error) {
+	amenities := request.Amenities
+	accommodations, err := handler.service.CheckAccommodationForAmenities(amenities)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.FilterAccommodationResponse{Accommodations: []*pb.Accommodation{}}
+	for _, Accommodation := range accommodations {
+		accommodationPb := mapAccommodation(Accommodation)
+		response.Accommodations = append(response.Accommodations, accommodationPb)
 
+	}
+	return response, nil
+}
 func (handler *AccommodationHandler) ChangeAccommodationReservationType(ctx context.Context, request *pb.ChangeReservationTypeRequest) (*pb.ChangeReservationTypeResponse, error) {
 	accommodationId := request.Id
 	objectId, err := primitive.ObjectIDFromHex(accommodationId)

@@ -28,7 +28,18 @@ func NewUserHandler(service *application.UserService, serviceAuth *application.A
 		serviceAuth: serviceAuth,
 	}
 }
-
+func (handler *UserHandler) GetProminentHosts(ctx context.Context, request *pb.GetProminentHostRequest) (*pb.GetProminentHostResponse, error) {
+	Hosts, err := handler.service.GetProminentHosts()
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.GetProminentHostResponse{HostsID: []string{}}
+	for _, User := range Hosts {
+		//current := mapUser(User)
+		response.HostsID = append(response.HostsID, User.Id.Hex())
+	}
+	return response, nil
+}
 func (handler *UserHandler) Get(ctx context.Context, request *pb.GetRequest) (*pb.GetResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)

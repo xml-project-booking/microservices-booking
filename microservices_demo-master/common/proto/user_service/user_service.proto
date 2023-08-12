@@ -59,6 +59,11 @@ service UserService{
       delete: "/users/delete/{id}"
     };
   }
+  rpc GetProminentHosts(GetProminentHostRequest) returns (GetProminentHostResponse) {
+    option (google.api.http) = {
+      get: "/users/prominent-host"
+    };
+  }
 
 
   rpc UpdateCancellationNumber(UpdateCancellationNumberRequest) returns(UpdateCancellationNumberResponse) {
@@ -68,7 +73,12 @@ service UserService{
   }
 
 }
+message GetProminentHostRequest{
 
+}
+message GetProminentHostResponse {
+  repeated string hostsID = 1;
+}
 message GetRequest {
   string id = 1;
 }

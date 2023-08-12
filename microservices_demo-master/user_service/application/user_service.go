@@ -19,6 +19,10 @@ func (service *UserService) Get(id primitive.ObjectID) (*domain.User, error) {
 	return service.store.Get(id)
 }
 
+func (service *UserService) GetProminentHosts() ([]*domain.User, error) {
+	return service.store.GetProminentHosts()
+}
+
 func (service *UserService) UpdateCancellationNumber(user *domain.User) error {
 	return service.store.UpdateCancellationNumber(user)
 }

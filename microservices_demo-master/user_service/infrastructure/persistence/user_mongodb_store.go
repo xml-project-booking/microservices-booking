@@ -21,6 +21,11 @@ type UserMongoDBStore struct {
 	users *mongo.Collection
 }
 
+func (store *UserMongoDBStore) GetProminentHosts() ([]*domain.User, error) {
+	filter := bson.M{"is_prominent": true}
+	return store.filter(filter)
+}
+
 var ErrorUsernameTaken = errors.New("Username is already taken")
 var ErrorUserNotFound = errors.New("User not found")
 

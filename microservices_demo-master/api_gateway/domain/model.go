@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )
 
@@ -65,4 +66,22 @@ type TermDTO struct {
 	Value           string
 	StartDate       string
 	EndDate         string
+}
+type Accommodation struct {
+	Id                      primitive.ObjectID
+	Name                    string
+	ReservationConfirmation string
+	City                    string
+	Country                 string
+	Street                  string
+	StreetNumber            string
+	MinGuest                int
+	MaxGuest                int
+	HostId                  primitive.ObjectID
+	Wifi                    bool
+	Kitchen                 bool
+	AirConditioning         bool
+	FreeParking             bool
+	Photos                  []string
+	AverageRating           float64
 }

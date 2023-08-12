@@ -40,6 +40,23 @@ func (service *TermService) Update(term *domain.Term) error {
 func (service *TermService) Delete(term *domain.Term) error {
 	return service.store.Delete(term)
 }
+func (service *TermService) GetAccommodationsInPriceRange(minPrice, maxPrice int32) []*domain.Term {
+	terms, err := service.store.GetTermsInPriceRange(minPrice, maxPrice)
+	if err != nil {
+		return nil
+	}
+	seen := make(map[primitive.ObjectID]bool)
+	filteredList := []*domain.Term{}
+
+	for _, item := range terms {
+		if _, ok := seen[item.AccommodationID]; !ok {
+			seen[item.AccommodationID] = true
+			filteredList = append(filteredList, item)
+		}
+	}
+
+	return filteredList
+}
 
 func (service *TermService) DeleteReservationsInDateRange(accommodationId primitive.ObjectID, startDate time.Time, endDate time.Time) bool {
 

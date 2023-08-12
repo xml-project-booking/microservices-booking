@@ -17,6 +17,7 @@ type User struct {
 	Address            string             `bson:"address,omitempty" json:"address"`
 	Role               Role               `bson:"role" json:"role"`
 	CancellationNumber int                `bson:"cancellation_number"`
+	isProminent        bool               `bson:"is_prominent"`
 }
 
 type Role int

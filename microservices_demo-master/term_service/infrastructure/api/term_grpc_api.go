@@ -26,7 +26,16 @@ func NewUserHandler(service *application.TermService) *TermHandler {
 		service: service,
 	}
 }
-
+func (handler *TermHandler) GetAllAccommodationIdsInPriceRange(ctx context.Context, request *pb.PriceRangeRequest) (*pb.PriceRangeResponse, error) {
+	minPrice := request.MinPrice
+	maxPrice := request.MaxPrice
+	var terms = handler.service.GetAccommodationsInPriceRange(minPrice, maxPrice)
+	response := &pb.PriceRangeResponse{}
+	for _, term := range terms {
+		response.AccommodationIds = append(response.AccommodationIds, term.AccommodationID.Hex())
+	}
+	return response, nil
+}
 func (handler *TermHandler) Update(ctx context.Context, request *pb.UpdateRequest) (*pb.UpdateResponse, error) {
 
 	//OVO NZM STA JE VRV JSON U BINARNO

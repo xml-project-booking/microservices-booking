@@ -65,13 +65,26 @@ service TermService {
       body: "*"
     };
   }
+  rpc GetAllAccommodationIdsInPriceRange(PriceRangeRequest) returns (PriceRangeResponse) {
+    option (google.api.http) = {
+      post: "/terms/price-range"
+      body:"*"
+    };
+  }
 
 }
-
+message PriceRangeRequest{
+  int32 minPrice = 1;
+  int32 maxPrice = 2;
+}
+message PriceRangeResponse{
+  repeated string accommodationIds = 1;
+}
 message GetAvailableAccommodationsInPeriodRequest {
   string StartDate = 1;
   string EndDate = 2;
 }
+
 
 message GetAvailableAccommodationsInPeriodResponse {
   repeated AccommodationWithPriceResponse accommodationWithPrice = 1;

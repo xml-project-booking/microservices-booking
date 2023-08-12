@@ -45,7 +45,16 @@ func (handler *RatingHandler) CreateHostRating(ctx context.Context, request *pb.
 		Id: "kreirano",
 	}, nil
 }
-
+func (handler *RatingHandler) GetAverageHostRating(ctx context.Context, request *pb.AverageHostRequest) (*pb.AverageHostResponse, error) {
+	id := request.Id
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, err
+	}
+	averageRating, _ := handler.service.GetHostAverage(objectId)
+	response := &pb.AverageHostResponse{Average: float32(averageRating)}
+	return response, nil
+}
 func (handler *RatingHandler) DeleteRating(ctx context.Context, request *pb.DeleteRatingRequest) (*pb.DeleteRatingResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)

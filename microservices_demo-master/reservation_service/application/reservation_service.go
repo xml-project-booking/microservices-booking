@@ -40,6 +40,39 @@ func (service *ReservationService) GetAllReservationsByGuestIdPending(guestId pr
 func (service *ReservationService) GetAllReservation() ([]*domain.Reservation, error) {
 	return service.store.GetAllReservation()
 }
+func (service *ReservationService) CheckTotalReservationDuration(hostId primitive.ObjectID) bool {
+	reservations, _ := service.store.GetReservationsByHost(hostId)
+	var duration = 0.0
+	for _, Reservation := range reservations {
+		difference := (Reservation.EndDate.Sub(Reservation.StartDate).Hours()) / 24
+		duration = duration + difference
+	}
+	if duration > 50 {
+		return true
+	} else {
+		return false
+	}
+}
+func (service *ReservationService) CheckReservationNumberForHost(hostId primitive.ObjectID) bool {
+	reservations, _ := service.store.GetReservationsByHost(hostId)
+	var num = len(reservations)
+	if num >= 5 {
+		return true
+	} else {
+		return false
+	}
+}
+func (service *ReservationService) CheckCancellationRate(hostId primitive.ObjectID) bool {
+	hostCanceledReservations, _ := service.store.GetReservationCancelByHost(hostId)
+	hostReservations, _ := service.store.GetReservationsByHost(hostId)
+	cancellationRate := (len(hostCanceledReservations) / len(hostReservations)) * 100
+	if cancellationRate < 5 {
+		return true
+	} else {
+		return false
+	}
+
+}
 func (service *ReservationService) GetAll() ([]*domain.Reservation, error) {
 	return service.store.GetAll()
 }
@@ -214,8 +247,6 @@ func (service *ReservationService) CheckGuestCanLeaveRating(accommodationId, gue
 		}
 	}
 	var num = len(pastReservations)
-	fmt.Println("broj rezevracija je")
-	fmt.Println(num)
 	if num > 0 {
 		return true
 	}
@@ -230,7 +261,6 @@ func (service *ReservationService) CheckGuestCanLeaveRatingForHost(hostId, guest
 		}
 	}
 	var num = len(pastReservations)
-	fmt.Println("broj")
 	if num > 0 {
 		return true
 	}

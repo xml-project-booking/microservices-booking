@@ -19,21 +19,22 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ReservationService_Get_FullMethodName                             = "/reservations.ReservationService/Get"
-	ReservationService_GetAll_FullMethodName                          = "/reservations.ReservationService/GetAll"
-	ReservationService_GetAllByAccommodation_FullMethodName           = "/reservations.ReservationService/GetAllByAccommodation"
-	ReservationService_GetAllByAccommodationConfirmed_FullMethodName  = "/reservations.ReservationService/GetAllByAccommodationConfirmed"
-	ReservationService_GetAllByGuest_FullMethodName                   = "/reservations.ReservationService/GetAllByGuest"
-	ReservationService_GetAllByGuestPending_FullMethodName            = "/reservations.ReservationService/GetAllByGuestPending"
-	ReservationService_MakeRequestForReservation_FullMethodName       = "/reservations.ReservationService/MakeRequestForReservation"
-	ReservationService_CancelReservation_FullMethodName               = "/reservations.ReservationService/CancelReservation"
-	ReservationService_ConfirmReservationManually_FullMethodName      = "/reservations.ReservationService/ConfirmReservationManually"
-	ReservationService_CancelReservationManually_FullMethodName       = "/reservations.ReservationService/CancelReservationManually"
-	ReservationService_ConfirmReservationAutomatically_FullMethodName = "/reservations.ReservationService/ConfirmReservationAutomatically"
-	ReservationService_HasActiveReservations_FullMethodName           = "/reservations.ReservationService/HasActiveReservations"
-	ReservationService_GetAllFuture_FullMethodName                    = "/reservations.ReservationService/GetAllFuture"
-	ReservationService_DeleteReservationRequestGuest_FullMethodName   = "/reservations.ReservationService/DeleteReservationRequestGuest"
-	ReservationService_TermCheck_FullMethodName                       = "/reservations.ReservationService/TermCheck"
+	ReservationService_Get_FullMethodName                              = "/reservations.ReservationService/Get"
+	ReservationService_GetAll_FullMethodName                           = "/reservations.ReservationService/GetAll"
+	ReservationService_GetAllByAccommodation_FullMethodName            = "/reservations.ReservationService/GetAllByAccommodation"
+	ReservationService_GetAllByAccommodationConfirmed_FullMethodName   = "/reservations.ReservationService/GetAllByAccommodationConfirmed"
+	ReservationService_GetAllByGuest_FullMethodName                    = "/reservations.ReservationService/GetAllByGuest"
+	ReservationService_GetAllByGuestPending_FullMethodName             = "/reservations.ReservationService/GetAllByGuestPending"
+	ReservationService_MakeRequestForReservation_FullMethodName        = "/reservations.ReservationService/MakeRequestForReservation"
+	ReservationService_CancelReservation_FullMethodName                = "/reservations.ReservationService/CancelReservation"
+	ReservationService_ConfirmReservationManually_FullMethodName       = "/reservations.ReservationService/ConfirmReservationManually"
+	ReservationService_CancelReservationManually_FullMethodName        = "/reservations.ReservationService/CancelReservationManually"
+	ReservationService_ConfirmReservationAutomatically_FullMethodName  = "/reservations.ReservationService/ConfirmReservationAutomatically"
+	ReservationService_HasActiveReservations_FullMethodName            = "/reservations.ReservationService/HasActiveReservations"
+	ReservationService_GetAllFuture_FullMethodName                     = "/reservations.ReservationService/GetAllFuture"
+	ReservationService_DeleteReservationRequestGuest_FullMethodName    = "/reservations.ReservationService/DeleteReservationRequestGuest"
+	ReservationService_TermCheck_FullMethodName                        = "/reservations.ReservationService/TermCheck"
+	ReservationService_CheckReservationRequirementsHost_FullMethodName = "/reservations.ReservationService/CheckReservationRequirementsHost"
 )
 
 // ReservationServiceClient is the client API for ReservationService service.
@@ -55,6 +56,7 @@ type ReservationServiceClient interface {
 	GetAllFuture(ctx context.Context, in *GetAllFutureRequest, opts ...grpc.CallOption) (*GetAllFutureResponse, error)
 	DeleteReservationRequestGuest(ctx context.Context, in *DeleteReservationRequest, opts ...grpc.CallOption) (*DeleteReservationResponse, error)
 	TermCheck(ctx context.Context, in *TermCheckRequest, opts ...grpc.CallOption) (*TermCheckResponse, error)
+	CheckReservationRequirementsHost(ctx context.Context, in *ReservationRequirementsHostRequest, opts ...grpc.CallOption) (*ReservationRequirementsHostResponse, error)
 }
 
 type reservationServiceClient struct {
@@ -200,6 +202,15 @@ func (c *reservationServiceClient) TermCheck(ctx context.Context, in *TermCheckR
 	return out, nil
 }
 
+func (c *reservationServiceClient) CheckReservationRequirementsHost(ctx context.Context, in *ReservationRequirementsHostRequest, opts ...grpc.CallOption) (*ReservationRequirementsHostResponse, error) {
+	out := new(ReservationRequirementsHostResponse)
+	err := c.cc.Invoke(ctx, ReservationService_CheckReservationRequirementsHost_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReservationServiceServer is the server API for ReservationService service.
 // All implementations must embed UnimplementedReservationServiceServer
 // for forward compatibility
@@ -219,6 +230,7 @@ type ReservationServiceServer interface {
 	GetAllFuture(context.Context, *GetAllFutureRequest) (*GetAllFutureResponse, error)
 	DeleteReservationRequestGuest(context.Context, *DeleteReservationRequest) (*DeleteReservationResponse, error)
 	TermCheck(context.Context, *TermCheckRequest) (*TermCheckResponse, error)
+	CheckReservationRequirementsHost(context.Context, *ReservationRequirementsHostRequest) (*ReservationRequirementsHostResponse, error)
 	mustEmbedUnimplementedReservationServiceServer()
 }
 
@@ -270,6 +282,9 @@ func (UnimplementedReservationServiceServer) DeleteReservationRequestGuest(conte
 }
 func (UnimplementedReservationServiceServer) TermCheck(context.Context, *TermCheckRequest) (*TermCheckResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TermCheck not implemented")
+}
+func (UnimplementedReservationServiceServer) CheckReservationRequirementsHost(context.Context, *ReservationRequirementsHostRequest) (*ReservationRequirementsHostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckReservationRequirementsHost not implemented")
 }
 func (UnimplementedReservationServiceServer) mustEmbedUnimplementedReservationServiceServer() {}
 
@@ -554,6 +569,24 @@ func _ReservationService_TermCheck_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReservationService_CheckReservationRequirementsHost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReservationRequirementsHostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReservationServiceServer).CheckReservationRequirementsHost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReservationService_CheckReservationRequirementsHost_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReservationServiceServer).CheckReservationRequirementsHost(ctx, req.(*ReservationRequirementsHostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReservationService_ServiceDesc is the grpc.ServiceDesc for ReservationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -620,6 +653,10 @@ var ReservationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TermCheck",
 			Handler:    _ReservationService_TermCheck_Handler,
+		},
+		{
+			MethodName: "CheckReservationRequirementsHost",
+			Handler:    _ReservationService_CheckReservationRequirementsHost_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

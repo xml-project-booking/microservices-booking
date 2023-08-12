@@ -2,11 +2,13 @@ package api
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/tamararankovic/microservices_demo/api_gateway/domain"
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/services"
 	accommodationGw "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
+	ratingGw "github.com/tamararankovic/microservices_demo/common/proto/rating_service"
 	reservationGw "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	userGw "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	//"log"
@@ -17,13 +19,15 @@ type UserHandler struct {
 	UserAddress          string
 	ReservationAddress   string
 	AccommodationAddress string
+	RatingAddress        string
 }
 
-func NewUserHandler(userAddress string, reservationAddress string, accommodationAddress string) Handler {
+func NewUserHandler(userAddress string, reservationAddress string, accommodationAddress, ratingAddress string) Handler {
 	return &UserHandler{
 		UserAddress:          userAddress,
 		ReservationAddress:   reservationAddress,
 		AccommodationAddress: accommodationAddress,
+		RatingAddress:        ratingAddress,
 	}
 }
 func (handler *UserHandler) Init(mux *runtime.ServeMux) {
@@ -31,7 +35,37 @@ func (handler *UserHandler) Init(mux *runtime.ServeMux) {
 	if err != nil {
 		panic(err)
 	}
+	err = mux.HandlePath("GET", "/users/prominent-host/{id}", handler.ProminentHost)
 }
+func (handler *UserHandler) ProminentHost(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	hostId := pathParams["id"]
+	reservationClient := services.NewReservationClient(handler.ReservationAddress)
+	ratingClient := services.NewRatingClient(handler.RatingAddress)
+	averageHostRating, err := ratingClient.GetAverageHostRating(context.TODO(), &ratingGw.AverageHostRequest{Id: hostId})
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	checkHost, err := reservationClient.CheckReservationRequirementsHost(context.TODO(), &reservationGw.ReservationRequirementsHostRequest{HostId: hostId})
+	if averageHostRating.Average >= 4.7 {
+		if checkHost.IsPossible {
+			response, err := json.Marshal(true)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.Write(response)
+		}
+	} else {
+		response, err := json.Marshal(false)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Write(response)
+	}
+}
+
 func (handler *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
 	id := pathParams["id"]
 	if id == "" {

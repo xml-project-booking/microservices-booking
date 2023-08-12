@@ -20,6 +20,11 @@ type ReservationMongoDBStore struct {
 	reservations *mongo.Collection
 }
 
+func (store *ReservationMongoDBStore) GetReservationsByHost(hostId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"host_id": hostId, "reservation_status": "CONFIRMED"}
+	return store.filter(filter)
+}
+
 func (store *ReservationMongoDBStore) GetGuestAccommodationReservation(accommodationId, guestId primitive.ObjectID) ([]*domain.Reservation, error) {
 	filter := bson.M{"accommodation_id": accommodationId, "reservation_status": "CONFIRMED", "guest_id": guestId}
 	return store.filter(filter)
@@ -27,6 +32,10 @@ func (store *ReservationMongoDBStore) GetGuestAccommodationReservation(accommoda
 
 func (store *ReservationMongoDBStore) GetGuestAccommodationHostReservation(hostId, guestId primitive.ObjectID) ([]*domain.Reservation, error) {
 	filter := bson.M{"host_id": hostId, "reservation_status": "CONFIRMED", "guest_id": guestId}
+	return store.filter(filter)
+}
+func (store *ReservationMongoDBStore) GetReservationCancelByHost(hostId primitive.ObjectID) ([]*domain.Reservation, error) {
+	filter := bson.M{"host_id": hostId, "reservation_status": "CANCELED", "confirmation": false}
 	return store.filter(filter)
 }
 
@@ -109,7 +118,7 @@ func (store *ReservationMongoDBStore) UpdateStatusForCanceled(reservation *domai
 		},
 	)
 	if err != nil {
-		fmt.Println("ovoo mozdaa")
+
 		return err
 	}
 	if result.MatchedCount != 1 {

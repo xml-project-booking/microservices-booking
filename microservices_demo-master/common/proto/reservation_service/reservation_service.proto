@@ -92,6 +92,19 @@ service ReservationService{
 
     };
   }
+  rpc CheckReservationRequirementsHost(ReservationRequirementsHostRequest) returns (ReservationRequirementsHostResponse){
+    option (google.api.http) = {
+      get: "/reservations/host-req"
+      
+
+    };
+  }
+}
+message ReservationRequirementsHostRequest{
+  string hostId = 1;
+}
+message ReservationRequirementsHostResponse{
+  bool isPossible = 1;
 }
 message TermCheckRequest{
   string id = 1;

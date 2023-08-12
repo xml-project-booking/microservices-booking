@@ -82,13 +82,14 @@ func (server *Server) initCustomHandlers() {
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	accommodationEndpoint := fmt.Sprintf("%s:%s", server.config.AccommodationHost, server.config.AccommodationPort)
 	termEndpoint := fmt.Sprintf("%s:%s", server.config.TermHost, server.config.TermPort)
+	ratingEndpoint := fmt.Sprintf("%s:%s", server.config.RatingHost, server.config.RatingPort)
 	reservationHandler := api.NewReservationHandler(reservationEndpoint, userEndpoint, accommodationEndpoint, termEndpoint)
 	orderingHandler := api.NewOrderingHandler(orderingEmdpoint, catalogueEmdpoint, shippingEmdpoint)
 	orderingHandler.Init(server.mux)
 	reservationHandler.Init(server.mux)
 
 	//delete-user
-	userHandler := api.NewUserHandler(userEndpoint, reservationEndpoint, accommodationEndpoint)
+	userHandler := api.NewUserHandler(userEndpoint, reservationEndpoint, accommodationEndpoint, ratingEndpoint)
 	userHandler.Init(server.mux)
 }
 

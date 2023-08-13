@@ -82,6 +82,5 @@ type Accommodation struct {
 	Kitchen                 bool
 	AirConditioning         bool
 	FreeParking             bool
-	Photos                  []string
 	AverageRating           float64
 }

@@ -71,7 +71,19 @@ service UserService{
       get: "/users/cancellation/{id}"
     };
   }
+  rpc UpdateProminentStatus(UpdateProminentStatusRequest) returns(UpdateProminentStatusResponse) {
+    option (google.api.http) = {
+      get: "/users/prominent/{id}/{status}"
+    };
+  }
 
+}
+message UpdateProminentStatusRequest{
+  string id = 1;
+  bool status =2;
+}
+message UpdateProminentStatusResponse{
+  string created = 1;
 }
 message GetProminentHostRequest{
 

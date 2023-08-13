@@ -21,6 +21,23 @@ type UserMongoDBStore struct {
 	users *mongo.Collection
 }
 
+func (store *UserMongoDBStore) UpdateHostProminentStatus(hostId primitive.ObjectID, status bool) error {
+	result, err := store.users.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": hostId},
+		bson.D{
+			{"$set", bson.D{{"is_prominent", status}}},
+		},
+	)
+	if err != nil {
+		return err
+	}
+	if result.MatchedCount != 1 {
+		return errors.New("one document should've been updated")
+	}
+	return nil
+}
+
 func (store *UserMongoDBStore) GetProminentHosts() ([]*domain.User, error) {
 	filter := bson.M{"is_prominent": true}
 	return store.filter(filter)

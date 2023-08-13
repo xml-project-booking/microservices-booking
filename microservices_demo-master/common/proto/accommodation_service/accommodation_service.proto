@@ -55,7 +55,8 @@ service AccommodationService{
   }
   rpc FilterAccommodation(FilterAccommodationRequest) returns (FilterAccommodationResponse){
     option (google.api.http) = {
-      get: "/accommodations/filter"
+      post: "/accommodations/filter"
+      body:"*"
 
 
     };

@@ -21,7 +21,7 @@ func (service *AccommodationService) CheckAccommodationForAmenities(amenities []
 			filteredAccommodations = append(filteredAccommodations, Accommodation)
 		}
 	}
-	git return filteredAccommodations, nil
+	return filteredAccommodations, nil
 
 }
 func (service *AccommodationService) UpdateReservationConfirmationType(accommodation *domain.Accommodation) error {

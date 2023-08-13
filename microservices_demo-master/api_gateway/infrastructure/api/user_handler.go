@@ -41,6 +41,7 @@ func (handler *UserHandler) ProminentHost(w http.ResponseWriter, r *http.Request
 	hostId := pathParams["id"]
 	reservationClient := services.NewReservationClient(handler.ReservationAddress)
 	ratingClient := services.NewRatingClient(handler.RatingAddress)
+	userClient := services.NewUserClient(handler.UserAddress)
 	averageHostRating, err := ratingClient.GetAverageHostRating(context.TODO(), &ratingGw.AverageHostRequest{Id: hostId})
 
 	if err != nil {
@@ -49,7 +50,16 @@ func (handler *UserHandler) ProminentHost(w http.ResponseWriter, r *http.Request
 	checkHost, err := reservationClient.CheckReservationRequirementsHost(context.TODO(), &reservationGw.ReservationRequirementsHostRequest{HostId: hostId})
 	if averageHostRating.Average >= 4.7 {
 		if checkHost.IsPossible {
+			_, err = userClient.UpdateProminentStatus(context.TODO(), &userGw.UpdateProminentStatusRequest{Id: hostId, Status: true})
 			response, err := json.Marshal(true)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.Write(response)
+		} else {
+			_, err = userClient.UpdateProminentStatus(context.TODO(), &userGw.UpdateProminentStatusRequest{Id: hostId, Status: false})
+			response, err := json.Marshal(false)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
@@ -57,6 +67,7 @@ func (handler *UserHandler) ProminentHost(w http.ResponseWriter, r *http.Request
 			w.Write(response)
 		}
 	} else {
+		_, err = userClient.UpdateProminentStatus(context.TODO(), &userGw.UpdateProminentStatusRequest{Id: hostId, Status: false})
 		response, err := json.Marshal(false)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

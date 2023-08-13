@@ -1,6 +1,6 @@
 module github.com/tamararankovic/microservices_demo/api_gateway
 
-go 1.17
+go 1.18
 
 replace github.com/tamararankovic/microservices_demo/common => ../common
 

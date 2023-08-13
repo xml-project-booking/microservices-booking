@@ -28,6 +28,21 @@ func NewUserHandler(service *application.UserService, serviceAuth *application.A
 		serviceAuth: serviceAuth,
 	}
 }
+func (handler *UserHandler) UpdateProminentStatus(ctx context.Context, request *pb.UpdateProminentStatusRequest) (*pb.UpdateProminentStatusResponse, error) {
+	hostId := request.Id
+	status := request.Status
+	objectId, err := primitive.ObjectIDFromHex(hostId)
+	if err != nil {
+		return nil, err
+	}
+	err = handler.service.UpdateProminentStatusHost(objectId, status)
+	response := &pb.UpdateProminentStatusResponse{Created: "update done"}
+	if err != nil {
+		return &pb.UpdateProminentStatusResponse{Created: "nije kreirano"}, err
+	}
+	return response, nil
+
+}
 func (handler *UserHandler) GetProminentHosts(ctx context.Context, request *pb.GetProminentHostRequest) (*pb.GetProminentHostResponse, error) {
 	Hosts, err := handler.service.GetProminentHosts()
 	if err != nil {

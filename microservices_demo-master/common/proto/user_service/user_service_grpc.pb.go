@@ -30,6 +30,7 @@ const (
 	UserService_Delete_FullMethodName                   = "/users.UserService/Delete"
 	UserService_GetProminentHosts_FullMethodName        = "/users.UserService/GetProminentHosts"
 	UserService_UpdateCancellationNumber_FullMethodName = "/users.UserService/UpdateCancellationNumber"
+	UserService_UpdateProminentStatus_FullMethodName    = "/users.UserService/UpdateProminentStatus"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -47,6 +48,7 @@ type UserServiceClient interface {
 	Delete(ctx context.Context, in *DeleteRequest, opts ...grpc.CallOption) (*DeleteResponse, error)
 	GetProminentHosts(ctx context.Context, in *GetProminentHostRequest, opts ...grpc.CallOption) (*GetProminentHostResponse, error)
 	UpdateCancellationNumber(ctx context.Context, in *UpdateCancellationNumberRequest, opts ...grpc.CallOption) (*UpdateCancellationNumberResponse, error)
+	UpdateProminentStatus(ctx context.Context, in *UpdateProminentStatusRequest, opts ...grpc.CallOption) (*UpdateProminentStatusResponse, error)
 }
 
 type userServiceClient struct {
@@ -156,6 +158,15 @@ func (c *userServiceClient) UpdateCancellationNumber(ctx context.Context, in *Up
 	return out, nil
 }
 
+func (c *userServiceClient) UpdateProminentStatus(ctx context.Context, in *UpdateProminentStatusRequest, opts ...grpc.CallOption) (*UpdateProminentStatusResponse, error) {
+	out := new(UpdateProminentStatusResponse)
+	err := c.cc.Invoke(ctx, UserService_UpdateProminentStatus_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -171,6 +182,7 @@ type UserServiceServer interface {
 	Delete(context.Context, *DeleteRequest) (*DeleteResponse, error)
 	GetProminentHosts(context.Context, *GetProminentHostRequest) (*GetProminentHostResponse, error)
 	UpdateCancellationNumber(context.Context, *UpdateCancellationNumberRequest) (*UpdateCancellationNumberResponse, error)
+	UpdateProminentStatus(context.Context, *UpdateProminentStatusRequest) (*UpdateProminentStatusResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -210,6 +222,9 @@ func (UnimplementedUserServiceServer) GetProminentHosts(context.Context, *GetPro
 }
 func (UnimplementedUserServiceServer) UpdateCancellationNumber(context.Context, *UpdateCancellationNumberRequest) (*UpdateCancellationNumberResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCancellationNumber not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateProminentStatus(context.Context, *UpdateProminentStatusRequest) (*UpdateProminentStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProminentStatus not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -422,6 +437,24 @@ func _UserService_UpdateCancellationNumber_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UpdateProminentStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProminentStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateProminentStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserService_UpdateProminentStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateProminentStatus(ctx, req.(*UpdateProminentStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -472,6 +505,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateCancellationNumber",
 			Handler:    _UserService_UpdateCancellationNumber_Handler,
+		},
+		{
+			MethodName: "UpdateProminentStatus",
+			Handler:    _UserService_UpdateProminentStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

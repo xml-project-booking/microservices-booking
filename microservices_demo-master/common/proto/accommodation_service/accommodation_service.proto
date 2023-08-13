@@ -64,6 +64,7 @@ service AccommodationService{
 }
 message FilterAccommodationRequest{
   repeated bool amenities = 1;
+  repeated Accommodation accommodations = 2;
 }
 message FilterAccommodationResponse{
   repeated Accommodation accommodations = 1;

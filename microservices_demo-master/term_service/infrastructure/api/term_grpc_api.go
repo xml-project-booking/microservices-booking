@@ -34,6 +34,17 @@ func (handler *TermHandler) GetAllAccommodationIdsInPriceRange(ctx context.Conte
 	for _, term := range terms {
 		response.AccommodationIds = append(response.AccommodationIds, term.AccommodationID.Hex())
 	}
+
+	/*seen := make(map[string]bool)
+	result := []string{}
+
+	for _, val := range response.AccommodationIds {
+		if !seen[val] {
+			seen[val] = true
+			result = append(result, val)
+		}
+	}*/
+
 	return response, nil
 }
 func (handler *TermHandler) Update(ctx context.Context, request *pb.UpdateRequest) (*pb.UpdateResponse, error) {

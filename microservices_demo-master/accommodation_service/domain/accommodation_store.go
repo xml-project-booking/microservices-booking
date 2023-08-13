@@ -10,5 +10,5 @@ type AccommodationStore interface {
 	DeleteAll()
 	UpdateStatus(user *Accommodation) error
 	DeleteAccommodation(id primitive.ObjectID) error
-	FilterAccommodationsByAmenities(amenities []bool) ([]*Accommodation, error)
+	FilterAccommodationsByAmenities(amenities []bool, accommodations []*Accommodation) ([]*Accommodation, error)
 }

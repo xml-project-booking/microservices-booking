@@ -14,8 +14,14 @@ func NewAccommodationService(store domain.AccommodationStore) *AccommodationServ
 		store: store,
 	}
 }
-func (service *AccommodationService) CheckAccommodationForAmenities(amenities []bool) ([]*domain.Accommodation, error) {
-	return service.store.FilterAccommodationsByAmenities(amenities)
+func (service *AccommodationService) CheckAccommodationForAmenities(amenities []bool, accommodations []*domain.Accommodation) ([]*domain.Accommodation, error) {
+	var filteredAccommodations []*domain.Accommodation
+	for _, Accommodation := range accommodations {
+		if Accommodation.Wifi == amenities[0] && Accommodation.Kitchen == amenities[1] && Accommodation.AirConditioning == amenities[2] && Accommodation.FreeParking == amenities[3] {
+			filteredAccommodations = append(filteredAccommodations, Accommodation)
+		}
+	}
+	git return filteredAccommodations, nil
 
 }
 func (service *AccommodationService) UpdateReservationConfirmationType(accommodation *domain.Accommodation) error {

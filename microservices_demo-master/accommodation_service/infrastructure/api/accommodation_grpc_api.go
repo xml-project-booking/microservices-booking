@@ -25,7 +25,14 @@ func NewAccommodationHandler(service *application.AccommodationService) *Accommo
 }
 func (handler *AccommodationHandler) FilterAccommodation(ctx context.Context, request *pb.FilterAccommodationRequest) (*pb.FilterAccommodationResponse, error) {
 	amenities := request.Amenities
-	accommodations, err := handler.service.CheckAccommodationForAmenities(amenities)
+	accommodationsPb := request.Accommodations
+	var accommodationsToFilter []*domain.Accommodation
+	for _, Accommodation := range accommodationsPb {
+		accommodationDomain := mapAccommodationPb(Accommodation)
+		accommodationsToFilter = append(accommodationsToFilter, accommodationDomain)
+
+	}
+	accommodations, err := handler.service.CheckAccommodationForAmenities(amenities, accommodationsToFilter)
 	if err != nil {
 		return nil, err
 	}

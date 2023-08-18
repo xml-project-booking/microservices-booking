@@ -25,6 +25,18 @@ type ReservationHandler struct {
 	LogError *logrus.Logger
 }
 
+func (handler ReservationHandler) GetAccommodationsReservedInTimePeriod(ctx context.Context, request *pb.GetAccTimePeriodRequest) (*pb.GetAccTimePeriodResponse, error) {
+	layout := "2006-01-02T15:04:05.000Z"
+	startDate, _ := time.Parse(layout, request.StartDate)
+	endDate, _ := time.Parse(layout, request.EndDate)
+	reservations := handler.service.GetAllReservationsSearch(startDate, endDate)
+	var accommodationsIds []string
+	for _, Reservation := range reservations {
+		accommodationsIds = append(accommodationsIds, Reservation.AccommodationID.Hex())
+	}
+	response := &pb.GetAccTimePeriodResponse{AccommodationIds: accommodationsIds}
+	return response, nil
+}
 func (handler *ReservationHandler) CheckReservationRequirementsHost(ctx context.Context, request *pb.ReservationRequirementsHostRequest) (*pb.ReservationRequirementsHostResponse, error) {
 	hostId := request.HostId
 	objectId, err := primitive.ObjectIDFromHex(hostId)

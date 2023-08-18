@@ -30,6 +30,10 @@ func (handler *AccommodationHandler) Init(mux *runtime.ServeMux) {
 	if err != nil {
 		panic(err)
 	}
+	err = mux.HandlePath("POST", "/search-accommodations", handler.SearchAccommodations)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func NewAccommodationHandler(reservationClientAddress, userClientAddress, accommodationAddress, termAddress string) Handler {
@@ -113,4 +117,8 @@ func (handler *AccommodationHandler) GetAccommodationsByProminentHost(w http.Res
 
 }
 
-func (handler *AccommodationHandler) GetAccommodationsByAmenities() {}
+func (handler *AccommodationHandler) SearchAccommodations(w http.ResponseWriter, request *http.Request, params map[string]string) {
+	accommodationClient := services.NewAccommodationClient(handler.accommodationAddress)
+	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+
+}

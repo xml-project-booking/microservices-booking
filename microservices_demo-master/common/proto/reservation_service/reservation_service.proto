@@ -99,6 +99,21 @@ service ReservationService{
 
     };
   }
+
+  rpc GetAccommodationsReservedInTimePeriod(GetAccTimePeriodRequest) returns (GetAccTimePeriodResponse){
+    option (google.api.http) = {
+      get: "/reservations/reservation-period"
+
+
+    };
+  }
+}
+message GetAccTimePeriodRequest{
+  string startDate = 1;
+  string endDate = 2;
+}
+message GetAccTimePeriodResponse{
+  repeated string accommodationIds = 1;
 }
 message ReservationRequirementsHostRequest{
   string hostId = 1;

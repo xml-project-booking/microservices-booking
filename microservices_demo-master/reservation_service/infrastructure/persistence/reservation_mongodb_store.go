@@ -140,11 +140,11 @@ func (store *ReservationMongoDBStore) Get(id primitive.ObjectID) (*domain.Reserv
 }
 
 func (store *ReservationMongoDBStore) GetAllReservationRequests() ([]*domain.Reservation, error) {
-	filter := bson.M{"confirmation": false}
+	filter := bson.M{"reservation_status": "PENDING"}
 	return store.filter(filter)
 }
 func (store *ReservationMongoDBStore) GetAllReservation() ([]*domain.Reservation, error) {
-	filter := bson.M{"confirmation": true}
+	filter := bson.M{"reservation_status": "CONFIRMED"}
 	return store.filter(filter)
 }
 

@@ -61,7 +61,23 @@ service AccommodationService{
 
     };
   }
+  rpc SearchAccommodationsByLocation(SearchAccommodationRequest) returns (SearchAccommodationResponse){
+    option (google.api.http) = {
+      post: "/accommodations/search"
+      body:"*"
 
+
+    };
+  }
+
+}
+message SearchAccommodationRequest{
+  string location = 1;
+  repeated Accommodation accommodations = 2;
+
+}
+message SearchAccommodationResponse{
+  repeated Accommodation accommodations = 1;
 }
 message FilterAccommodationRequest{
   repeated bool amenities = 1;

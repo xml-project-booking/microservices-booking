@@ -28,6 +28,7 @@ const (
 	AccommodationService_DeleteAllByHost_FullMethodName                    = "/accommodations.AccommodationService/DeleteAllByHost"
 	AccommodationService_GetAccommodation_FullMethodName                   = "/accommodations.AccommodationService/GetAccommodation"
 	AccommodationService_FilterAccommodation_FullMethodName                = "/accommodations.AccommodationService/FilterAccommodation"
+	AccommodationService_SearchAccommodationsByLocation_FullMethodName     = "/accommodations.AccommodationService/SearchAccommodationsByLocation"
 )
 
 // AccommodationServiceClient is the client API for AccommodationService service.
@@ -43,6 +44,7 @@ type AccommodationServiceClient interface {
 	DeleteAllByHost(ctx context.Context, in *DeleteAllByHostRequest, opts ...grpc.CallOption) (*DeleteAllByHostResponse, error)
 	GetAccommodation(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetAccommodationResponse, error)
 	FilterAccommodation(ctx context.Context, in *FilterAccommodationRequest, opts ...grpc.CallOption) (*FilterAccommodationResponse, error)
+	SearchAccommodationsByLocation(ctx context.Context, in *SearchAccommodationRequest, opts ...grpc.CallOption) (*SearchAccommodationResponse, error)
 }
 
 type accommodationServiceClient struct {
@@ -134,6 +136,15 @@ func (c *accommodationServiceClient) FilterAccommodation(ctx context.Context, in
 	return out, nil
 }
 
+func (c *accommodationServiceClient) SearchAccommodationsByLocation(ctx context.Context, in *SearchAccommodationRequest, opts ...grpc.CallOption) (*SearchAccommodationResponse, error) {
+	out := new(SearchAccommodationResponse)
+	err := c.cc.Invoke(ctx, AccommodationService_SearchAccommodationsByLocation_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AccommodationServiceServer is the server API for AccommodationService service.
 // All implementations must embed UnimplementedAccommodationServiceServer
 // for forward compatibility
@@ -147,6 +158,7 @@ type AccommodationServiceServer interface {
 	DeleteAllByHost(context.Context, *DeleteAllByHostRequest) (*DeleteAllByHostResponse, error)
 	GetAccommodation(context.Context, *GetRequest) (*GetAccommodationResponse, error)
 	FilterAccommodation(context.Context, *FilterAccommodationRequest) (*FilterAccommodationResponse, error)
+	SearchAccommodationsByLocation(context.Context, *SearchAccommodationRequest) (*SearchAccommodationResponse, error)
 	mustEmbedUnimplementedAccommodationServiceServer()
 }
 
@@ -180,6 +192,9 @@ func (UnimplementedAccommodationServiceServer) GetAccommodation(context.Context,
 }
 func (UnimplementedAccommodationServiceServer) FilterAccommodation(context.Context, *FilterAccommodationRequest) (*FilterAccommodationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FilterAccommodation not implemented")
+}
+func (UnimplementedAccommodationServiceServer) SearchAccommodationsByLocation(context.Context, *SearchAccommodationRequest) (*SearchAccommodationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchAccommodationsByLocation not implemented")
 }
 func (UnimplementedAccommodationServiceServer) mustEmbedUnimplementedAccommodationServiceServer() {}
 
@@ -356,6 +371,24 @@ func _AccommodationService_FilterAccommodation_Handler(srv interface{}, ctx cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AccommodationService_SearchAccommodationsByLocation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchAccommodationRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccommodationServiceServer).SearchAccommodationsByLocation(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccommodationService_SearchAccommodationsByLocation_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccommodationServiceServer).SearchAccommodationsByLocation(ctx, req.(*SearchAccommodationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AccommodationService_ServiceDesc is the grpc.ServiceDesc for AccommodationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -398,6 +431,10 @@ var AccommodationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FilterAccommodation",
 			Handler:    _AccommodationService_FilterAccommodation_Handler,
+		},
+		{
+			MethodName: "SearchAccommodationsByLocation",
+			Handler:    _AccommodationService_SearchAccommodationsByLocation_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

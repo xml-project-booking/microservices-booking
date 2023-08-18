@@ -84,3 +84,10 @@ type Accommodation struct {
 	FreeParking             bool
 	AverageRating           float64
 }
+
+type SearchDTO struct {
+	StartDate   string
+	EndDate     string
+	Location    string
+	GuestNumber int
+}

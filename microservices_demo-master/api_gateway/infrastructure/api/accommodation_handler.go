@@ -7,11 +7,14 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/tamararankovic/microservices_demo/api_gateway/domain"
 	"github.com/tamararankovic/microservices_demo/api_gateway/infrastructure/services"
+	accommodations "github.com/tamararankovic/microservices_demo/common/proto/accommodation_service"
+	reservations "github.com/tamararankovic/microservices_demo/common/proto/reservation_service"
 	terms "github.com/tamararankovic/microservices_demo/common/proto/term_service"
 	users "github.com/tamararankovic/microservices_demo/common/proto/user_service"
 	"golang.org/x/exp/slices"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type AccommodationHandler struct {
@@ -120,5 +123,42 @@ func (handler *AccommodationHandler) GetAccommodationsByProminentHost(w http.Res
 func (handler *AccommodationHandler) SearchAccommodations(w http.ResponseWriter, request *http.Request, params map[string]string) {
 	accommodationClient := services.NewAccommodationClient(handler.accommodationAddress)
 	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	decoder := json.NewDecoder(request.Body)
+	var t domain.SearchDTO
+	err := decoder.Decode(&t)
+	fmt.Println(t)
+	if err != nil {
+		panic(err)
+
+	}
+	response, err := reservationClient.GetAccommodationsReservedInTimePeriod(context.TODO(), &reservations.GetAccTimePeriodRequest{
+		StartDate: t.StartDate, EndDate: t.EndDate,
+	})
+	if err != nil {
+		panic(err)
+	}
+	allAccommodations, err := accommodationClient.GetAll(context.TODO(), &accommodations.GetAllRequest{})
+	searchAccommodations := make([]domain.Accommodation, 0)
+	for _, Accommodation := range allAccommodations.Accommodations {
+		contains := slices.Contains(response.AccommodationIds, Accommodation.Id)
+		if !contains {
+			accommodationToAdd := domain.Accommodation{Name: Accommodation.Name, Street: Accommodation.Street, City: Accommodation.City,
+				Wifi: Accommodation.Wifi, Kitchen: Accommodation.Kitchen, AirConditioning: Accommodation.AirConditioning, MinGuest: int(Accommodation.MinGuest),
+				MaxGuest: int(Accommodation.MaxGuest), FreeParking: Accommodation.FreeParking, Country: Accommodation.Country}
+			searchAccommodations = append(searchAccommodations, accommodationToAdd)
+		}
+	}
+
+}
+func (handler *AccommodationHandler) SearchAccommodationsByLocationAndGuestNumber(accommodationsList []domain.Accommodation, location string, guestNumber int) []domain.Accommodation {
+	var filteredList []domain.Accommodation
+	for _, Accommodation := range accommodationsList {
+		result := strings.Contains(strings.ToLower(Accommodation.Country), strings.ToLower(location))
+		resultOne := strings.Contains(strings.ToLower(Accommodation.City), strings.ToLower(location))
+		if (result || resultOne) && (guestNumber >= Accommodation.MinGuest && guestNumber <= Accommodation.MaxGuest) {
+			filteredList = append(filteredList, Accommodation)
+		}
+	}
+	return filteredList
 
 }

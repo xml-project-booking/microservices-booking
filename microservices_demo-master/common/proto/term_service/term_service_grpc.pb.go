@@ -29,6 +29,8 @@ const (
 	TermService_GetByAccommodationId_FullMethodName               = "/terms.TermService/GetByAccommodationId"
 	TermService_GetAvailableAccommodationsInPeriod_FullMethodName = "/terms.TermService/GetAvailableAccommodationsInPeriod"
 	TermService_GetAllAccommodationIdsInPriceRange_FullMethodName = "/terms.TermService/GetAllAccommodationIdsInPriceRange"
+	TermService_GetAllAccommodationIdsInTimePeriod_FullMethodName = "/terms.TermService/GetAllAccommodationIdsInTimePeriod"
+	TermService_GetTermInfoByAccommodationId_FullMethodName       = "/terms.TermService/GetTermInfoByAccommodationId"
 )
 
 // TermServiceClient is the client API for TermService service.
@@ -45,6 +47,8 @@ type TermServiceClient interface {
 	GetByAccommodationId(ctx context.Context, in *GetByAccommodationIdRequest, opts ...grpc.CallOption) (*GetByAccommodationIdResponse, error)
 	GetAvailableAccommodationsInPeriod(ctx context.Context, in *GetAvailableAccommodationsInPeriodRequest, opts ...grpc.CallOption) (*GetAvailableAccommodationsInPeriodResponse, error)
 	GetAllAccommodationIdsInPriceRange(ctx context.Context, in *PriceRangeRequest, opts ...grpc.CallOption) (*PriceRangeResponse, error)
+	GetAllAccommodationIdsInTimePeriod(ctx context.Context, in *TimePeriodRequest, opts ...grpc.CallOption) (*TimePeriodResponse, error)
+	GetTermInfoByAccommodationId(ctx context.Context, in *TermInfoRequest, opts ...grpc.CallOption) (*TermInfoResponse, error)
 }
 
 type termServiceClient struct {
@@ -145,6 +149,24 @@ func (c *termServiceClient) GetAllAccommodationIdsInPriceRange(ctx context.Conte
 	return out, nil
 }
 
+func (c *termServiceClient) GetAllAccommodationIdsInTimePeriod(ctx context.Context, in *TimePeriodRequest, opts ...grpc.CallOption) (*TimePeriodResponse, error) {
+	out := new(TimePeriodResponse)
+	err := c.cc.Invoke(ctx, TermService_GetAllAccommodationIdsInTimePeriod_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *termServiceClient) GetTermInfoByAccommodationId(ctx context.Context, in *TermInfoRequest, opts ...grpc.CallOption) (*TermInfoResponse, error) {
+	out := new(TermInfoResponse)
+	err := c.cc.Invoke(ctx, TermService_GetTermInfoByAccommodationId_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // TermServiceServer is the server API for TermService service.
 // All implementations must embed UnimplementedTermServiceServer
 // for forward compatibility
@@ -159,6 +181,8 @@ type TermServiceServer interface {
 	GetByAccommodationId(context.Context, *GetByAccommodationIdRequest) (*GetByAccommodationIdResponse, error)
 	GetAvailableAccommodationsInPeriod(context.Context, *GetAvailableAccommodationsInPeriodRequest) (*GetAvailableAccommodationsInPeriodResponse, error)
 	GetAllAccommodationIdsInPriceRange(context.Context, *PriceRangeRequest) (*PriceRangeResponse, error)
+	GetAllAccommodationIdsInTimePeriod(context.Context, *TimePeriodRequest) (*TimePeriodResponse, error)
+	GetTermInfoByAccommodationId(context.Context, *TermInfoRequest) (*TermInfoResponse, error)
 	mustEmbedUnimplementedTermServiceServer()
 }
 
@@ -195,6 +219,12 @@ func (UnimplementedTermServiceServer) GetAvailableAccommodationsInPeriod(context
 }
 func (UnimplementedTermServiceServer) GetAllAccommodationIdsInPriceRange(context.Context, *PriceRangeRequest) (*PriceRangeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllAccommodationIdsInPriceRange not implemented")
+}
+func (UnimplementedTermServiceServer) GetAllAccommodationIdsInTimePeriod(context.Context, *TimePeriodRequest) (*TimePeriodResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAllAccommodationIdsInTimePeriod not implemented")
+}
+func (UnimplementedTermServiceServer) GetTermInfoByAccommodationId(context.Context, *TermInfoRequest) (*TermInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTermInfoByAccommodationId not implemented")
 }
 func (UnimplementedTermServiceServer) mustEmbedUnimplementedTermServiceServer() {}
 
@@ -389,6 +419,42 @@ func _TermService_GetAllAccommodationIdsInPriceRange_Handler(srv interface{}, ct
 	return interceptor(ctx, in, info, handler)
 }
 
+func _TermService_GetAllAccommodationIdsInTimePeriod_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TimePeriodRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TermServiceServer).GetAllAccommodationIdsInTimePeriod(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TermService_GetAllAccommodationIdsInTimePeriod_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TermServiceServer).GetAllAccommodationIdsInTimePeriod(ctx, req.(*TimePeriodRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _TermService_GetTermInfoByAccommodationId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TermInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TermServiceServer).GetTermInfoByAccommodationId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: TermService_GetTermInfoByAccommodationId_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TermServiceServer).GetTermInfoByAccommodationId(ctx, req.(*TermInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // TermService_ServiceDesc is the grpc.ServiceDesc for TermService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -435,6 +501,14 @@ var TermService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllAccommodationIdsInPriceRange",
 			Handler:    _TermService_GetAllAccommodationIdsInPriceRange_Handler,
+		},
+		{
+			MethodName: "GetAllAccommodationIdsInTimePeriod",
+			Handler:    _TermService_GetAllAccommodationIdsInTimePeriod_Handler,
+		},
+		{
+			MethodName: "GetTermInfoByAccommodationId",
+			Handler:    _TermService_GetTermInfoByAccommodationId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

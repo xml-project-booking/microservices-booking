@@ -18,6 +18,11 @@ type TermMongoDBStore struct {
 	terms *mongo.Collection
 }
 
+func (store *TermMongoDBStore) GetByAccommodationIdOne(id primitive.ObjectID) (*domain.Term, error) {
+	filter := bson.M{"accommodationId": id}
+	return store.filterOne(filter)
+}
+
 func (store *TermMongoDBStore) GetTermsInPriceRange(minPrice, maxPrice int32) ([]*domain.Term, error) {
 	filter := bson.M{
 		"value": bson.M{

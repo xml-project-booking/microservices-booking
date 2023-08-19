@@ -83,6 +83,9 @@ type Accommodation struct {
 	AirConditioning         bool
 	FreeParking             bool
 	AverageRating           float64
+	Price                   int64
+	TotalPrice              int64
+	Type                    string
 }
 
 type SearchDTO struct {

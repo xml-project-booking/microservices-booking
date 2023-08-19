@@ -4,6 +4,8 @@ import (
 	"accommodation_service/application"
 	"accommodation_service/domain"
 	"context"
+	"fmt"
+
 	//"encoding/json"
 	//"fmt"
 
@@ -177,10 +179,12 @@ func (handler *AccommodationHandler) Get(ctx context.Context, request *pb.GetReq
 		return nil, err
 	}
 	Accommodation, err := handler.service.Get(objectId)
+	fmt.Println(Accommodation)
 	if err != nil {
 		return nil, err
 	}
 	AccommodationPb := mapAccommodation(Accommodation)
+	fmt.Println(AccommodationPb)
 	response := &pb.GetResponse{
 		Accommodation: AccommodationPb,
 	}

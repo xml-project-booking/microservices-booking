@@ -12,5 +12,6 @@ type TermStore interface {
 	DeleteAll()
 	Update(term *Term) error
 	GetByAccommodationId(id primitive.ObjectID) ([]*Term, error)
+	GetByAccommodationIdOne(id primitive.ObjectID) (*Term, error)
 	GetTermsInPriceRange(minPrice, maxPrice int32) ([]*Term, error)
 }

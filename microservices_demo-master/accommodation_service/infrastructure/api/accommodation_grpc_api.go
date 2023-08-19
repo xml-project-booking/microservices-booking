@@ -4,6 +4,8 @@ import (
 	"accommodation_service/application"
 	"accommodation_service/domain"
 	"context"
+	"fmt"
+
 	//"encoding/json"
 	//"fmt"
 
@@ -23,7 +25,45 @@ func NewAccommodationHandler(service *application.AccommodationService) *Accommo
 		service: service,
 	}
 }
+func (handler *AccommodationHandler) SearchAccommodationsByLocation(ctx context.Context, request *pb.SearchAccommodationRequest) (*pb.SearchAccommodationResponse, error) {
+	accommodationsPb := request.Accommodations
+	location := request.Location
+	var accommodationsToSearch []*domain.Accommodation
+	for _, Accommodation := range accommodationsPb {
+		accommodationDomain := mapAccommodationPb(Accommodation)
+		accommodationsToSearch = append(accommodationsToSearch, accommodationDomain)
 
+	}
+	accommodations := handler.service.SearchAccommodationsByLocation(accommodationsToSearch, location)
+	response := &pb.SearchAccommodationResponse{Accommodations: []*pb.Accommodation{}}
+	for _, Accommodation := range accommodations {
+		accommodationPb := mapAccommodation(Accommodation)
+		response.Accommodations = append(response.Accommodations, accommodationPb)
+
+	}
+	return response, nil
+}
+func (handler *AccommodationHandler) FilterAccommodation(ctx context.Context, request *pb.FilterAccommodationRequest) (*pb.FilterAccommodationResponse, error) {
+	amenities := request.Amenities
+	accommodationsPb := request.Accommodations
+	var accommodationsToFilter []*domain.Accommodation
+	for _, Accommodation := range accommodationsPb {
+		accommodationDomain := mapAccommodationPb(Accommodation)
+		accommodationsToFilter = append(accommodationsToFilter, accommodationDomain)
+
+	}
+	accommodations, err := handler.service.CheckAccommodationForAmenities(amenities, accommodationsToFilter)
+	if err != nil {
+		return nil, err
+	}
+	response := &pb.FilterAccommodationResponse{Accommodations: []*pb.Accommodation{}}
+	for _, Accommodation := range accommodations {
+		accommodationPb := mapAccommodation(Accommodation)
+		response.Accommodations = append(response.Accommodations, accommodationPb)
+
+	}
+	return response, nil
+}
 func (handler *AccommodationHandler) ChangeAccommodationReservationType(ctx context.Context, request *pb.ChangeReservationTypeRequest) (*pb.ChangeReservationTypeResponse, error) {
 	accommodationId := request.Id
 	objectId, err := primitive.ObjectIDFromHex(accommodationId)
@@ -139,10 +179,12 @@ func (handler *AccommodationHandler) Get(ctx context.Context, request *pb.GetReq
 		return nil, err
 	}
 	Accommodation, err := handler.service.Get(objectId)
+	fmt.Println(Accommodation)
 	if err != nil {
 		return nil, err
 	}
 	AccommodationPb := mapAccommodation(Accommodation)
+	fmt.Println(AccommodationPb)
 	response := &pb.GetResponse{
 		Accommodation: AccommodationPb,
 	}

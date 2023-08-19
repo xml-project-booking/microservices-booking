@@ -3,6 +3,7 @@ package application
 import (
 	"accommodation_service/domain"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"strings"
 )
 
 type AccommodationService struct {
@@ -14,7 +15,27 @@ func NewAccommodationService(store domain.AccommodationStore) *AccommodationServ
 		store: store,
 	}
 }
+func (service *AccommodationService) SearchAccommodationsByLocation(accommodations []*domain.Accommodation, location string) []*domain.Accommodation {
+	var filterAccommodations []*domain.Accommodation
+	for _, Accommodation := range accommodations {
+		result := strings.Contains(strings.ToLower(Accommodation.City), strings.ToLower(location))
+		resultOne := strings.Contains(strings.ToLower(Accommodation.Country), strings.ToLower(location))
+		if result || resultOne {
+			filterAccommodations = append(filterAccommodations, Accommodation)
+		}
+	}
+	return filterAccommodations
+}
+func (service *AccommodationService) CheckAccommodationForAmenities(amenities []bool, accommodations []*domain.Accommodation) ([]*domain.Accommodation, error) {
+	var filteredAccommodations []*domain.Accommodation
+	for _, Accommodation := range accommodations {
+		if Accommodation.Wifi == amenities[0] && Accommodation.Kitchen == amenities[1] && Accommodation.AirConditioning == amenities[2] && Accommodation.FreeParking == amenities[3] {
+			filteredAccommodations = append(filteredAccommodations, Accommodation)
+		}
+	}
+	return filteredAccommodations, nil
 
+}
 func (service *AccommodationService) UpdateReservationConfirmationType(accommodation *domain.Accommodation) error {
 	return service.store.UpdateReservationConfirmationType(accommodation)
 }
@@ -59,4 +80,3 @@ func (service *AccommodationService) DeleteAllAccommodationsByHost(id string) er
 	}
 	return nil
 }
-

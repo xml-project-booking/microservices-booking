@@ -65,13 +65,55 @@ service TermService {
       body: "*"
     };
   }
+  rpc GetAllAccommodationIdsInPriceRange(PriceRangeRequest) returns (PriceRangeResponse) {
+    option (google.api.http) = {
+      post: "/terms/price-range"
+      body:"*"
+    };
+  }
+  rpc GetAllAccommodationIdsInTimePeriod(TimePeriodRequest) returns (TimePeriodResponse) {
+    option (google.api.http) = {
+      post: "/terms/time-period"
+      body:"*"
+    };
+  }
+  rpc GetTermInfoByAccommodationId(TermInfoRequest) returns (TermInfoResponse) {
+    option (google.api.http) = {
+      post: "/terms/acc-id"
+      body:"*"
+    };
+  }
+
 
 }
+message TimePeriodRequest{
+  string startDate = 1;
+  string endDate = 2;
+}
+message TimePeriodResponse{
+  repeated string accommodationsIds = 1;
+}
+message TermInfoRequest{
+  string accommodationId = 1;
+}
+message TermInfoResponse{
+  int64 price =1;
+  string type = 2;
+  int64 fullPrice =3;
 
+}
+message PriceRangeRequest{
+  int32 minPrice = 1;
+  int32 maxPrice = 2;
+}
+message PriceRangeResponse{
+  repeated string accommodationIds = 1;
+}
 message GetAvailableAccommodationsInPeriodRequest {
   string StartDate = 1;
   string EndDate = 2;
 }
+
 
 message GetAvailableAccommodationsInPeriodResponse {
   repeated AccommodationWithPriceResponse accommodationWithPrice = 1;

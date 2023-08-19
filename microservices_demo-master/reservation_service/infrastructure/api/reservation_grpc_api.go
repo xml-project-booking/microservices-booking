@@ -25,6 +25,35 @@ type ReservationHandler struct {
 	LogError *logrus.Logger
 }
 
+func (handler ReservationHandler) GetAccommodationsReservedInTimePeriod(ctx context.Context, request *pb.GetAccTimePeriodRequest) (*pb.GetAccTimePeriodResponse, error) {
+	layout := "2006-01-02T15:04:05.000Z"
+	startDate, _ := time.Parse(layout, request.StartDate)
+	endDate, _ := time.Parse(layout, request.EndDate)
+	reservations := handler.service.GetAllReservationsSearch(startDate, endDate)
+	var accommodationsIds []string
+	for _, Reservation := range reservations {
+		accommodationsIds = append(accommodationsIds, Reservation.AccommodationID.Hex())
+	}
+	response := &pb.GetAccTimePeriodResponse{AccommodationIds: accommodationsIds}
+	return response, nil
+}
+func (handler *ReservationHandler) CheckReservationRequirementsHost(ctx context.Context, request *pb.ReservationRequirementsHostRequest) (*pb.ReservationRequirementsHostResponse, error) {
+	hostId := request.HostId
+	objectId, err := primitive.ObjectIDFromHex(hostId)
+	if err != nil {
+		return nil, err
+	}
+	a := handler.service.CheckReservationNumberForHost(objectId)
+	b := handler.service.CheckCancellationRate(objectId)
+	c := handler.service.CheckTotalReservationDuration(objectId)
+	if a && b && c {
+		response := &pb.ReservationRequirementsHostResponse{IsPossible: true}
+		return response, nil
+	} else {
+		response := &pb.ReservationRequirementsHostResponse{IsPossible: false}
+		return response, nil
+	}
+}
 func (handler *ReservationHandler) CancelReservation(ctx context.Context, request *pb.CancelReservationRequest) (*pb.CancelReservationResponse, error) {
 	id := request.Id
 	objectId, err := primitive.ObjectIDFromHex(id)
@@ -103,8 +132,6 @@ func (handler *ReservationHandler) DeleteReservationRequestGuest(ctx context.Con
 func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context, request *pb.ReservationRequest) (*pb.ReservationRequestResponse, error) {
 
 	var reservationDTO domain.ReservationDTO
-	fmt.Print("request: ")
-	fmt.Println(request)
 
 	jsonBytes, err := protojson.Marshal(request)
 	if err != nil {
@@ -122,19 +149,6 @@ func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context
 	if err != nil {
 		// Handle error
 	}
-	fmt.Println("kako se ispisati  resefvationdto")
-	fmt.Println(reservationDTO)
-
-	/*if err != nil {
-		handler.LogError.WithFields(logrus.Fields{
-			"status":    "failure",
-			"location":  "AdvertisementHandler",
-			"action":    "CRADA731",
-			"timestamp": time.Now().String(),
-		}).Error("Wrong cast json to AdvertisementDTO!")
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}*/
 	layout := "2006-01-02T15:04:05.000Z"
 	startDate, _ := time.Parse(layout, reservationDTO.StartDate)
 	endDate, _ := time.Parse(layout, reservationDTO.EndDate)
@@ -142,8 +156,6 @@ func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context
 	Minnum, err := strconv.Atoi(reservationDTO.MinGuest)
 	MaxNum, err := strconv.Atoi(reservationDTO.MaxGuest)
 	b, err := strconv.ParseBool("false")
-	fmt.Println(Minnum)
-	fmt.Println(MaxNum)
 	var isValidGuestNum = handler.service.CheckIfNumberOfGuestIsValid(int64(Minnum), int64(MaxNum), int64(num))
 	re := &pb.ReservationRequestResponse{Id: "nedozvoljen broj gostiju"}
 	fmt.Print("ovoooo je vrednost")
@@ -167,11 +179,6 @@ func (handler *ReservationHandler) MakeRequestForReservation(ctx context.Context
 		ReservationStatus: "PENDING",
 		HostId:            reservationDTO.HostId,
 	}
-	fmt.Println(reservationDTO.AccommodationID)
-	fmt.Println("ahhahahahahahahaahahahah")
-	fmt.Println(reservationDTO.AccommodationID)
-	fmt.Println(reservationDTO.StartDate)
-	fmt.Println(reservationDTO.EndDate)
 
 	err = handler.service.CreateReservationRequest(&reservationRequest)
 	ReservationPb := mapReservation(&reservationRequest)

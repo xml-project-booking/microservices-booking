@@ -20,6 +20,9 @@ func NewTermService(store domain.TermStore) *TermService {
 func (service *TermService) Get(id primitive.ObjectID) (*domain.Term, error) {
 	return service.store.Get(id)
 }
+func (service *TermService) GetOneByAccommodationId(accommodationId primitive.ObjectID) (*domain.Term, error) {
+	return service.store.GetByAccommodationIdOne(accommodationId)
+}
 
 func (service *TermService) GetAll() ([]*domain.Term, error) {
 	return service.store.GetAll()
@@ -39,6 +42,46 @@ func (service *TermService) Update(term *domain.Term) error {
 
 func (service *TermService) Delete(term *domain.Term) error {
 	return service.store.Delete(term)
+}
+func (service *TermService) GetAccommodationsInPriceRange(minPrice, maxPrice int32) []*domain.Term {
+	terms, err := service.store.GetTermsInPriceRange(minPrice, maxPrice)
+	if err != nil {
+		return nil
+	}
+	seen := make(map[primitive.ObjectID]bool)
+	filteredList := []*domain.Term{}
+
+	for _, item := range terms {
+		if _, ok := seen[item.AccommodationID]; !ok {
+			seen[item.AccommodationID] = true
+			filteredList = append(filteredList, item)
+		}
+	}
+
+	return filteredList
+}
+func (service *TermService) GetAccommodationsInTimePeriod(startDate, endDate time.Time) []*domain.Term {
+	terms, err := service.store.GetAll()
+	if err != nil {
+		return nil
+	}
+	seen := make(map[primitive.ObjectID]bool)
+	filteredList := []*domain.Term{}
+	removedCopyList := []*domain.Term{}
+	for _, item := range terms {
+		if item.Date.After(startDate) && item.Date.Before(endDate) {
+			filteredList = append(filteredList, item)
+		}
+	}
+
+	for _, item := range filteredList {
+		if _, ok := seen[item.AccommodationID]; !ok {
+			seen[item.AccommodationID] = true
+			removedCopyList = append(removedCopyList, item)
+		}
+	}
+
+	return removedCopyList
 }
 
 func (service *TermService) DeleteReservationsInDateRange(accommodationId primitive.ObjectID, startDate time.Time, endDate time.Time) bool {

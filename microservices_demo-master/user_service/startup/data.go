@@ -12,6 +12,7 @@ var users = []*domain.User{
 		Name:               "Marko",
 		Surname:            "Markovic",
 		Role:               1,
+		IsProminent:        true,
 	},
 	{
 		Id:                 getObjectId("623b0cc336a1d6fd8c1cf0f5"),
@@ -19,6 +20,7 @@ var users = []*domain.User{
 		Name:               "Ivan",
 		Surname:            "Ivanovic",
 		Role:               1,
+		IsProminent:        false,
 	},
 }
 

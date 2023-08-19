@@ -26,7 +26,62 @@ func NewUserHandler(service *application.TermService) *TermHandler {
 		service: service,
 	}
 }
+func (handler *TermHandler) GetTermInfoByAccommodationId(ctx context.Context, request *pb.TermInfoRequest) (*pb.TermInfoResponse, error) {
+	id := request.AccommodationId
+	objectId, _ := primitive.ObjectIDFromHex(id)
+	term, _ := handler.service.GetOneByAccommodationId(objectId)
+	fmt.Println(term)
+	response := &pb.TermInfoResponse{
+		Price:     int64(term.Value),
+		Type:      term.PriceType,
+		FullPrice: 0,
+	}
+	fmt.Println(response)
+	return response, nil
+}
+func (handler *TermHandler) GetAllAccommodationIdsInTimePeriod(ctx context.Context, request *pb.TimePeriodRequest) (*pb.TimePeriodResponse, error) {
+	layout := "2006-01-02T15:04:05.000Z"
+	startdate, _ := time.Parse(layout, request.StartDate)
+	enddate, _ := time.Parse(layout, request.EndDate)
+	var terms = handler.service.GetAccommodationsInTimePeriod(startdate, enddate)
+	response := &pb.TimePeriodResponse{}
+	for _, term := range terms {
+		response.AccommodationsIds = append(response.AccommodationsIds, term.AccommodationID.Hex())
+	}
 
+	/*seen := make(map[string]bool)
+	result := []string{}
+
+	for _, val := range response.AccommodationIds {
+		if !seen[val] {
+			seen[val] = true
+			result = append(result, val)
+		}
+	}*/
+
+	return response, nil
+}
+func (handler *TermHandler) GetAllAccommodationIdsInPriceRange(ctx context.Context, request *pb.PriceRangeRequest) (*pb.PriceRangeResponse, error) {
+	minPrice := request.MinPrice
+	maxPrice := request.MaxPrice
+	var terms = handler.service.GetAccommodationsInPriceRange(minPrice, maxPrice)
+	response := &pb.PriceRangeResponse{}
+	for _, term := range terms {
+		response.AccommodationIds = append(response.AccommodationIds, term.AccommodationID.Hex())
+	}
+
+	/*seen := make(map[string]bool)
+	result := []string{}
+
+	for _, val := range response.AccommodationIds {
+		if !seen[val] {
+			seen[val] = true
+			result = append(result, val)
+		}
+	}*/
+
+	return response, nil
+}
 func (handler *TermHandler) Update(ctx context.Context, request *pb.UpdateRequest) (*pb.UpdateResponse, error) {
 
 	//OVO NZM STA JE VRV JSON U BINARNO

@@ -16,4 +16,6 @@ type UserStore interface {
 	UpdateUser(user *User) error
 	UpdateCancellationNumber(user *User) error
 	DeleteUser(id string) error
+	GetProminentHosts() ([]*User, error)
+	UpdateHostProminentStatus(hostId primitive.ObjectID, status bool) error
 }

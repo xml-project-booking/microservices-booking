@@ -1,6 +1,6 @@
 module github.com/tamararankovic/microservices_demo/api_gateway
 
-go 1.17
+go 1.18
 
 replace github.com/tamararankovic/microservices_demo/common => ../common
 
@@ -8,6 +8,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0
 	github.com/tamararankovic/microservices_demo/common v1.0.0
 	go.mongodb.org/mongo-driver v1.12.1
+	golang.org/x/exp v0.0.0-20230811145659-89c5cff77bcb
 	golang.org/x/net v0.10.0
 	google.golang.org/grpc v1.55.0
 )

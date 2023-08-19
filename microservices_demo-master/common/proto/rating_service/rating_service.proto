@@ -41,10 +41,28 @@ service RatingService{
 
     };
   }
+  rpc GetAverageHostRating(AverageHostRequest) returns(AverageHostResponse) {
+    option (google.api.http) = {
+      get: "/average-host/{id}"
+
+    };
+  }
+  rpc GetAverageAccommodationRating(AverageHostRequest) returns(AverageHostResponse) {
+    option (google.api.http) = {
+      get: "/average-accommodation/{id}"
+
+    };
+  }
 }
 
 message GetRequest {
   string id = 1;
+}
+message AverageHostRequest{
+  string id =1;
+}
+message AverageHostResponse{
+  float average = 1;
 }
 
 message GetResponse {

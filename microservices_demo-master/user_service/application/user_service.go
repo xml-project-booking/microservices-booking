@@ -14,9 +14,15 @@ func NewUserService(store domain.UserStore) *UserService {
 		store: store,
 	}
 }
-
+func (service *UserService) UpdateProminentStatusHost(hostId primitive.ObjectID, status bool) error {
+	return service.store.UpdateHostProminentStatus(hostId, status)
+}
 func (service *UserService) Get(id primitive.ObjectID) (*domain.User, error) {
 	return service.store.Get(id)
+}
+
+func (service *UserService) GetProminentHosts() ([]*domain.User, error) {
+	return service.store.GetProminentHosts()
 }
 
 func (service *UserService) UpdateCancellationNumber(user *domain.User) error {

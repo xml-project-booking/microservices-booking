@@ -75,20 +75,18 @@ func (server *Server) initHandlers() {
 }
 
 func (server *Server) initCustomHandlers() {
-	catalogueEmdpoint := fmt.Sprintf("%s:%s", server.config.CatalogueHost, server.config.CataloguePort)
-	orderingEmdpoint := fmt.Sprintf("%s:%s", server.config.OrderingHost, server.config.OrderingPort)
-	shippingEmdpoint := fmt.Sprintf("%s:%s", server.config.ShippingHost, server.config.ShippingPort)
 	reservationEndpoint := fmt.Sprintf("%s:%s", server.config.ReservationHost, server.config.ReservationPort)
 	userEndpoint := fmt.Sprintf("%s:%s", server.config.UserHost, server.config.UserPort)
 	accommodationEndpoint := fmt.Sprintf("%s:%s", server.config.AccommodationHost, server.config.AccommodationPort)
 	termEndpoint := fmt.Sprintf("%s:%s", server.config.TermHost, server.config.TermPort)
+	ratingEndpoint := fmt.Sprintf("%s:%s", server.config.RatingHost, server.config.RatingPort)
 	reservationHandler := api.NewReservationHandler(reservationEndpoint, userEndpoint, accommodationEndpoint, termEndpoint)
-	orderingHandler := api.NewOrderingHandler(orderingEmdpoint, catalogueEmdpoint, shippingEmdpoint)
-	orderingHandler.Init(server.mux)
+	accommodationHandler := api.NewAccommodationHandler(reservationEndpoint, userEndpoint, accommodationEndpoint, termEndpoint)
 	reservationHandler.Init(server.mux)
+	accommodationHandler.Init(server.mux)
 
 	//delete-user
-	userHandler := api.NewUserHandler(userEndpoint, reservationEndpoint, accommodationEndpoint)
+	userHandler := api.NewUserHandler(userEndpoint, reservationEndpoint, accommodationEndpoint, ratingEndpoint)
 	userHandler.Init(server.mux)
 }
 

@@ -40,8 +40,44 @@ func (service *ReservationService) GetAllReservationsByGuestIdPending(guestId pr
 func (service *ReservationService) GetAllReservation() ([]*domain.Reservation, error) {
 	return service.store.GetAllReservation()
 }
+func (service *ReservationService) CheckTotalReservationDuration(hostId primitive.ObjectID) bool {
+	reservations, _ := service.store.GetReservationsByHost(hostId)
+	var duration = 0.0
+	for _, Reservation := range reservations {
+		difference := (Reservation.EndDate.Sub(Reservation.StartDate).Hours()) / 24
+		duration = duration + difference
+	}
+	if duration > 50 {
+		return true
+	} else {
+		return false
+	}
+}
+func (service *ReservationService) CheckReservationNumberForHost(hostId primitive.ObjectID) bool {
+	reservations, _ := service.store.GetReservationsByHost(hostId)
+	var num = len(reservations)
+	if num >= 5 {
+		return true
+	} else {
+		return false
+	}
+}
+func (service *ReservationService) CheckCancellationRate(hostId primitive.ObjectID) bool {
+	hostCanceledReservations, _ := service.store.GetReservationCancelByHost(hostId)
+	hostReservations, _ := service.store.GetReservationsByHost(hostId)
+	cancellationRate := (len(hostCanceledReservations) / len(hostReservations)) * 100
+	if cancellationRate < 5 {
+		return true
+	} else {
+		return false
+	}
+
+}
 func (service *ReservationService) GetAll() ([]*domain.Reservation, error) {
 	return service.store.GetAll()
+}
+func (service *ReservationService) GetAllConfirmedReservations() ([]*domain.Reservation, error) {
+	return service.store.GetAllReservation()
 }
 
 func (service *ReservationService) Create(user *domain.Reservation) error {
@@ -78,21 +114,28 @@ func (service *ReservationService) CancelAllReservationRequestOverlaping(reserva
 	}
 
 }
-func (service *ReservationService) GetAllReservationRequestWhichOverlapsWithConfirmed(startDate time.Time, endDate time.Time, accommodationId primitive.ObjectID) []*domain.Reservation {
-	allReservations, _ := service.store.GetAllReservationRequests()
+func (service *ReservationService) GetAllReservationsSearch(startDate time.Time, endDate time.Time) []*domain.Reservation {
+	allReservations, _ := service.store.GetAllReservation()
 	fmt.Println("ovo su svi zahtjevi za rezeervaciju")
 	fmt.Println(allReservations)
-	var filteredReservationsByAccommodation []*domain.Reservation
 	var filteredReservationsOverlaps []*domain.Reservation
-	for _, reservation := range allReservations {
-		if reservation.AccommodationID == accommodationId {
-			fmt.Println("usao je  eem alo dddj")
-			filteredReservationsByAccommodation = append(filteredReservationsByAccommodation, reservation)
+	for _, res := range allReservations {
+		fmt.Println(res)
+		var overLaps = service.CheckIfOverLaps(res.StartDate, res.EndDate, startDate, endDate)
+		if overLaps {
+			fmt.Println("usao u fju za prekpalanje")
+			filteredReservationsOverlaps = append(filteredReservationsOverlaps, res)
 		}
+
 	}
-	fmt.Println("ovo je duzina filterocane liste akomodacijom")
-	fmt.Println(filteredReservationsByAccommodation)
-	for _, res := range filteredReservationsByAccommodation {
+	return filteredReservationsOverlaps
+}
+func (service *ReservationService) GetAllReservationRequestWhichOverlapsWithConfirmed(startDate time.Time, endDate time.Time, accommodationId primitive.ObjectID) []*domain.Reservation {
+	allReservations, _ := service.store.GetAllReservationByAccommodation(accommodationId)
+	fmt.Println("ovo su svi zahtjevi za rezeervaciju")
+	fmt.Println(allReservations)
+	var filteredReservationsOverlaps []*domain.Reservation
+	for _, res := range allReservations {
 		fmt.Println(res)
 		var overLaps = service.CheckIfOverLaps(res.StartDate, res.EndDate, startDate, endDate)
 		if overLaps {
@@ -105,18 +148,8 @@ func (service *ReservationService) GetAllReservationRequestWhichOverlapsWithConf
 }
 func (service *ReservationService) CheckForReservationInDateRange(accommodationId primitive.ObjectID, startDate time.Time, endDate time.Time) bool {
 
-	allReservations, _ := service.store.GetAllReservation()
-	var filteredReservations []*domain.Reservation
-	fmt.Println(len(allReservations))
-	fmt.Println(accommodationId)
-	for _, reservation := range allReservations {
-		if reservation.AccommodationID == accommodationId {
-
-			filteredReservations = append(filteredReservations, reservation)
-		}
-	}
-
-	for _, res := range filteredReservations {
+	allReservations, _ := service.store.GetAllConfirmedReservationByAccommodation(accommodationId)
+	for _, res := range allReservations {
 		var isTaken = service.CheckIfOverLaps(res.StartDate, res.EndDate, startDate, endDate)
 		if isTaken == true {
 			return isTaken
@@ -128,21 +161,12 @@ func (service *ReservationService) CheckForReservationInDateRange(accommodationI
 }
 func (service *ReservationService) CheckForReservationInDateRangeAndGetUserId(accommodationId primitive.ObjectID, startDate time.Time, endDate time.Time) string {
 	fmt.Println("usaooooooooooo ovdee")
-	allReservations, _ := service.store.GetAllReservation()
-	var filteredReservations []*domain.Reservation
+	allReservations, _ := service.store.GetAllConfirmedReservationByAccommodation(accommodationId)
 	var termCondition string
 	fmt.Println("lista filterovana po acc id")
 	fmt.Println(allReservations)
-	for _, reservation := range allReservations {
-		fmt.Println(reservation.AccommodationID)
-		if reservation.AccommodationID == accommodationId {
 
-			filteredReservations = append(filteredReservations, reservation)
-		}
-	}
-	fmt.Println("lista filterovana po acc id")
-	fmt.Println(filteredReservations)
-	for _, res := range filteredReservations {
+	for _, res := range allReservations {
 		var isTaken = service.CheckIfOverLaps(res.StartDate, res.EndDate, startDate, endDate)
 		if isTaken {
 			fmt.Println("uslov ispunjen")
@@ -214,8 +238,6 @@ func (service *ReservationService) CheckGuestCanLeaveRating(accommodationId, gue
 		}
 	}
 	var num = len(pastReservations)
-	fmt.Println("broj rezevracija je")
-	fmt.Println(num)
 	if num > 0 {
 		return true
 	}
@@ -230,7 +252,6 @@ func (service *ReservationService) CheckGuestCanLeaveRatingForHost(hostId, guest
 		}
 	}
 	var num = len(pastReservations)
-	fmt.Println("broj")
 	if num > 0 {
 		return true
 	}

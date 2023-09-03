@@ -164,6 +164,7 @@ func (handler *UserHandler) Login(ctx context.Context, request *pb.LoginRequest)
 	log.Println("BLAA " + request.Username + request.Password)
 	jwtToken, role, id, err := handler.serviceAuth.Login(request.Username, request.Password)
 
+	println("ERROR: " + err.Error())
 	if err != nil {
 		return &pb.LoginResponse{
 			RequestResult: &pb.RequestResult{

@@ -303,6 +303,7 @@ func (handler *TermHandler) UpdateInPeriod(ctx context.Context, request *pb.Upda
 		return nil, err
 	}
 
+	println("ACCID: " + updateRequest.AccommodationId)
 	// Convert string IDs to primitive.ObjectIDs
 	accId, _ := primitive.ObjectIDFromHex(updateRequest.AccommodationId)
 

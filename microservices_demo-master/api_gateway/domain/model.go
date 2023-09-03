@@ -68,24 +68,24 @@ type TermDTO struct {
 	EndDate         string
 }
 type Accommodation struct {
-	Id                      primitive.ObjectID
-	Name                    string
-	ReservationConfirmation string
-	City                    string
-	Country                 string
-	Street                  string
-	StreetNumber            string
-	MinGuest                int
-	MaxGuest                int
-	HostId                  primitive.ObjectID
-	Wifi                    bool
-	Kitchen                 bool
-	AirConditioning         bool
-	FreeParking             bool
-	AverageRating           float64
-	Price                   int64
-	TotalPrice              int64
-	Type                    string
+	Id                      primitive.ObjectID `json:"id"`
+	Name                    string             `json:"name"`
+	ReservationConfirmation string             `json:"reservation_confirmation"`
+	City                    string             `json:"city"`
+	Country                 string             `json:"country"`
+	Street                  string             `json:"street"`
+	StreetNumber            string             `json:"street_number"`
+	MinGuest                int                `json:"MinGuest"`
+	MaxGuest                int                `json:"MaxGuest"`
+	HostId                  primitive.ObjectID `json:"hostId"`
+	Wifi                    bool               `json:"wifi"`
+	Kitchen                 bool               `json:"kitchen"`
+	AirConditioning         bool               `json:"airConditioning"`
+	FreeParking             bool               `json:"freeParking"`
+	AverageRating           float64            `json:"average_rating"`
+	Price                   int64              `json:"price"`
+	TotalPrice              int64              `json:"totalPrice"`
+	Type                    string             `json:"type"`
 }
 
 type SearchDTO struct {
@@ -93,4 +93,16 @@ type SearchDTO struct {
 	EndDate     string
 	Location    string
 	GuestNumber int
+}
+type Mix struct {
+	Amenities      []bool
+	Accommodations []*Accommodation
+}
+
+type FilterParameters struct {
+	Amenities      []bool
+	Accommodations []*Accommodation
+	MinPrice       int64
+	MaxPrice       int64
+	IsHost         bool
 }

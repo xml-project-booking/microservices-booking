@@ -115,7 +115,8 @@ message CreateAccommodationRequest {
   bool kitchen = 11;
   bool airConditioning = 12;
   bool freeParking = 13;
-  repeated FileToUpload files = 14;
+  string priceType = 14;
+  repeated FileToUpload files = 15;
 }
 message CreateAccommodationResponse {
   string id = 1;
@@ -157,6 +158,7 @@ message Accommodation {
   bool kitchen = 11;
   bool airConditioning = 12;
   bool freeParking = 13;
+  string priceType=14;
 }
 message GetAllIdsByHostRequest {
   string id = 1;

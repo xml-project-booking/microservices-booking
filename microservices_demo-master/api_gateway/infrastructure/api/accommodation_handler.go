@@ -13,7 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"strings"
-	"time"
 )
 
 type AccommodationHandler struct {
@@ -66,13 +65,15 @@ func (handler *AccommodationHandler) FilterAccommodation(w http.ResponseWriter, 
 	}
 	var commonElements []*domain.Accommodation
 	var commonElementsTwo []*domain.Accommodation
-	for _, accommodation := range t.Accommodations {
-		if accommodation.Wifi == t.Amenities[0] && accommodation.Kitchen == t.Amenities[1] &&
-			accommodation.AirConditioning == t.Amenities[2] && accommodation.FreeParking == t.Amenities[3] &&
-			accommodation.Price >= t.MinPrice && accommodation.Price <= t.MaxPrice {
-			commonElements = append(commonElements, accommodation)
-		}
+	if len(t.Amenities) != 0 {
+		for _, accommodation := range t.Accommodations {
+			if accommodation.Wifi == t.Amenities[0] && accommodation.Kitchen == t.Amenities[1] &&
+				accommodation.AirConditioning == t.Amenities[2] && accommodation.FreeParking == t.Amenities[3] &&
+				accommodation.Price >= t.MinPrice && accommodation.Price <= t.MaxPrice {
+				commonElements = append(commonElements, accommodation)
+			}
 
+		}
 	}
 	if t.IsHost {
 		accommodationsThird := handler.GetAccommodationsByProminentHost(t.Accommodations)
@@ -213,27 +214,13 @@ func (handler *AccommodationHandler) SearchAccommodations(w http.ResponseWriter,
 	var t domain.SearchDTO
 	err := decoder.Decode(&t)
 	fmt.Println(t)
-	startDate, err := time.Parse("2006-01-02T15:04:05Z", t.StartDate)
-	if err != nil {
-		fmt.Println("Error parsing start date:", err)
-		return
-	}
-	endDate, err := time.Parse("2006-01-02T15:04:05Z", t.EndDate)
-	if err != nil {
-		fmt.Println("Error parsing start date:", err)
-		return
-	}
-	duration := endDate.Sub(startDate)
-	daysDifference := int(duration.Hours() / 24)
-	if err != nil {
-		panic(err)
-
-	}
 
 	if err != nil {
 		panic(err)
 	}
 	response, err := termClient.GetAllAccommodationIdsInTimePeriod(context.TODO(), &terms.TimePeriodRequest{StartDate: t.StartDate, EndDate: t.EndDate})
+	println("aHAAHAHAHAH")
+	println(response)
 	searchAccommodations := make([]domain.Accommodation, 0)
 	for _, id := range response.AccommodationsIds {
 		fmt.Println(id)
@@ -245,23 +232,19 @@ func (handler *AccommodationHandler) SearchAccommodations(w http.ResponseWriter,
 		if err != nil {
 			panic(err)
 		}
-		var totalPrice = 0
-		if termInfo.Type == "per person" {
-			totalPrice = int(termInfo.Price) * t.GuestNumber * daysDifference
-		} else {
-			totalPrice = int(termInfo.Price) * daysDifference
-		}
+
 		objectId, _ := primitive.ObjectIDFromHex(res.Accommodation.Id)
+		hostid, _ := primitive.ObjectIDFromHex(res.Accommodation.HostId)
 		accommodationToAdd := domain.Accommodation{Name: res.Accommodation.Name, Street: res.Accommodation.Street, City: res.Accommodation.City, Id: objectId,
 			Wifi: res.Accommodation.Wifi, Kitchen: res.Accommodation.Kitchen, AirConditioning: res.Accommodation.AirConditioning, MinGuest: int(res.Accommodation.MinGuest),
-			MaxGuest: int(res.Accommodation.MaxGuest), FreeParking: res.Accommodation.FreeParking, Country: res.Accommodation.Country,
-			Price: termInfo.Price, Type: termInfo.Type, TotalPrice: int64(totalPrice)}
+			MaxGuest: int(res.Accommodation.MaxGuest), FreeParking: res.Accommodation.FreeParking, Country: res.Accommodation.Country, HostId: hostid,
+			Price: termInfo.Price, Type: termInfo.Type, TotalPrice: 0}
 		searchAccommodations = append(searchAccommodations, accommodationToAdd)
 
 	}
 	searchAccommodations = handler.SearchAccommodationsByLocationAndGuestNumber(searchAccommodations, t.Location, t.GuestNumber)
 
-	searchAccommodations = handler.GetPriceForAccommodations(searchAccommodations, t.GuestNumber)
+	searchAccommodations = handler.GetPriceForAccommodations(searchAccommodations, t.GuestNumber, t.StartDate, t.EndDate)
 	fmt.Println(searchAccommodations)
 	responseOne, err := json.Marshal(searchAccommodations)
 	if err != nil {
@@ -286,18 +269,43 @@ func (handler *AccommodationHandler) SearchAccommodationsByLocationAndGuestNumbe
 
 }
 
-func (handler *AccommodationHandler) GetPriceForAccommodations(accommodations []domain.Accommodation, guestNumber int) []domain.Accommodation {
+func (handler *AccommodationHandler) GetPriceForAccommodations(accommodations []domain.Accommodation, guestNumber int, startDate, endDate string) []domain.Accommodation {
 	termClient := services.NewTermClient(handler.termAddress)
-	for _, Accomodation := range accommodations {
+	fmt.Println(startDate)
+	fmt.Println(endDate)
+	if len(accommodations) == 0 {
+		return accommodations
+	}
+
+	for i := range accommodations {
+
+		Accomodation := &accommodations[i]
 		fmt.Println(Accomodation.Id.Hex())
 		termInfo, err := termClient.GetTermInfoByAccommodationId(context.TODO(), &terms.TermInfoRequest{AccommodationId: Accomodation.Id.Hex()})
+		terms, err := termClient.GetTermsInPeriod(context.TODO(), &terms.GetTermsInPeriodRequest{AccommodationId: Accomodation.Id.Hex(), StartDate: startDate, EndDate: endDate})
+		println(terms.Terms)
+		fmt.Println()
+
 		if err != nil {
 			panic(err)
 		}
 		fmt.Println(termInfo)
 		Accomodation.Price = termInfo.Price
 		fmt.Println(Accomodation.Price)
-		Accomodation.TotalPrice = termInfo.Price * int64(guestNumber)
+		totalprice := 0
+		for _, Term := range terms.Terms {
+			fmt.Println(Term.Value)
+			fmt.Println(Term.Date)
+
+			totalprice = int(int64(totalprice) + int64(Term.Value))
+		}
+		fmt.Println(totalprice)
+		if Accomodation.Type == "PerPerson" {
+			totalprice = int(int64(totalprice) * int64(guestNumber))
+		}
+		Accomodation.TotalPrice = int64(totalprice)
+		fmt.Println(Accomodation.TotalPrice)
+		//Accomodation.TotalPrice = termInfo.Price * int64(guestNumber)
 		Accomodation.Type = termInfo.Type
 	}
 	fmt.Println(accommodations)

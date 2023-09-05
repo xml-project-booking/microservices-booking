@@ -34,9 +34,11 @@ func NewLeaveRatingCommandHandler(ratingService *application.RatingService, publ
 func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingCommand) {
 
 	reply := events.LeaveRatingReply{Rating: command.Rating}
-
+	fmt.Println("4")
+	fmt.Println(command.Type)
 	switch command.Type {
 	case events.CreateRating:
+		fmt.Println("5")
 		oldValue := command.Rating.OldValue
 		var err error
 		r := domain.Rating{
@@ -47,6 +49,11 @@ func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingComm
 			TargetType:   int(command.Rating.TargetType),
 			LastModified: command.Rating.LastModified,
 		}
+		fmt.Println("3")
+		println(oldValue)
+		fmt.Println(r)
+		log.Println(r)
+
 		if oldValue == nil {
 
 			reply.Rating.ID = r.Id

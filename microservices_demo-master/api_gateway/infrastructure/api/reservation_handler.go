@@ -52,6 +52,15 @@ func (handler *ReservationHandler) Init(mux *runtime.ServeMux) {
 	if err != nil {
 		panic(err)
 	}
+	err = mux.HandlePath("GET", "/guest/reservation-guest-pending/{guestId}", handler.GetPendingGuestReservations)
+	if err != nil {
+		panic(err)
+	}
+	err = mux.HandlePath("GET", "/guest/reservation-guest/{guestId}", handler.GetGuestReservations)
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 func NewReservationHandler(reservationClientAddress, userClientAddress, accommodationAddress, termAddress string) Handler {
@@ -61,6 +70,94 @@ func NewReservationHandler(reservationClientAddress, userClientAddress, accommod
 		accommodationAddress:     accommodationAddress,
 		termAddress:              termAddress,
 	}
+}
+func (handler *ReservationHandler) GetPendingGuestReservations(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	guestIdString := pathParams["guestId"]
+
+	var reservationDetailsList []domain.ReservationDetails
+
+	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	accommodationClient := services.NewAccommodationClient(handler.accommodationAddress)
+	if guestIdString == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	reservations, err := reservationClient.GetAllByGuestPending(context.TODO(), &reservations.GetAllByGuestRequest{Id: guestIdString})
+	for _, Reservation := range reservations.Reservations {
+		res, err := accommodationClient.Get(context.TODO(), &accommodations.GetRequest{Id: Reservation.AccommodationID})
+		if err != nil {
+			panic(err)
+		}
+		resrevationDetails := domain.ReservationDetails{
+			Id:                Reservation.Id,
+			AccommodationID:   Reservation.AccommodationID,
+			StartDate:         Reservation.StartDate,
+			EndDate:           Reservation.EndDate,
+			GuestNumber:       int(Reservation.GuestNumber),
+			Confirmation:      Reservation.ReservationStatus,
+			GuestId:           Reservation.GuestId,
+			HostId:            res.Accommodation.HostId,
+			AccName:           res.Accommodation.Name,
+			City:              res.Accommodation.City,
+			Country:           res.Accommodation.Country,
+			Street:            res.Accommodation.Street,
+			StreetNumber:      "55",
+			ReservationStatus: Reservation.ReservationStatus,
+		}
+		reservationDetailsList = append(reservationDetailsList, resrevationDetails)
+
+	}
+	response, err := json.Marshal(reservationDetailsList)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
+}
+func (handler *ReservationHandler) GetGuestReservations(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	guestIdString := pathParams["guestId"]
+
+	var reservationDetailsList []domain.ReservationDetails
+
+	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	accommodationClient := services.NewAccommodationClient(handler.accommodationAddress)
+	if guestIdString == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	reservations, err := reservationClient.GetAllByGuest(context.TODO(), &reservations.GetAllByGuestRequest{Id: guestIdString})
+	for _, Reservation := range reservations.Reservations {
+		res, err := accommodationClient.Get(context.TODO(), &accommodations.GetRequest{Id: Reservation.AccommodationID})
+		if err != nil {
+			panic(err)
+		}
+		resrevationDetails := domain.ReservationDetails{
+			Id:                Reservation.Id,
+			AccommodationID:   Reservation.AccommodationID,
+			StartDate:         Reservation.StartDate,
+			EndDate:           Reservation.EndDate,
+			GuestNumber:       int(Reservation.GuestNumber),
+			Confirmation:      Reservation.ReservationStatus,
+			GuestId:           Reservation.GuestId,
+			HostId:            res.Accommodation.HostId,
+			AccName:           res.Accommodation.Name,
+			City:              res.Accommodation.City,
+			Country:           res.Accommodation.Country,
+			Street:            res.Accommodation.Street,
+			StreetNumber:      "55",
+			ReservationStatus: Reservation.ReservationStatus,
+		}
+		reservationDetailsList = append(reservationDetailsList, resrevationDetails)
+
+	}
+	response, err := json.Marshal(reservationDetailsList)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(response)
 }
 
 func (handler *ReservationHandler) CancelReservation(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
@@ -72,6 +169,7 @@ func (handler *ReservationHandler) CancelReservation(w http.ResponseWriter, r *h
 	userId, err := primitive.ObjectIDFromHex(userIdString)
 	reservationId, err := primitive.ObjectIDFromHex(reservationIdString)
 	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	termClient := services.NewTermClient(handler.termAddress)
 	userClient := services.NewUserClient(handler.userClientAddress)
 	if userIdString == "" {
 		w.WriteHeader(http.StatusBadRequest)
@@ -92,6 +190,10 @@ func (handler *ReservationHandler) CancelReservation(w http.ResponseWriter, r *h
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+	reservation, err := reservationClient.Get(context.TODO(), &reservations.GetRequest{Id: reservationIdString})
+	message, err := termClient.ChangeUserIdInTermPeriod(context.TODO(), &terms.BookTermRequest{UserId: "0",
+		AccommodationdId: reservation.Reservation.AccommodationID, EndDate: reservation.Reservation.EndDate, StartDate: reservation.Reservation.StartDate})
+	fmt.Println(message)
 	//handler.addShippingInfo(orderDetails)
 	//handler.addProductInfo(orderDetails)
 
@@ -229,7 +331,7 @@ func (handler *ReservationHandler) GetReservations(accommodationId primitive.Obj
 func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWriter, req *http.Request, params map[string]string) {
 	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
 	accommodationClient := services.NewAccommodationClient(handler.accommodationAddress)
-	//termClient := services.NewTermClient(handler.termAddress)
+	termClient := services.NewTermClient(handler.termAddress)
 
 	decoder := json.NewDecoder(req.Body)
 	var t domain.ReservationDTO
@@ -246,6 +348,9 @@ func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWrit
 	fmt.Println(accommodation.Accommodation.AccommodationReservationType + "ovo je tip")
 	if accommodation.Accommodation.AccommodationReservationType == "AUTOMATIC" {
 		fmt.Println("usaooooooooo u automatic")
+		message, err := termClient.ChangeUserIdInTermPeriod(context.TODO(), &terms.BookTermRequest{UserId: t.GuestId,
+			AccommodationdId: t.AccommodationID, EndDate: t.EndDate, StartDate: t.StartDate})
+		fmt.Println(message)
 		res, err := reservationClient.ConfirmReservationAutomatically(context.TODO(), &reservations.ReservationRequest{
 			Id:              t.Id,
 			AccommodationID: t.AccommodationID,
@@ -274,6 +379,7 @@ func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWrit
 	}
 
 	fmt.Println("usaoooooooo u manuall")
+
 	result, err := reservationClient.MakeRequestForReservation(context.TODO(), &reservations.ReservationRequest{Id: t.Id,
 		AccommodationID: t.AccommodationID,
 		StartDate:       t.StartDate,
@@ -303,13 +409,18 @@ func (handler *ReservationHandler) ConfirmationOfReservation(w http.ResponseWrit
 
 func (handler *ReservationHandler) ManuallyConfirmReservation(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
 	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	termClient := services.NewTermClient(handler.termAddress)
 	id := pathParams["reservationId"]
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	reservation, err := reservationClient.Get(context.TODO(), &reservations.GetRequest{Id: id})
 
 	result, err := reservationClient.ConfirmReservationManually(context.TODO(), &reservations.ConfirmReservationManuallyRequest{Id: id})
+	message, err := termClient.ChangeUserIdInTermPeriod(context.TODO(), &terms.BookTermRequest{UserId: reservation.Reservation.GuestId,
+		AccommodationdId: reservation.Reservation.AccommodationID, EndDate: reservation.Reservation.EndDate, StartDate: reservation.Reservation.StartDate})
+	fmt.Println(message)
 	if err != nil {
 		return
 	}
@@ -325,11 +436,16 @@ func (handler *ReservationHandler) ManuallyConfirmReservation(w http.ResponseWri
 }
 func (handler *ReservationHandler) ManuallyCancelReservation(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
 	reservationClient := services.NewReservationClient(handler.reservationClientAddress)
+	termClient := services.NewTermClient(handler.termAddress)
 	id := pathParams["reservationId"]
 	if id == "" {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	reservation, err := reservationClient.Get(context.TODO(), &reservations.GetRequest{Id: id})
+	message, err := termClient.ChangeUserIdInTermPeriod(context.TODO(), &terms.BookTermRequest{UserId: "0",
+		AccommodationdId: reservation.Reservation.AccommodationID, EndDate: reservation.Reservation.EndDate, StartDate: reservation.Reservation.StartDate})
+	fmt.Println(message)
 
 	result, err := reservationClient.CancelReservationManually(context.TODO(), &reservations.CancelReservationManuallyRequest{Id: id})
 	if err != nil {

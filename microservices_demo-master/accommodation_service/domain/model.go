@@ -22,6 +22,7 @@ type Accommodation struct {
 	FreeParking             bool               `bson:"free_parking"`
 	Photos                  []string           `bson:"photos"`
 	AverageRating           float64            `bson:"average_rating"`
+	PriceType               string             `bson:"price_type"`
 }
 
 type ConfirmationType int

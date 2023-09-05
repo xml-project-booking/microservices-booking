@@ -83,7 +83,38 @@ service TermService {
       body:"*"
     };
   }
+  rpc ChangeUserIdInTermPeriod(BookTermRequest) returns (BookTermResponse) {
+    option (google.api.http) = {
+      post: "/terms/book-term"
+      body:"*"
+    };
+  }
+  rpc GetTermsInPeriod(GetTermsInPeriodRequest) returns (GetTermsInPeriodResponse) {
+    option (google.api.http) = {
+      post: "/terms/period-specific"
+      body:"*"
+    };
+  }
 
+
+
+}
+message GetTermsInPeriodRequest{
+  string accommodationId = 1;
+  string startDate = 2;
+  string endDate = 3;
+}
+message GetTermsInPeriodResponse{
+  repeated Term terms = 1;
+}
+message BookTermRequest{
+  string accommodationdId = 1;
+  string userId = 2;
+  string startDate = 3;
+  string endDate =4;
+}
+message BookTermResponse{
+  string message = 1;
 
 }
 message TimePeriodRequest{
@@ -153,6 +184,14 @@ message GetRequest {
 }
 
 message GetResponse {
+  string id = 1;
+  string accommodationId = 2;
+  string userId = 3;
+  string Date = 4;
+  string PriceType = 5;
+  double Value = 6;
+}
+message Term{
   string id = 1;
   string accommodationId = 2;
   string userId = 3;

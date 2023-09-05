@@ -35,12 +35,14 @@ func (handler *LeaveRatingCommandHandler) handle(command *events.LeaveRatingComm
 	case events.StartedCreatingRating:
 		//var canLeaveRating = false
 		if command.Rating.TargetType == 0 {
+			fmt.Println("2")
 			canLeaveRating = handler.reservationService.CheckGuestCanLeaveRating(command.Rating.TargetID, command.Rating.UserID)
 		} else {
 			canLeaveRating = handler.reservationService.CheckGuestCanLeaveRatingForHost(command.Rating.TargetID, command.Rating.UserID)
 		}
 		fmt.Println(canLeaveRating)
 		if canLeaveRating {
+			fmt.Println("8888")
 			reply.Type = events.CreationStarted
 			break
 		}

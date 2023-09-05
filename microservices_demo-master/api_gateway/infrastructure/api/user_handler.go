@@ -36,6 +36,79 @@ func (handler *UserHandler) Init(mux *runtime.ServeMux) {
 		panic(err)
 	}
 	err = mux.HandlePath("GET", "/users/prominent-host/{id}", handler.ProminentHost)
+	err = mux.HandlePath("GET", "/users/ratings/host/{id}", handler.RatingsHost)
+	err = mux.HandlePath("GET", "/users/ratings/accommodation/{id}", handler.RatingsAccommodation)
+}
+func (handler *UserHandler) RatingsHost(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	hostId := pathParams["id"]
+	var ratingsHost []domain.RatingDTO
+	ratingClient := services.NewRatingClient(handler.RatingAddress)
+	userClient := services.NewUserClient(handler.UserAddress)
+	ratings, err := ratingClient.GetRatingsByType(context.TODO(), &ratingGw.GetRatingsByTypeRequest{
+		Type: 1,
+		Id:   hostId,
+	})
+	for _, Rating := range ratings.Ratings {
+		User, err := userClient.Get(context.TODO(), &userGw.GetRequest{Id: Rating.UserID})
+		if err != nil {
+			panic(err)
+		}
+
+		accommodationToAdd := domain.RatingDTO{
+			UserID:       Rating.UserID,
+			TargetId:     Rating.TargetId,
+			RatingValue:  int(Rating.RatingValue),
+			LastModified: Rating.LastModified,
+			Name:         User.User.Name,
+			Username:     User.User.Username,
+			Surname:      User.User.Surname,
+		}
+		ratingsHost = append(ratingsHost, accommodationToAdd)
+	}
+
+	responseOne, err := json.Marshal(ratingsHost)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseOne)
+}
+func (handler *UserHandler) RatingsAccommodation(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	hostId := pathParams["id"]
+	var ratingsHost []domain.RatingDTO
+	ratingClient := services.NewRatingClient(handler.RatingAddress)
+	userClient := services.NewUserClient(handler.UserAddress)
+	ratings, err := ratingClient.GetRatingsByType(context.TODO(), &ratingGw.GetRatingsByTypeRequest{
+		Type: 0,
+		Id:   hostId,
+	})
+	for _, Rating := range ratings.Ratings {
+		User, err := userClient.Get(context.TODO(), &userGw.GetRequest{Id: Rating.UserID})
+		if err != nil {
+			panic(err)
+		}
+
+		accommodationToAdd := domain.RatingDTO{
+			UserID:       Rating.UserID,
+			TargetId:     Rating.TargetId,
+			RatingValue:  int(Rating.RatingValue),
+			LastModified: Rating.LastModified,
+			Name:         User.User.Name,
+			Username:     User.User.Username,
+			Surname:      User.User.Surname,
+			Id:           Rating.Id,
+		}
+		ratingsHost = append(ratingsHost, accommodationToAdd)
+	}
+
+	responseOne, err := json.Marshal(ratingsHost)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(responseOne)
 }
 func (handler *UserHandler) ProminentHost(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
 	hostId := pathParams["id"]
@@ -48,24 +121,15 @@ func (handler *UserHandler) ProminentHost(w http.ResponseWriter, r *http.Request
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	checkHost, err := reservationClient.CheckReservationRequirementsHost(context.TODO(), &reservationGw.ReservationRequirementsHostRequest{HostId: hostId})
-	if averageHostRating.Average >= 4.7 {
-		if checkHost.IsPossible {
-			_, err = userClient.UpdateProminentStatus(context.TODO(), &userGw.UpdateProminentStatusRequest{Id: hostId, Status: true})
-			response, err := json.Marshal(true)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.Write(response)
-		} else {
-			_, err = userClient.UpdateProminentStatus(context.TODO(), &userGw.UpdateProminentStatusRequest{Id: hostId, Status: false})
-			response, err := json.Marshal(false)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-			}
-			w.Write(response)
+	if averageHostRating.Average >= 4.7 && checkHost.IsPossible {
+
+		_, err = userClient.UpdateProminentStatus(context.TODO(), &userGw.UpdateProminentStatusRequest{Id: hostId, Status: true})
+		response, err := json.Marshal(true)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
+		w.Write(response)
 	} else {
 		_, err = userClient.UpdateProminentStatus(context.TODO(), &userGw.UpdateProminentStatusRequest{Id: hostId, Status: false})
 		response, err := json.Marshal(false)
@@ -75,6 +139,7 @@ func (handler *UserHandler) ProminentHost(w http.ResponseWriter, r *http.Request
 		}
 		w.Write(response)
 	}
+
 }
 
 func (handler *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
@@ -175,7 +240,7 @@ func (handler *UserHandler) hasReservationsHost(id string) (bool, error) {
 	hasReservations := false
 	for _, reservation := range reservationsResponse.Reservations {
 		for _, idA := range accommodationIds.Ids {
-			if reservation.AccommodationID == idA && reservation.IsConfirmed == true {
+			if reservation.AccommodationID == idA && reservation.ReservationStatus == "CONFIRMED" {
 				hasReservations = true
 			}
 		}

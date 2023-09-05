@@ -2,6 +2,7 @@ package application
 
 import (
 	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"rating_service/domain"
 )
@@ -22,6 +23,8 @@ func NewRatingService(store domain.RatingStore, leaveRatingOrchestrator *LeaveRa
 
 func (service *RatingService) CreateRating(rating *domain.Rating) error {
 	var oldRating *domain.Rating = nil
+	println("ovo je target type")
+	println(rating.TargetType)
 	oldRating, err := service.store.GetByUserAndTargetID(rating.UserID, rating.TargetId, rating.TargetType)
 	err = service.leaveRatingOrchestrator.Start(rating, oldRating)
 	if err != nil {
@@ -49,6 +52,7 @@ func (service *RatingService) DeleteRating(id primitive.ObjectID) error {
 
 func (service *RatingService) GetAccommodationAverage(accommodationId primitive.ObjectID) (float64, error) {
 	accommodationRatings, err := service.store.GetTargetRatings(accommodationId, 0)
+	fmt.Println(accommodationRatings)
 	if err != nil {
 		return 0, err
 	}
@@ -58,6 +62,9 @@ func (service *RatingService) GetAccommodationAverage(accommodationId primitive.
 			return 0.0, errors.New("invalid input: division by zero or special value")
 		}
 		sum += rating.RatingValue
+	}
+	if len(accommodationRatings) == 0 {
+		return 0, nil
 	}
 
 	return float64(sum / int32(len(accommodationRatings))), nil
@@ -75,6 +82,9 @@ func (service *RatingService) GetHostAverage(hostId primitive.ObjectID) (float64
 			return 0.0, errors.New("invalid input: division by zero or special value")
 		}
 		sum += rating.RatingValue
+	}
+	if len(hostRatings) == 0 {
+		return 0, nil
 	}
 
 	return float64(sum / int32(len(hostRatings))), nil

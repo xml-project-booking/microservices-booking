@@ -162,6 +162,7 @@ func (handler *AccommodationHandler) CreateAccommodation(ctx context.Context, re
 		Kitchen:                 request.Kitchen,
 		AirConditioning:         request.AirConditioning,
 		FreeParking:             request.FreeParking,
+		PriceType:               request.PriceType,
 		Photos:                  array,
 	}
 

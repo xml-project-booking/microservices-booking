@@ -65,7 +65,11 @@ func (service *ReservationService) CheckReservationNumberForHost(hostId primitiv
 func (service *ReservationService) CheckCancellationRate(hostId primitive.ObjectID) bool {
 	hostCanceledReservations, _ := service.store.GetReservationCancelByHost(hostId)
 	hostReservations, _ := service.store.GetReservationsByHost(hostId)
+	if len(hostReservations) == 0 {
+		return true
+	}
 	cancellationRate := (len(hostCanceledReservations) / len(hostReservations)) * 100
+
 	if cancellationRate < 5 {
 		return true
 	} else {
@@ -190,7 +194,10 @@ func (service *ReservationService) CancelReservation(reservation *domain.Reserva
 	}
 
 	var isDeleted = service.store.UpdateStatusForCanceledUser(reservation)
-	return isDeleted.Error()
+	if isDeleted != nil {
+		return isDeleted.Error()
+	}
+	return "proslo"
 
 }
 

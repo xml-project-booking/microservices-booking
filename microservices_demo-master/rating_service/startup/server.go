@@ -59,13 +59,7 @@ func (server *Server) initMongoClient() *mongo.Client {
 
 func (server *Server) initRatingStore(client *mongo.Client) domain.RatingStore {
 	store := persistence.NewRatingMongoDBStore(client)
-	store.DeleteAll()
-	for _, Rating := range ratings {
-		err := store.Insert(Rating)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+
 	return store
 }
 

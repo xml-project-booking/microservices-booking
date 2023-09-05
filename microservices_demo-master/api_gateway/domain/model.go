@@ -53,6 +53,22 @@ type ReservationDTO struct {
 	GuestId         string
 	HostId          string
 }
+type ReservationDetails struct {
+	Id                string
+	AccommodationID   string
+	StartDate         string
+	EndDate           string
+	GuestNumber       int
+	Confirmation      string
+	GuestId           string
+	HostId            string
+	AccName           string
+	City              string
+	Country           string
+	Street            string
+	StreetNumber      string
+	ReservationStatus string
+}
 
 type UserInfo struct {
 	Id   string
@@ -105,4 +121,14 @@ type FilterParameters struct {
 	MinPrice       int64
 	MaxPrice       int64
 	IsHost         bool
+}
+type RatingDTO struct {
+	UserID       string
+	TargetId     string
+	RatingValue  int
+	LastModified string
+	Name         string
+	Username     string
+	Surname      string
+	Id           string
 }

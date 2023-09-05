@@ -26,6 +26,99 @@ func NewUserHandler(service *application.TermService) *TermHandler {
 		service: service,
 	}
 }
+func (handler *TermHandler) GetTermsInPeriod(ctx context.Context, request *pb.GetTermsInPeriodRequest) (*pb.GetTermsInPeriodResponse, error) {
+	accId, _ := primitive.ObjectIDFromHex(request.AccommodationId)
+	layout := "2006-01-02T15:04:05.000Z"
+	startDate, _ := time.Parse(layout, request.StartDate)
+	endDate, _ := time.Parse(layout, request.EndDate)
+	var termsFiltered []*domain.Term
+	terms, err := handler.service.GetAll()
+	response := &pb.GetTermsInPeriodResponse{
+		Terms: []*pb.Term{},
+	}
+
+	for date := startDate; date.Before(endDate); date = date.AddDate(0, 0, 1) {
+		println("current date" + date.String())
+		// Check if a term exists for the date and accommodation ID
+		existingTerm := findTermByDateAndAccommodation(terms, date, accId)
+		fmt.Println(existingTerm)
+		if existingTerm != nil {
+			// Update the existing term with new information
+			termsFiltered = append(termsFiltered, existingTerm)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	for _, Term := range termsFiltered {
+		current := mapTermOne(Term)
+		response.Terms = append(response.Terms, current)
+	}
+
+	return response, nil
+
+}
+func (handler *TermHandler) ChangeUserIdInTermPeriod(ctx context.Context, request *pb.BookTermRequest) (*pb.BookTermResponse, error) {
+	accId, _ := primitive.ObjectIDFromHex(request.AccommodationdId)
+
+	usrId, _ := primitive.ObjectIDFromHex(request.UserId)
+	fmt.Println(request)
+	layout := "2006-01-02T15:04:05.000Z"
+	parsedStartTime, err := time.Parse("2006-01-02", request.StartDate)
+	if err != nil {
+		fmt.Println("Error parsing date:", err)
+		return nil, err
+	}
+	parsedEndTime, err := time.Parse("2006-01-02", request.EndDate)
+	if err != nil {
+		fmt.Println("Error parsing date:", err)
+		return nil, err
+	}
+
+	// Format the parsed time as a string in "2006-01-02T15:04:05.000Z" format
+	formattedStringStart := parsedStartTime.Format("2006-01-02T15:04:05.000Z")
+	formattedStringEnd := parsedEndTime.Format("2006-01-02T15:04:05.000Z")
+	// Parse start and end date strings to time.Time
+	startDate, _ := time.Parse(layout, formattedStringStart)
+	endDate, _ := time.Parse(layout, formattedStringEnd)
+	// Set date hours, secons ... to 0
+	startDate = startDate.Truncate(24 * time.Hour)
+	endDate = endDate.Truncate(24 * time.Hour)
+	endDate = endDate.AddDate(0, 0, 1)
+	startDate = startDate.AddDate(0, 0, 1)
+	println("1")
+	// Get all terms
+	terms, err := handler.service.GetAll()
+	fmt.Println(terms)
+	if err != nil {
+		return nil, err
+	}
+	println("2")
+	fmt.Println(startDate)
+	fmt.Println(endDate)
+	fmt.Println(startDate.Before(endDate))
+	// Iterate through dates in the period
+	for date := startDate; date.Before(endDate); date = date.AddDate(0, 0, 1) {
+		println("current date" + date.String())
+		// Check if a term exists for the date and accommodation ID
+		existingTerm := findTermByDateAndAccommodation(terms, date, accId)
+		fmt.Println(existingTerm)
+		if existingTerm != nil {
+			// Update the existing term with new information
+			existingTerm.UserID = usrId
+
+			err = handler.service.Update(existingTerm)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Prepare the response
+	res := pb.BookTermResponse{Message: "updated"}
+
+	return &res, nil
+}
 func (handler *TermHandler) GetTermInfoByAccommodationId(ctx context.Context, request *pb.TermInfoRequest) (*pb.TermInfoResponse, error) {
 	id := request.AccommodationId
 	objectId, _ := primitive.ObjectIDFromHex(id)
@@ -334,6 +427,9 @@ func (handler *TermHandler) UpdateInPeriod(ctx context.Context, request *pb.Upda
 	if existingTerm != nil {
 		return nil, errors.New("Cannot update/create terms. An existing term in the period already has a non-nil or non-zero user ID")
 	}
+	fmt.Println(startDate)
+	fmt.Println(endDate)
+	fmt.Println(startDate.Before(endDate))
 
 	// Iterate through dates in the period
 	for date := startDate; date.Before(endDate); date = date.AddDate(0, 0, 1) {
@@ -367,6 +463,7 @@ func (handler *TermHandler) UpdateInPeriod(ctx context.Context, request *pb.Upda
 // Helper function to check if request is valid
 func findTermByDateAndAccommodation(terms []*domain.Term, date time.Time, accId primitive.ObjectID) *domain.Term {
 	for _, term := range terms {
+		fmt.Println(term)
 		if term.Date.Equal(date) && term.AccommodationID == accId {
 			return term
 		}

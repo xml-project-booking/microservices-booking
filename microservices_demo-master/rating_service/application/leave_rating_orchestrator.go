@@ -26,7 +26,7 @@ func NewLeaveRatingOrchestrator(publisher saga.Publisher, subscriber saga.Subscr
 }
 
 func (o *LeaveRatingOrchestrator) Start(rating *domain.Rating, oldRating *domain.Rating) error {
-
+	fmt.Println("1")
 	event := &events.LeaveRatingCommand{
 		Type: events.StartedCreatingRating,
 		Rating: events.RatingDetails{

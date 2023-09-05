@@ -53,6 +53,24 @@ service RatingService{
 
     };
   }
+  rpc CanUserLeaveRating(CanUserLeaveRatingRequest) returns(CanUserLeaveRatingResponse) {
+    option (google.api.http) = {
+      post: "/can-leave/rating"
+      body:"*"
+
+    };
+  }
+}
+message CanUserLeaveRatingRequest{
+  string userId = 1;
+  string hostId = 2;
+  string accommodationId = 3;
+
+}
+message CanUserLeaveRatingResponse{
+ bool canLeaveHost = 1;
+ bool canLeaveAccommodation = 2;
+
 }
 
 message GetRequest {
@@ -110,5 +128,6 @@ message Rating {
   int32   TargetType = 3;
   string TargetId = 4;
   string LastModified = 5;
+  string Id = 6;
 
 }

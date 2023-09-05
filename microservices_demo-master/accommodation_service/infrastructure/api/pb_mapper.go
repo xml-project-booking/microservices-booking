@@ -20,6 +20,7 @@ func mapAccommodation(order *domain.Accommodation) *pb.Accommodation {
 		Kitchen:                      order.Kitchen,
 		FreeParking:                  order.FreeParking,
 		AirConditioning:              order.AirConditioning,
+		HostId:                       order.HostId.Hex(),
 	}
 	return orderPb
 }

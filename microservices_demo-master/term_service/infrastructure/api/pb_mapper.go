@@ -16,3 +16,15 @@ func mapTerm(term *domain.Term) *pb.GetResponse {
 	}
 	return termPb
 }
+
+func mapTermOne(term *domain.Term) *pb.Term {
+	termPb := &pb.Term{
+		Id:              term.Id.Hex(),
+		Date:            term.Date.String(),
+		PriceType:       term.PriceType,
+		Value:           float64(term.Value),
+		AccommodationId: term.AccommodationID.Hex(),
+		UserId:          term.UserID.Hex(),
+	}
+	return termPb
+}

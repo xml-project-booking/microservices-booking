@@ -336,7 +336,7 @@ func (handler *ReservationHandler) HasActiveReservations(ctx context.Context, re
 	//ako se promeni na enum ovde menjaj
 	allReservations := []*domain.Reservation{}
 	for _, reservation := range reservations {
-		if reservation.GuestId == guestId && reservation.Confirmation == true {
+		if reservation.GuestId == guestId && reservation.ReservationStatus == "CONFIRMED" {
 			allReservations = append(allReservations, reservation)
 		}
 	}

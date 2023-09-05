@@ -105,10 +105,10 @@ func (handler *UserHandler) UpdateCancellationNumber(ctx context.Context, reques
 		return nil, err
 	}
 	//UserPb := mapUser(User)
-	error := handler.service.UpdateCancellationNumber(User)
+	_ = handler.service.UpdateCancellationNumber(User)
+
 	response := &pb.UpdateCancellationNumberResponse{
-		CancelNumber: error.Error(),
-	}
+		CancelNumber: "uspesno"}
 	return response, nil
 }
 
@@ -163,8 +163,6 @@ func (handler *UserHandler) Register(ctx context.Context, request *pb.RegisterRe
 func (handler *UserHandler) Login(ctx context.Context, request *pb.LoginRequest) (*pb.LoginResponse, error) {
 	log.Println("BLAA " + request.Username + request.Password)
 	jwtToken, role, id, err := handler.serviceAuth.Login(request.Username, request.Password)
-
-	println("ERROR: " + err.Error())
 	if err != nil {
 		return &pb.LoginResponse{
 			RequestResult: &pb.RequestResult{
